@@ -30,12 +30,15 @@ const IconLayer = styled.div<StateProp>`
 
 interface FloatingButtonProps {
   state: 'add' | 'close';
-  onToggle: () => void;
+  onToggle?: () => void;
 }
 
 export const FloatingButton = ({ state, onToggle }: FloatingButtonProps) => {
   return (
-    <BackgroundStyle onClick={onToggle}>
+    <BackgroundStyle 
+      onClick={onToggle}
+      aria-label={state === 'add' ? '추가하기' : '닫기'}
+    >
       <IconLayer isActive={state === 'add'}>
         <AddIcon color="#fff" width={32} height={32} />
       </IconLayer>
