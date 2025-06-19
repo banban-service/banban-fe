@@ -2,21 +2,17 @@ import React from "react";
 import styled, { css } from "styled-components";
 
 interface DefaultButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  isActive: boolean;
+  isActive?: boolean;
   children: React.ReactNode;
 }
 
-interface StyledProps {
-  $isActive: boolean;
-};
-
-const cursorStyle = css<StyledProps>`
-  cursor: ${({ $isActive }) => ($isActive ? 'pointer' : 'default')};
+const cursorStyle = css<DefaultButtonProps>`
+  cursor: ${({ isActive }) => (isActive ? 'pointer' : 'default')};
 `;
 
-const hoverStyle = css<StyledProps>`
-  ${({ $isActive }) =>
-    $isActive &&
+const hoverStyle = css<DefaultButtonProps>`
+  ${({ isActive }) =>
+    isActive &&
     css`
       &:hover {
         background-color: #D5D7DA;
@@ -28,7 +24,10 @@ const baseStyle = css`
   transition: background-color 0.4s ease;
 `;
 
-const BackgroundStyle = styled.button<StyledProps>`
+const BackgroundStyle = styled.button
+  .withConfig({
+    shouldForwardProp: prop => prop !== 'isActive'
+  })<DefaultButtonProps>`
   display: flex;
 
   background-color: #FFFFFF;
@@ -60,10 +59,10 @@ const ContentStyle = styled.div`
   line-height: 20px;
 `;
 
-export const DefaultButton = ({ isActive, onClick, children, ...rest }: DefaultButtonProps) => {
+export const DefaultButton = ({ isActive = true, onClick, children, ...rest }: DefaultButtonProps) => {
   return (
     <BackgroundStyle 
-      $isActive={isActive}
+      isActive={isActive}
       disabled={!isActive}
       onClick={onClick}
       {...rest}
