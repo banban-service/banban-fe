@@ -12,13 +12,14 @@ export interface LoginButtonProps
 export const LoginButton = ({
   color,
   fontcolor,
-  disabled,
+  disabled = false,
   icon,
   children,
   ...props
 }: LoginButtonProps) => {
   return (
     <StyledButton
+      role="button"
       color={color}
       fontcolor={fontcolor}
       disabled={disabled}
