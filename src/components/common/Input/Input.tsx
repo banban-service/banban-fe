@@ -48,7 +48,7 @@ const InputContext = createContext<InputContextType | null>(null);
 export const Input = ({ $width, children, ...rest }: InputProps) => {
   const baseId = useId();
   const inputId = `${baseId}-field`;
-  const errorId = `${baseId}-field`;
+  const errorId = `${baseId}-error`;
 
   return (
     <InputContext.Provider value={{ inputId, errorId }}>
