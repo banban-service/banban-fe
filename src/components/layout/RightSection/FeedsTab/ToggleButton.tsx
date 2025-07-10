@@ -37,8 +37,13 @@ export default function ToggleButton({
           after:bg-white after:border-gray-300 after:border
           after:rounded-full after:h-4 after:w-4 after:transition-all
           dark:border-gray-600
-          peer-checked:bg-gradient-to-r from-[#6142FF] to-[#1478FF]
-          dark:peer-checked:bg-gradient-to-r from-[#6142FF] to-[#1478FF]
+          peer-checked:bg-gradient-to-r 
+          peer-checked:from-[#6142FF] 
+          peer-checked:to-[#1478FF]
+
+          dark:peer-checked:bg-gradient-to-r 
+          dark:peer-checked:from-[#6142FF] 
+          dark:peer-checked:to-[#1478FF]
         "
       ></div>
     </label>
