@@ -23,7 +23,7 @@ const StyledContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding: 5px 0;
+  padding: 5px 0 15px 0;
 `;
 
 const StyledSquad = styled.div`
