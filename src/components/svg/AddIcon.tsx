@@ -1,6 +1,6 @@
+import { IconProps } from "@/types/iconProps";
 import React from "react";
 import { forwardRef } from "react";
-import type { IconProps } from "@/types/IconProps";
 
 export const AddIcon = forwardRef<SVGSVGElement, IconProps>(
   ({ width = 32, height = 32, color, ...props }, ref) => {
@@ -21,7 +21,7 @@ export const AddIcon = forwardRef<SVGSVGElement, IconProps>(
         />
       </svg>
     );
-  }
+  },
 );
 
 AddIcon.displayName = "AddIcon";
