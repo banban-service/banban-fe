@@ -2,7 +2,7 @@ import { StoryObj, Meta } from "@storybook/react-vite";
 import { CommunityInfoCard } from "./CommunityInfoCard";
 
 const meta: Meta<typeof CommunityInfoCard> = {
-  title: "Components/CommunityInfo/CommunityInfoCard",
+  title: "Components/Common/CommunityInfoCard",
   component: CommunityInfoCard,
   tags: ["autodocs"],
 };
