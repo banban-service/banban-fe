@@ -1,23 +1,23 @@
 'use server';
 
-import type { FeedRequest, FeedsResponse } from "@/types/feeds";
 import { mockFeeds } from "../data/feeds";
+import { FeedRequestApi, FeedsResponseApi } from "../types/feeds";
 
 const mockFeedsApi = ({
-  lastId,
+  last_id,
   size,
-}: FeedRequest): Promise<FeedsResponse> => {
+}: FeedRequestApi): Promise<FeedsResponseApi> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const startIndex = lastId
-        ? mockFeeds.findIndex((feed) => feed.id === lastId) + 1
-        : 100;
+      const startIndex = last_id
+        ? mockFeeds.findIndex((feed) => feed.id === last_id) + 1
+        : 0;
 
       const data = mockFeeds.slice(startIndex, startIndex + size);
 
       const hasNext = startIndex + size < mockFeeds.length;
 
-      const response: FeedsResponse = {
+      const response: FeedsResponseApi = {
         code: 200,
         status: "SUCCESS",
         data: data,

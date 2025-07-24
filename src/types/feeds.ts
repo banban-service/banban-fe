@@ -4,14 +4,19 @@ interface User {
   profileImage: string;
 }
 
+interface AdMeta {
+  campaignId: string;
+  ctaLabel: string;
+}
+
 interface Feed {
   id: number;
-  type: "USER" | "ADMIN";
+  type: "USER" | "AD";
   user: User;
   content: string;
   adUrl: null | string;
-  adMeta: null | string;
-  createdAt: Date;
+  adMeta: AdMeta | string;
+  createdAt: string;
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
@@ -33,4 +38,4 @@ interface FeedsResponse {
 }
 
 // User는 추후 User 타입으로 변경. 충돌 가능성 때문에 여기에 두겠습니다.
-export type { Feed, User, FeedRequest, FeedsResponse };
+export type { Feed, User, AdMeta, FeedRequest, FeedsResponse };

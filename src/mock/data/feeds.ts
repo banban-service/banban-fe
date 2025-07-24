@@ -1,25 +1,28 @@
-import { Feed } from "@/types/feeds";
+import { FeedApi } from "../types/feeds";
 
-const mockFeeds: Feed[] = Array.from({ length: 32 }, (_, i): Feed => {
+const mockFeeds: FeedApi[] = Array.from({ length: 32 }, (_, i): FeedApi => {
   const id = i + 1;
-  const isAdminFeed = id % 20 === 0;
+  const isAdFeed = id % 20 === 0;
 
   return {
     id: id,
-    type: isAdminFeed ? "ADMIN" : "USER",
+    type: isAdFeed ? "AD" : "USER",
     user: {
-      userId: id + 100,
-      username: `User${id}`,
-      profileImage: `https://picsum.photos/200/200?random=${id}`,
+      user_id: isAdFeed ? null : id + 100 ,
+      username: isAdFeed ? 'Ad' : `User${id}`,
+      profile_image: `https://picsum.photos/200/200?random=${id}`,
     },
     content: `This is a mock feed content number ${id}. It's designed to test the UI and data fetching.`,
-    adUrl: isAdminFeed ? `https://picsum.photos/600/400?random=${id}` : null,
-    adMeta: isAdminFeed ? `This is an ad meta for feed ${id}` : null,
-    createdAt: new Date(
-      Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)
-    ),
-    likeCount: Math.floor(Math.random() * 1000),
-    commentCount: Math.floor(Math.random() * 200),
+    ad_url: isAdFeed ? `https://picsum.photos/600/400?random=${id}` : null,
+    ad_meta: isAdFeed ? {
+      campaignId: "ECO-202507",
+      ctaLabel: "바로 보기"
+    } : null,
+    created_at: new Date(
+      Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000),
+    ).toISOString(),
+    like_count: Math.floor(Math.random() * 1000),
+    comment_count: Math.floor(Math.random() * 200),
     isLiked: Math.random() > 0.5,
     isMine: Math.random() > 0.8,
   };
