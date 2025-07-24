@@ -1,6 +1,6 @@
-import { FeedApi } from "../types/feeds";
+import type { MockFeed } from "../types/feeds";
 
-const mockFeeds: FeedApi[] = Array.from({ length: 32 }, (_, i): FeedApi => {
+const mockFeeds: MockFeed[] = Array.from({ length: 32 }, (_, i): MockFeed => {
   const id = i + 1;
   const isAdFeed = id % 20 === 0;
 

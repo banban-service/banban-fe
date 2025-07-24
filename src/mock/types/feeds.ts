@@ -1,21 +1,21 @@
-interface UserApi {
+interface MockUser {
   user_id: number | null;
   username: string;
   profile_image: string;
 }
 
-interface AdMetaApi {
+interface MockAdMeta {
   campaignId: string;
   ctaLabel: string;
 }
 
-interface FeedApi {
+interface MockFeed {
   id: number;
   type: "USER" | "AD";
-  user: UserApi;
+  user: MockUser;
   content: string;
   ad_url: string | null;
-  ad_meta: AdMetaApi | null;
+  ad_meta: MockAdMeta | null;
   created_at: string;
   like_count: number;
   comment_count: number;
@@ -23,18 +23,18 @@ interface FeedApi {
   isMine: boolean;
 }
 
-interface FeedRequestApi {
+interface MockFeedsRequest {
   last_id: number;
   size: number;
 }
 
-interface FeedsResponseApi {
+interface MockFeedsResponse {
   code: number;
   status: "SUCCESS" | "FAIL";
-  data: FeedApi[];
+  data: MockFeed[];
   hasNext: boolean;
   size: number;
   numberOfElements: number;
 }
 
-export type { FeedApi, FeedRequestApi, FeedsResponseApi, UserApi };
+export type { MockAdMeta, MockFeed, MockFeedsRequest, MockFeedsResponse, MockUser };

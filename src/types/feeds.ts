@@ -23,7 +23,7 @@ interface Feed {
   isMine: boolean;
 }
 
-interface FeedRequest {
+interface FeedsRequest {
   lastId: number;
   size: number;
 }
@@ -38,4 +38,4 @@ interface FeedsResponse {
 }
 
 // User는 추후 User 타입으로 변경. 충돌 가능성 때문에 여기에 두겠습니다.
-export type { Feed, User, AdMeta, FeedRequest, FeedsResponse };
+export type { Feed, User, AdMeta, FeedsRequest, FeedsResponse };
