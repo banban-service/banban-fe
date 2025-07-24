@@ -1,6 +1,6 @@
 import { Feed } from "@/types/feeds";
 
-export const mockFeeds: Feed[] = Array.from({ length: 32 }, (_, i): Feed => {
+const mockFeeds: Feed[] = Array.from({ length: 32 }, (_, i): Feed => {
   const id = i + 1;
   const isAdminFeed = id % 20 === 0;
 
@@ -24,3 +24,5 @@ export const mockFeeds: Feed[] = Array.from({ length: 32 }, (_, i): Feed => {
     isMine: Math.random() > 0.8,
   };
 });
+
+export { mockFeeds };
