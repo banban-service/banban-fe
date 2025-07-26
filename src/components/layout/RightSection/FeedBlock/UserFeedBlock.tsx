@@ -1,21 +1,27 @@
 import styled from "styled-components";
-import { Avatar } from "@/components/common/Avatar"
+import { Avatar } from "@/components/common/Avatar";
 import { FeedHeartButton, FeedCommentButton } from "@/components/common/Button";
 import { MoreIcon } from "@/components/svg/MoreIcon";
+import type { Feed } from "@/types/feeds";
+interface UserFeedBlockProps {
+  feedProps: Feed;
+}
 
-export function UserFeedBlock() {
+export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
+  const formattedCreatedAt = new Date(feedProps.createdAt).toLocaleDateString();
+
   return (
     <StyledContainer>
-      <Avatar 
-        src="/love.jpg" 
-        alt="사용자 프로필 이미지" 
+      <Avatar
+        src={feedProps.user.profileImage || ""}
+        alt="사용자 프로필 이미지"
         size={40}
       />
       <StyledContentContainer>
         <StyledTitleContainer>
           <StyledTitleWrapper>
-            <StyledTitle>minty_day</StyledTitle>
-            <StyledCreatedAt>2시간 전</StyledCreatedAt>
+            <StyledTitle>{feedProps.user.username}</StyledTitle>
+            <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
           <StyledMoreButton>
             <MoreIcon />
@@ -23,16 +29,16 @@ export function UserFeedBlock() {
         </StyledTitleContainer>
 
         <StyledBodyContainer>
-          300이면 월세, 밥값 다 커버하고도 남는데? 하고 싶은 거 하면서 사는 게 국룰이지 😎 진짜 나답게 살고 싶어
+          {feedProps.content}
         </StyledBodyContainer>
 
         <StyledIconButtonContainer>
-          <FeedHeartButton />
-          <FeedCommentButton />
+          <FeedHeartButton likeCount={feedProps.likeCount}/>
+          <FeedCommentButton commentCount={feedProps.commentCount}/>
         </StyledIconButtonContainer>
       </StyledContentContainer>
     </StyledContainer>
-  )
+  );
 }
 
 const StyledContainer = styled.div`
@@ -40,7 +46,7 @@ const StyledContainer = styled.div`
   min-width: 300px;
 
   display: flex;
-  flex-direction: row;  
+  flex-direction: row;
   gap: 10px;
   padding: 10px 16px;
 
@@ -104,4 +110,3 @@ const StyledMoreButton = styled.button`
 
   cursor: pointer;
 `;
-
