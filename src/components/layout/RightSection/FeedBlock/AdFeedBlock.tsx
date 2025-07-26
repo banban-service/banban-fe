@@ -10,14 +10,14 @@ export function AdFeedBlock({ feedProps }: AdFeedBlockProps) {
   return (
     <StyledContainer>
       <Avatar 
-        src={feedProps.user.profileImage || ""}
+        src={feedProps.author.profileImage || ""}
         alt="광고 프로필 이미지" 
         size={40}
         background="rgba(0, 0, 0, 0.00)"
       />
       <StyledContentContainer>
         <StyledTitleContainer>
-          <StyledTitle>{feedProps.user.username}</StyledTitle>
+          <StyledTitle>{feedProps.author.username}</StyledTitle>
           <StyledCreatedAt>광고</StyledCreatedAt>
         </StyledTitleContainer>
         <StyledImageContainer src="/Ad.png" alt="광고 이미지" />

@@ -19,15 +19,16 @@ export default function FeedStream() {
 
   return (
     <StyledFeedStreamContainer>
-      {data?.pages.map((page, index) => (
+      {data?.pages?.map((page, index) => (
         <Fragment key={`page-${index}`}>
-          {page?.data?.map((item, idx, array) => {
+          {page?.data?.content?.map((item, idx, array) => {
             const isSecondFromLast = idx === array.length - 4;
+            console.log(array.length);
 
             return (
               <Fragment key={`page-${index}-item-${idx}`}>
                 {isSecondFromLast && hasNextPage && <div ref={scrollTrigger} />}
-                {item.type === "USER" ? (
+                {item.type === "NORMAL" || item.type === "POLL" ? (
                   <UserFeedBlock feedProps={item} />
                 ) : (
                   <AdFeedBlock feedProps={item} />
@@ -41,7 +42,7 @@ export default function FeedStream() {
         {hasNextPage ? (
           <div>로딩중...</div>
         ) : (
-          <p className="text-gray-500">No more posts to load</p>
+          <p className="text-gray-500">불러올 피드가 없습니다</p>
         )}
       </div>
     </StyledFeedStreamContainer>
