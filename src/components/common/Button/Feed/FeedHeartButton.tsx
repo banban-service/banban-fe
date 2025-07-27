@@ -1,22 +1,24 @@
-'use client';
+"use client";
 
-import { useState } from "react"; 
+import { useState } from "react";
 import HeartIcon from "@/components/svg/HeartIcon";
 import styled from "styled-components";
 
-export function FeedHeartButton() {
+export function FeedHeartButton({ likeCount }: { likeCount: number }) {
   const [liked, setLiked] = useState<boolean>(false);
-  const [count, setCount] = useState<number>(0);
+  const [count, setCount] = useState<number>(likeCount);
 
   return (
-    <StyledButton onClick={() => {
-      setLiked(!liked);
-      setCount(liked ? count - 1 : count + 1);
-    }}>
+    <StyledButton
+      onClick={() => {
+        setLiked(!liked);
+        setCount(liked ? count - 1 : count + 1);
+      }}
+    >
       <HeartIcon $isActive={liked} />
       <StyledSpan>{count}</StyledSpan>
     </StyledButton>
-  )
+  );
 }
 
 const StyledButton = styled.button`
