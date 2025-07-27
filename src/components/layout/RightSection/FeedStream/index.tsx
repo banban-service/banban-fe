@@ -23,7 +23,6 @@ export default function FeedStream() {
         <Fragment key={`page-${index}`}>
           {page?.data?.content?.map((item, idx, array) => {
             const isSecondFromLast = idx === array.length - 4;
-            console.log(array.length);
 
             return (
               <Fragment key={`page-${index}-item-${idx}`}>
