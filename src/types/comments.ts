@@ -1,7 +1,7 @@
 
-import { MockUser } from "../mock/types/feeds";
+import type { User } from "./feeds";
 
-type CommentUser = MockUser;
+type CommentUser = User;
 
 interface CommentContent {
   id: number;
