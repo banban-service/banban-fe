@@ -3,28 +3,28 @@ import { AdBlock } from "./AdBlock";
 import { FeedBlock } from "./FeedBlock";
 import { CommentHeadBlock } from "./CommentHeadBlock";
 import { CommentBlock } from "./CommentBlock";
+import { CommentContent } from "@/types/comments";
 
 type BlockType = "feed" | "ad" | "commentHead" | "comment";
 
-interface BlockProps {
-  type: BlockType;
-  feedProps: Feed;
-}
+type BlockProps =
+  | { type: "feed" | "ad" | "commentHead"; feedProps: Feed }
+  | { type: "comment"; commentProps: CommentContent };
 
-const Block = ({ type, feedProps }: BlockProps) => {
-  switch (type) {
+const Block = (props: BlockProps) => {
+  switch (props.type) {
     case "ad":
-      return <AdBlock feedProps={feedProps} />;
+      return <AdBlock props={props.feedProps} />;
     case "feed":
-      return <FeedBlock feedProps={feedProps} />;
+      return <FeedBlock props={props.feedProps} />;
     case "commentHead":
-      return <CommentHeadBlock feedProps={feedProps} />;
+      return <CommentHeadBlock props={props.feedProps} />;
     case "comment":
-      return <CommentBlock feedProps={feedProps} />;
+      return <CommentBlock props={props.commentProps} />;
     default:
       return null;
   }
-}
+};
 
 export { Block };
 export type { BlockType, BlockProps };

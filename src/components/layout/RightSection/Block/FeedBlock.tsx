@@ -6,20 +6,20 @@ import type { Feed } from "@/types/feeds";
 import { useContext } from "react";
 import { SectionContext } from "../SectionContext";
 
-const FeedBlock = ({ feedProps }: { feedProps: Feed }) => {
-  const formattedCreatedAt = new Date(feedProps.createdAt).toLocaleDateString();
+const FeedBlock = ({ props }: { props: Feed }) => {
+  const formattedCreatedAt = new Date(props.createdAt).toLocaleDateString();
   const { setSectionStatus, setTargetFeed } = useContext(SectionContext);
 
   return (
     <StyledContainer>
       <Avatar
-        src={feedProps.author.profileImage || ""}
+        src={props.author.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={
-          feedProps.userVoteOptionId === 1
+          props.userVoteOptionId === 1
             ? "linear-gradient(to right, #FF05CE, #FF474F)"
-            : feedProps.userVoteOptionId === 2
+            : props.userVoteOptionId === 2
             ? "linear-gradient(to right, #6142FF, #1478FF)"
             : undefined
         }
@@ -27,7 +27,7 @@ const FeedBlock = ({ feedProps }: { feedProps: Feed }) => {
       <StyledContentContainer>
         <StyledTitleContainer>
           <StyledTitleWrapper>
-            <StyledTitle>{feedProps.author.username}</StyledTitle>
+            <StyledTitle>{props.author.username}</StyledTitle>
             <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
           <StyledMoreButton>
@@ -35,12 +35,12 @@ const FeedBlock = ({ feedProps }: { feedProps: Feed }) => {
           </StyledMoreButton>
         </StyledTitleContainer>
 
-        <StyledBodyContainer>{feedProps.content}</StyledBodyContainer>
+        <StyledBodyContainer>{props.content}</StyledBodyContainer>
 
         <StyledIconButtonContainer>
-          <FeedHeartButton likeCount={feedProps.likeCount} />
-          <FeedCommentButton commentCount={feedProps.commentCount} onClick={() => {
-            setTargetFeed(feedProps);
+          <FeedHeartButton likeCount={props.likeCount} />
+          <FeedCommentButton commentCount={props.commentCount} onClick={() => {
+            setTargetFeed(props);
             setSectionStatus("comments");
           }} />
         </StyledIconButtonContainer>

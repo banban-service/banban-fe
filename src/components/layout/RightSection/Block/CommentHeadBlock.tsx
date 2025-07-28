@@ -1,20 +1,20 @@
 import styled from "styled-components";
 import { Avatar } from "@/components/common/Avatar";
-import type { Feed } from "@/types/feeds";
+import { Feed } from "@/types/feeds";
 
-const CommentHeadBlock = ({ feedProps }: { feedProps: Feed }) => {
-  const formattedCreatedAt = new Date(feedProps.createdAt).toLocaleDateString();
+const CommentHeadBlock = ({ props }: { props: Feed }) => {
+  const formattedCreatedAt = new Date(props.createdAt).toLocaleDateString();
 
   return (
     <StyledContainer>
       <Avatar
-        src={feedProps.author.profileImage || ""}
+        src={props.author.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={
-          feedProps.userVoteOptionId === 1
+          props.userVoteOptionId === 1
             ? "linear-gradient(to right, #FF05CE, #FF474F)"
-            : feedProps.userVoteOptionId === 2
+            : props.userVoteOptionId === 2
             ? "linear-gradient(to right, #6142FF, #1478FF)"
             : undefined
         }
@@ -22,11 +22,11 @@ const CommentHeadBlock = ({ feedProps }: { feedProps: Feed }) => {
       <StyledContentContainer>
         <StyledTitleContainer>
           <StyledTitleWrapper>
-            <StyledTitle>{feedProps.author.username}</StyledTitle>
+            <StyledTitle>{props.author.username}</StyledTitle>
             <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
         </StyledTitleContainer>
-        <StyledBodyContainer>{feedProps.content}</StyledBodyContainer>
+        <StyledBodyContainer>{props.content}</StyledBodyContainer>
       </StyledContentContainer>
     </StyledContainer>
   );
