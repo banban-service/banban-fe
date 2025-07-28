@@ -12,7 +12,7 @@ const CommentBlock = ({ feedProps }: { feedProps: Feed }) => {
   return (
     <StyledContainer>
       <StyledLeftPadding />
-      <CornerDownRightIcon size={44} color="#DADADA" />
+      <CornerDownRightIcon size={30} color="#DADADA" />
       <Avatar
         src={feedProps.author.profileImage || ""}
         alt="사용자 프로필 이미지"
