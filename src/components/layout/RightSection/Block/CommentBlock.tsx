@@ -1,21 +1,18 @@
+
 import styled from "styled-components";
 import { Avatar } from "@/components/common/Avatar";
-import { FeedHeartButton, FeedCommentButton } from "@/components/common/Button";
+import { FeedHeartButton } from "@/components/common/Button";
 import { MoreIcon } from "@/components/svg/MoreIcon";
 import type { Feed } from "@/types/feeds";
-import { useContext } from "react";
-import { SectionContext } from "../SectionContext";
+import { CornerDownRightIcon } from "@/components/svg/CornerDownRightIcon";
 
-interface UserFeedBlockProps {
-  feedProps: Feed;
-}
-
-export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
+const CommentBlock = ({ feedProps }: { feedProps: Feed }) => {
   const formattedCreatedAt = new Date(feedProps.createdAt).toLocaleDateString();
-  const { setSectionStatus } = useContext(SectionContext);
 
   return (
     <StyledContainer>
+      <StyledLeftPadding />
+      <CornerDownRightIcon size={24} color="#DADADA" />
       <Avatar
         src={feedProps.author.profileImage || ""}
         alt="사용자 프로필 이미지"
@@ -43,27 +40,26 @@ export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
 
         <StyledIconButtonContainer>
           <FeedHeartButton likeCount={feedProps.likeCount} />
-          <FeedCommentButton commentCount={feedProps.commentCount} onClick={() => {
-            setSectionStatus("comments");
-          }} />
         </StyledIconButtonContainer>
       </StyledContentContainer>
     </StyledContainer>
   );
 }
 
+const StyledLeftPadding = styled.div`
+  padding: 0 10px;
+`;
+
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: row;
   gap: 10px;
   padding: 10px 16px;
-
   align-items: start;
 `;
 
 const StyledContentContainer = styled.div`
   position: relative;
-
   display: flex;
   flex-direction: column;
 `;
@@ -98,16 +94,13 @@ const StyledCreatedAt = styled.div`
 const StyledBodyContainer = styled.div`
   font-size: 14px;
   line-height: 24px;
-
   margin-top: 4px;
 `;
 
 const StyledIconButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-
   margin-top: 7px;
-
   gap: 10px;
 `;
 
@@ -115,6 +108,7 @@ const StyledMoreButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-
   cursor: pointer;
 `;
+
+export { CommentBlock };

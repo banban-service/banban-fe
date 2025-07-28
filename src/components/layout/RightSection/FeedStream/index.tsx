@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { AdFeedBlock, UserFeedBlock } from "../FeedBlock";
 import { useFeedsQuery } from "@/hooks/useFeedsQuery";
 import { useInView } from "react-intersection-observer";
 import { Fragment, useEffect } from "react";
+import { Block } from "../Block";
 
 export default function FeedStream() {
   const { data, fetchNextPage, hasNextPage } = useFeedsQuery();
@@ -28,9 +28,9 @@ export default function FeedStream() {
               <Fragment key={`page-${index}-item-${idx}`}>
                 {isSecondFromLast && hasNextPage && <div ref={scrollTrigger} />}
                 {item.type === "NORMAL" || item.type === "POLL" ? (
-                  <UserFeedBlock feedProps={item} />
+                  <Block type="feed" feedProps={item} />
                 ) : (
-                  <AdFeedBlock feedProps={item} />
+                  <Block type="ad" feedProps={item} />
                 )}
               </Fragment>
             );

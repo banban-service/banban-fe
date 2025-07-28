@@ -6,13 +6,9 @@ import type { Feed } from "@/types/feeds";
 import { useContext } from "react";
 import { SectionContext } from "../SectionContext";
 
-interface UserFeedBlockProps {
-  feedProps: Feed;
-}
-
-export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
+const FeedBlock = ({ feedProps }: { feedProps: Feed }) => {
   const formattedCreatedAt = new Date(feedProps.createdAt).toLocaleDateString();
-  const { setSectionStatus } = useContext(SectionContext);
+  const { setSectionStatus, setTargetFeed } = useContext(SectionContext);
 
   return (
     <StyledContainer>
@@ -44,6 +40,7 @@ export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
         <StyledIconButtonContainer>
           <FeedHeartButton likeCount={feedProps.likeCount} />
           <FeedCommentButton commentCount={feedProps.commentCount} onClick={() => {
+            setTargetFeed(feedProps);
             setSectionStatus("comments");
           }} />
         </StyledIconButtonContainer>
@@ -57,13 +54,11 @@ const StyledContainer = styled.div`
   flex-direction: row;
   gap: 10px;
   padding: 10px 16px;
-
   align-items: start;
 `;
 
 const StyledContentContainer = styled.div`
   position: relative;
-
   display: flex;
   flex-direction: column;
 `;
@@ -98,16 +93,13 @@ const StyledCreatedAt = styled.div`
 const StyledBodyContainer = styled.div`
   font-size: 14px;
   line-height: 24px;
-
   margin-top: 4px;
 `;
 
 const StyledIconButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-
   margin-top: 7px;
-
   gap: 10px;
 `;
 
@@ -115,6 +107,7 @@ const StyledMoreButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-
   cursor: pointer;
 `;
+
+export { FeedBlock };
