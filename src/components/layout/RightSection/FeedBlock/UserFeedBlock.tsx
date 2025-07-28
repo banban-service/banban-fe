@@ -47,9 +47,6 @@ export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
 }
 
 const StyledContainer = styled.div`
-  max-width: 428px;
-  min-width: 300px;
-
   display: flex;
   flex-direction: row;
   gap: 10px;

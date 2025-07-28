@@ -1,21 +1,27 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { CommentIcon } from "@/components/svg/CommentIcon";
 import styled from "styled-components";
+import { useContext } from "react";
+import { SectionContext } from "@/components/layout/RightSection/RightSection";
 
 export function FeedCommentButton({ commentCount }: { commentCount: number }) {
   const [commented, setCommented] = useState<boolean>(false);
   const [count] = useState<number>(commentCount);
+  const { sectionStatus, setSectionStatus } = useContext(SectionContext);
 
   return (
-    <StyledButton onClick={() => {
-      setCommented(!commented);
-    }}>
+    <StyledButton
+      onClick={() => {
+        setCommented(!commented);
+        setSectionStatus(commented ? "feeds" : "comments");
+      }}
+    >
       <CommentIcon />
       <StyledSpan>{count}</StyledSpan>
     </StyledButton>
-  )
+  );
 }
 
 const StyledButton = styled.button`

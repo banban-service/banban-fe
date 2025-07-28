@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Avatar } from "@/components/common/Avatar"
+import { Avatar } from "@/components/common/Avatar";
 import type { Feed } from "@/types/feeds";
 
 interface AdFeedBlockProps {
@@ -9,9 +9,9 @@ interface AdFeedBlockProps {
 export function AdFeedBlock({ feedProps }: AdFeedBlockProps) {
   return (
     <StyledContainer>
-      <Avatar 
+      <Avatar
         src={feedProps.author.profileImage || ""}
-        alt="광고 프로필 이미지" 
+        alt="광고 프로필 이미지"
         size={40}
         background="rgba(0, 0, 0, 0.00)"
       />
@@ -21,20 +21,15 @@ export function AdFeedBlock({ feedProps }: AdFeedBlockProps) {
           <StyledCreatedAt>광고</StyledCreatedAt>
         </StyledTitleContainer>
         <StyledImageContainer src="/Ad.png" alt="광고 이미지" />
-        <StyledBodyContainer>
-          {feedProps.content}
-        </StyledBodyContainer>
+        <StyledBodyContainer>{feedProps.content}</StyledBodyContainer>
       </StyledContentContainer>
     </StyledContainer>
-  )
+  );
 }
 
 const StyledContainer = styled.div`
-  max-width: 428px;
-  min-width: 300px;
-
   display: flex;
-  flex-direction: row;  
+  flex-direction: row;
   gap: 10px;
   padding: 10px 16px;
 
@@ -81,5 +76,3 @@ const StyledImageContainer = styled.img`
   margin-top: 5px;
   border-radius: 20px;
 `;
-
-
