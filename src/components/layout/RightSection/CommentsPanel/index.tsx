@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { CommentTab } from "../CommentTab";
-import { CommentHeadBlock } from "../Block/CommentHeadBlock";
+import { Block } from "../Block";
 import { useContext } from "react";
 import { SectionContext } from "../SectionContext";
 import { CommentStream } from "../CommentStream";
@@ -15,7 +15,7 @@ const CommentsPanel = () => {
         <div>오류! 댓글이 없습니다!</div>
       ) : (
         <>
-          <CommentHeadBlock feedProps={targetFeed} />
+          <Block type="commentHead" feedProps={targetFeed} />
           <StyledDivider />
           <CommentStream />
         </>

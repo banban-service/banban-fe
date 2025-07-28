@@ -5,7 +5,7 @@ import { Fragment, useEffect } from "react";
 import { Block } from "../Block";
 
 export default function FeedStream() {
-  const { data, fetchNextPage, hasNextPage } = useFeedsQuery();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFeedsQuery();
 
   const [scrollTrigger, isInView] = useInView({
     threshold: 0,
@@ -38,7 +38,7 @@ export default function FeedStream() {
         </Fragment>
       ))}
       <div className="flex justify-center items-center h-30">
-        {hasNextPage ? (
+        {isFetchingNextPage ? (
           <div>로딩중...</div>
         ) : (
           <p className="text-gray-500">불러올 피드가 없습니다</p>
