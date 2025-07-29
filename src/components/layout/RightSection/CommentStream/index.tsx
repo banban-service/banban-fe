@@ -28,7 +28,7 @@ const CommentStream = () => {
       {data?.pages?.map((page, index) => (
         <Fragment key={`comment-page-${index}`}>
           {page?.data?.content?.map((item, idx, array) => {
-            const isSecondFromLast = idx === array.length - 4;
+            const isSecondFromLast = idx === array.length - 2;
 
             return (
               <Fragment key={`comment-page-${index}-item-${idx}`}>
