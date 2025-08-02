@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/common/Toast/useToast";
 import { Spinner } from "@/components/svg/Spinner";
 import styled from "styled-components";
@@ -14,6 +14,7 @@ export default function KakaoCallbackPage() {
   const [authCode, setAuthCode] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // 1 URL에서 인증 코드 추출
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function KakaoCallbackPage() {
       });
     } finally {
       setIsLoading(false);
+      router.push("/");
     }
   };
 

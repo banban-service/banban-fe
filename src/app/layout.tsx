@@ -6,7 +6,6 @@ import { NextProvider } from "./providers";
 import GlobalModalRenderer from "@/components/common/GlobalModalRenderer";
 import Header from "@/components/layout/Header";
 import StyledComponentsRegistry from "@/lib/registry";
-import { QueryProviders } from "./providers";
 
 export const metadata: Metadata = {
   title: "ban:ban",
@@ -26,7 +25,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <NextProvider>
             <AuthManager />
-            <Header isLoggedIn isNew />
+            <Header isNew />
             {children}
           </NextProvider>
           <div id="modal-root"></div>
