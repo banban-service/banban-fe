@@ -1,6 +1,10 @@
-import { APIResponse } from "@/types/api";
+import { useAuthStore } from "@/store/useAuthStore";
+import STORAGE_KEYS from "@/constants/storageKeys";
+import { TokenRequestResponse } from "@/types/auth";
 import { extractErrorMessage } from "@/utils/errorMessages";
 import { logger } from "@/utils/logger";
+import { saveAccessToken } from "@/utils/storage";
+import { ApiContext } from "@/types/api";
 
 let refreshPromise: Promise<boolean> | null = null;
 
@@ -8,8 +12,8 @@ export async function apiFetch<T>(
   url: string,
   options: RequestInit = {},
   retry = true,
-  context?: string,
-): Promise<APIResponse> {
+  context?: ApiContext,
+): Promise<T> {
   const startTime = Date.now();
 
   if (refreshPromise) {
@@ -23,7 +27,6 @@ export async function apiFetch<T>(
 
   const token = getAccessToken();
 
-  // 요청 시작 로그
   logger.debug("API 요청 시작", {
     url,
     method: options.method || "GET",
@@ -32,7 +35,7 @@ export async function apiFetch<T>(
     context,
   });
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${url}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api${url}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -56,6 +59,11 @@ export async function apiFetch<T>(
   if (res.status === 401 && retry) {
     logger.warn("액세스 토큰 만료 감지", { url, duration: `${duration}ms` });
 
+    if (!isUserLoggedIn()) {
+      logger.warn("로그인 상태 아님 - 토큰 갱신 시도하지 않음", { url });
+      throw new Error("로그인이 필요합니다.");
+    }
+
     if (!refreshPromise) {
       logger.info("토큰 갱신 시작");
       refreshPromise = tryRefreshToken();
@@ -68,7 +76,8 @@ export async function apiFetch<T>(
       logger.info("토큰 갱신 성공, 요청 재시도", { url });
       return apiFetch<T>(url, options, false, context);
     } else {
-      logger.error("토큰 갱신 실패", { url });
+      logger.error("토큰 갱신 실패, 로그아웃 처리", { url });
+      useAuthStore.getState().logout();
       throw new Error("인증이 만료되었습니다. 다시 로그인해주세요.");
     }
   }
@@ -89,19 +98,15 @@ export async function apiFetch<T>(
   throw new Error(errorMessage);
 }
 
-// 액세스 토큰 가져오기
 function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
-
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
   logger.debug("액세스 토큰 조회", { hasToken: !!token });
-
-  return localStorage.getItem("access_token");
+  return token;
 }
 
-// 리프레시 토큰으로 새 액세스 토큰 요청
 async function tryRefreshToken(): Promise<boolean> {
-  const refreshToken = localStorage.getItem("refresh_token");
+  const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
 
   if (!refreshToken) {
     logger.warn("리프레시 토큰이 없어 갱신 불가");
@@ -129,8 +134,8 @@ async function tryRefreshToken(): Promise<boolean> {
       return false;
     }
 
-    const data = await res.json();
-    localStorage.setItem("access_token", data.accessToken);
+    const data: TokenRequestResponse = await res.json();
+    saveAccessToken(data.data.access_token);
 
     logger.info("토큰 갱신 성공");
     return true;
@@ -138,4 +143,12 @@ async function tryRefreshToken(): Promise<boolean> {
     logger.error("토큰 갱신 중 예외 발생", error);
     return false;
   }
+}
+
+function isUserLoggedIn(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    !!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) &&
+    !!localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
+  );
 }

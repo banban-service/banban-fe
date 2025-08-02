@@ -1,9 +1,11 @@
+import AuthManager from "@/components/auth/AuthManager";
 import type { Metadata } from "next";
 import "../styles/globals.css";
 import { pretendardSans } from "../../public/fonts/variables";
 import { NextProvider } from "./providers";
-import Header from "@/components/layout/Header";
 import GlobalModalRenderer from "@/components/common/GlobalModalRenderer";
+import Header from "@/components/layout/Header";
+
 export const metadata: Metadata = {
   title: "ban:ban",
   description:
@@ -19,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${pretendardSans.variable} antialiased`}>
         <NextProvider>
+          <AuthManager />
           <Header isLoggedIn isNew />
           {children}
           <GlobalModalRenderer />

@@ -1,5 +1,5 @@
 import { SelectOptionGroup } from "@/components/common/SelectOptionGroup";
-import React from "react";
+
 import styled from "styled-components";
 import VoteResultCircle from "./VoteResultCircle/VoteResultCircle";
 import { selectOption } from "@/components/common/SelectOptionGroup/SelectOptionGroup";
@@ -86,6 +86,9 @@ const CountdownDescription = styled.div`
 `;
 
 const VoteResultCircleContainer = styled.div`
-  padding: 8px 10px;
+  display: flex;
+  justify-content: center;
+  margin: 8px;
+  padding: 0px 10px;
   max-height: 280px;
 `;

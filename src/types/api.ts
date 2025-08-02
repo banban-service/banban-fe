@@ -1,9 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface APIResponse<T = any> {
-  data: T;
-  message?: string;
-  status: number;
-}
+import { User } from "./auth";
+
+export type ApiContext = "login" | "profile" | "vote" | "comment" | string;
 
 export interface APIError {
   message: string;
@@ -14,4 +11,10 @@ export interface APIError {
 export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken?: string;
+}
+
+export interface UserInfoResponse {
+  code: number;
+  status: "SUCCESS" | "FAILURE";
+  data: User;
 }
