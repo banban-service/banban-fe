@@ -1,21 +1,28 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { CommentIcon } from "@/components/svg/CommentIcon";
 import styled from "styled-components";
 
-export function FeedCommentButton({ commentCount }: { commentCount: number }) {
-  const [commented, setCommented] = useState<boolean>(false);
+export function FeedCommentButton({
+  commentCount,
+  onClick,
+}: {
+  commentCount: number;
+  onClick: () => void;
+}) {
   const [count] = useState<number>(commentCount);
 
   return (
-    <StyledButton onClick={() => {
-      setCommented(!commented);
-    }}>
+    <StyledButton
+      onClick={() => {
+        onClick();
+      }}
+    >
       <CommentIcon />
       <StyledSpan>{count}</StyledSpan>
     </StyledButton>
-  )
+  );
 }
 
 const StyledButton = styled.button`

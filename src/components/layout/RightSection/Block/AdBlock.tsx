@@ -2,26 +2,22 @@ import styled from "styled-components";
 import { Avatar } from "@/components/common/Avatar";
 import type { Feed } from "@/types/feeds";
 
-interface AdFeedBlockProps {
-  feedProps: Feed;
-}
-
-export function AdFeedBlock({ feedProps }: AdFeedBlockProps) {
+const AdBlock = ({ props }: { props: Feed }) => {
   return (
     <StyledContainer>
       <Avatar
-        src={feedProps.author.profileImage || ""}
+        src={props.author.profileImage || ""}
         alt="광고 프로필 이미지"
         size={40}
         background="rgba(0, 0, 0, 0.00)"
       />
       <StyledContentContainer>
         <StyledTitleContainer>
-          <StyledTitle>{feedProps.author.username}</StyledTitle>
+          <StyledTitle>{props.author.username}</StyledTitle>
           <StyledCreatedAt>광고</StyledCreatedAt>
         </StyledTitleContainer>
         <StyledImageContainer src="/Ad.png" alt="광고 이미지" />
-        <StyledBodyContainer>{feedProps.content}</StyledBodyContainer>
+        <StyledBodyContainer>{props.content}</StyledBodyContainer>
       </StyledContentContainer>
     </StyledContainer>
   );
@@ -32,18 +28,18 @@ const StyledContainer = styled.div`
   flex-direction: row;
   gap: 10px;
   padding: 10px 16px;
-
   align-items: start;
 `;
 
 const StyledContentContainer = styled.div`
+  width: 100%;
   position: relative;
-
   display: flex;
   flex-direction: column;
 `;
 
 const StyledTitleContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -72,7 +68,8 @@ const StyledImageContainer = styled.img`
   height: 100%;
   object-fit: contain;
   object-position: center;
-
   margin-top: 5px;
   border-radius: 20px;
 `;
+
+export { AdBlock };

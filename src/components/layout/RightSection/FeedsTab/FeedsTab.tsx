@@ -19,7 +19,6 @@ export default function FeedsTab() {
 }
 
 const StyledContainer = styled.div`
-  min-width: 416px;
   display: flex;
   flex-direction: row;
   justify-content: center;

@@ -1,18 +1,49 @@
 import styled from "styled-components";
-import FeedsTab from "./FeedsTab/FeedsTab";
-import FeedStream from "./FeedStream";
+import FeedsPanel from "./FeedsPanel";
+import { useState, useRef } from "react";
+import { useCalculatedHeight } from "./hooks/useCalculateHeight";
+import { CommentsPanel } from "./CommentsPanel";
+import { SectionContext } from "./SectionContext";
+import type { Feed } from "@/types/feeds";
 
 export default function RightSection() {
+  const [sectionStatus, setSectionStatus] = useState<"feeds" | "comments">(
+    "feeds",
+  );
+
+  const [targetFeed, setTargetFeed] = useState<Feed | null>(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const calculatedHeight = useCalculatedHeight(containerRef);
+
+  const value = {
+    sectionStatus,
+    setSectionStatus,
+    targetFeed,
+    setTargetFeed,
+  };
+
   return (
-    <StyledFeedsContainer>
-      <FeedsTab />
-      <StyledDivider />
-      <FeedStream />
-    </StyledFeedsContainer>
+    <SectionContext.Provider value={value}>
+      <StyledContainer $calculatedHeight={calculatedHeight} ref={containerRef}>
+        {sectionStatus === "feeds" ? <FeedsPanel /> : <CommentsPanel />}
+      </StyledContainer>
+    </SectionContext.Provider>
   );
 }
 
-const StyledFeedsContainer = styled.div`
+const StyledContainer = styled.div<{ $calculatedHeight?: number }>`
+  width: 430px;
+  height: ${(props) =>
+    props.$calculatedHeight !== 0 ? `${props.$calculatedHeight}px` : "100%"};
+
+  overflow: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   display: flex;
   flex-direction: column;
 
@@ -25,7 +56,3 @@ const StyledFeedsContainer = styled.div`
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.15);
 `;
 
-const StyledDivider = styled.div`
-  border-top: 1px solid #F3F3F3;
-  margin: 4px 0 0 0;
-`;

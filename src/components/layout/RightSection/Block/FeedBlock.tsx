@@ -6,24 +6,20 @@ import type { Feed } from "@/types/feeds";
 import { useContext } from "react";
 import { SectionContext } from "../SectionContext";
 
-interface UserFeedBlockProps {
-  feedProps: Feed;
-}
-
-export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
-  const formattedCreatedAt = new Date(feedProps.createdAt).toLocaleDateString();
-  const { setSectionStatus } = useContext(SectionContext);
+const FeedBlock = ({ props }: { props: Feed }) => {
+  const formattedCreatedAt = new Date(props.createdAt).toLocaleDateString();
+  const { setSectionStatus, setTargetFeed } = useContext(SectionContext);
 
   return (
     <StyledContainer>
       <Avatar
-        src={feedProps.author.profileImage || ""}
+        src={props.author.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={
-          feedProps.userVoteOptionId === 1
+          props.userVoteOptionId === 1
             ? "linear-gradient(to right, #FF05CE, #FF474F)"
-            : feedProps.userVoteOptionId === 2
+            : props.userVoteOptionId === 2
             ? "linear-gradient(to right, #6142FF, #1478FF)"
             : undefined
         }
@@ -31,7 +27,7 @@ export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
       <StyledContentContainer>
         <StyledTitleContainer>
           <StyledTitleWrapper>
-            <StyledTitle>{feedProps.author.username}</StyledTitle>
+            <StyledTitle>{props.author.username}</StyledTitle>
             <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
           <StyledMoreButton>
@@ -39,13 +35,12 @@ export function UserFeedBlock({ feedProps }: UserFeedBlockProps) {
           </StyledMoreButton>
         </StyledTitleContainer>
 
-
-        <StyledBodyContainer>{feedProps.content}</StyledBodyContainer>
-
+        <StyledBodyContainer>{props.content}</StyledBodyContainer>
 
         <StyledIconButtonContainer>
-          <FeedHeartButton likeCount={feedProps.likeCount} />
-          <FeedCommentButton commentCount={feedProps.commentCount} onClick={() => {
+          <FeedHeartButton likeCount={props.likeCount} />
+          <FeedCommentButton commentCount={props.commentCount} onClick={() => {
+            setTargetFeed(props);
             setSectionStatus("comments");
           }} />
         </StyledIconButtonContainer>
@@ -59,18 +54,18 @@ const StyledContainer = styled.div`
   flex-direction: row;
   gap: 10px;
   padding: 10px 16px;
-
   align-items: start;
 `;
 
 const StyledContentContainer = styled.div`
+  width: 100%;
   position: relative;
-
   display: flex;
   flex-direction: column;
 `;
 
 const StyledTitleContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -100,16 +95,13 @@ const StyledCreatedAt = styled.div`
 const StyledBodyContainer = styled.div`
   font-size: 14px;
   line-height: 24px;
-
   margin-top: 4px;
 `;
 
 const StyledIconButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-
   margin-top: 7px;
-
   gap: 10px;
 `;
 
@@ -117,6 +109,7 @@ const StyledMoreButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-
   cursor: pointer;
 `;
+
+export { FeedBlock };
