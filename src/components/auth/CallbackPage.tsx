@@ -61,7 +61,7 @@ export default function CallbackPage({
       });
     } finally {
       setIsLoading(false);
-      router.push("/");
+      router.replace("/");
     }
   };
 
