@@ -34,7 +34,7 @@ const FeedBlock = ({ props }: { props: Feed }) => {
   return (
     <StyledContainer>
       <Avatar
-        src={props.user.profileImage || ""}
+        src={author.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={
