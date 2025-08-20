@@ -1,37 +1,23 @@
 "use client";
 
-import { useState } from "react";
 import HeartIcon from "@/components/svg/HeartIcon";
 import styled from "styled-components";
-import { apiFetch } from "@/lib/apiFetch";
 
 interface Props {
   likeCount: number;
   isLiked: boolean;
-  targetId: number;
-  targetType: "FEED" | "COMMENT";
+  onClick?: () => void;
 }
 
-export function FeedHeartButton({ likeCount, isLiked, targetId, targetType }: Props) {
-  const [liked, setLiked] = useState<boolean>(isLiked);
-  const [count, setCount] = useState<number>(likeCount);
-
+export function FeedHeartButton({ likeCount, isLiked, onClick }: Props) {
   return (
     <StyledButton
       onClick={() => {
-        setLiked(!liked);
-        setCount(liked ? count - 1 : count + 1);
-        apiFetch("/likes", {
-          method: "POST",
-          body: JSON.stringify({
-            target_id: targetId,
-            target_type: targetType,
-          }),
-        });
+        onClick?.();
       }}
     >
-      <HeartIcon $isActive={liked} />
-      <StyledSpan>{count}</StyledSpan>
+      <HeartIcon $isActive={isLiked} />
+      <StyledSpan>{likeCount}</StyledSpan>
     </StyledButton>
   );
 }

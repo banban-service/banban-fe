@@ -7,7 +7,7 @@ interface CommentContent {
   id: number;
   feedId: number;
   content: string;
-  user: CommentUser;
+  author: CommentUser;
   createdAt: string;
   updatedAt: string;
   likeCount: number;

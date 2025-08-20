@@ -7,6 +7,8 @@ import { useContext, useRef, useState } from "react";
 import { SectionContext } from "../SectionContext";
 import { OptionsDropdown } from "@/components/common/OptionsDropdown/OptionsDropdown";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFeedLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
 
 const FeedBlock = ({ props }: { props: Feed }) => {
   const {
@@ -23,6 +25,13 @@ const FeedBlock = ({ props }: { props: Feed }) => {
   const { setSectionStatus, setTargetFeed } = useContext(SectionContext);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   useClickOutside(dropdownRef, () => setDropdownOpen(false));
+
+  const queryClient = useQueryClient();
+
+  const [liked, setLiked] = useState<boolean>(isLiked);
+  const [count, setCount] = useState<number>(likeCount);
+
+  const likeMutation = useFeedLikeOptimisticUpdate({ id, queryClient });
 
   const handleToggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -77,7 +86,15 @@ const FeedBlock = ({ props }: { props: Feed }) => {
         <StyledBodyContainer>{content}</StyledBodyContainer>
 
         <StyledIconButtonContainer>
-          <FeedHeartButton likeCount={likeCount} targetId={id} targetType="FEED" isLiked={isLiked} />
+          <FeedHeartButton
+            likeCount={count}
+            isLiked={liked}
+            onClick={() => {
+              setCount(liked ? count - 1 : count + 1);
+              setLiked(!liked);
+              likeMutation.mutate();
+            }}
+          />
           <FeedCommentButton
             commentCount={commentCount}
             onClick={() => {

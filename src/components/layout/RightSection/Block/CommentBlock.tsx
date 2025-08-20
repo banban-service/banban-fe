@@ -4,24 +4,38 @@ import { Avatar } from "@/components/common/Avatar";
 import { FeedHeartButton } from "@/components/common/Button";
 import { MoreIcon } from "@/components/svg/MoreIcon";
 import { CornerDownRightIcon } from "@/components/svg/CornerDownRightIcon";
-import { CommentContent } from "@/types/comments";
+import { CommentContent,  } from "@/types/comments";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+
+import { useCommentLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
 
 const CommentBlock = ({ props }: { props: CommentContent }) => {
-  const formattedCreatedAt = new Date(props.createdAt).toLocaleDateString();
   const {
-    user,
-    content,
-    likeCount,
     id,
+    feedId,
+    content,
+    author,
+    likeCount,
     isLiked,
     userVoteOptionId
   } = props;
+  
+  const formattedCreatedAt = new Date(props.createdAt).toLocaleDateString();
+
+  const queryClient = useQueryClient();
+
+  const [liked, setLiked] = useState<boolean>(isLiked);
+  const [count, setCount] = useState<number>(likeCount);
+
+  const likeMutation = useCommentLikeOptimisticUpdate({ feedId, id, queryClient });
+
   return (
     <StyledContainer>
       <StyledLeftPadding />
       <CornerDownRightIcon size={30} color="#DADADA" />
       <Avatar
-        src={user.profileImage || ""}
+        src={author.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={
@@ -35,7 +49,7 @@ const CommentBlock = ({ props }: { props: CommentContent }) => {
       <StyledContentContainer>
         <StyledTitleContainer>
           <StyledTitleWrapper>
-            <StyledTitle>{user.username}</StyledTitle>
+            <StyledTitle>{author.username}</StyledTitle>
             <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
           <StyledMoreButton>
@@ -46,7 +60,15 @@ const CommentBlock = ({ props }: { props: CommentContent }) => {
         <StyledBodyContainer>{content}</StyledBodyContainer>
 
         <StyledIconButtonContainer>
-          <FeedHeartButton likeCount={likeCount} targetId={id} targetType="COMMENT" isLiked={isLiked} />
+          <FeedHeartButton
+            likeCount={count}
+            isLiked={liked}
+            onClick={() => {
+              setCount(liked ? count - 1 : count + 1);
+              setLiked(!liked);
+              likeMutation.mutate();
+            }}
+          />
         </StyledIconButtonContainer>
       </StyledContentContainer>
     </StyledContainer>
