@@ -1,21 +1,20 @@
 import { apiFetch } from "@/lib/apiFetch";
 import { CommentContent, CommentResponse } from "@/types/comments";
 import { Feed, FeedsResponse } from "@/types/feeds";
-import { InfiniteData, InfiniteQueryPageParamsOptions, QueryClient, useMutation } from "@tanstack/react-query";
+import { InfiniteData, InfiniteQueryPageParamsOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
 
 interface UseFeedLikeOptimisticUpdateProps {
   id: number;
-  queryClient: QueryClient;
 }
 
 interface UseCommentLikeOptimisticUpdateProps {
   feedId: number;
   id: number;
-  queryClient: QueryClient;
 }
 
-export const useFeedLikeOptimisticUpdate = ({ id, queryClient }: UseFeedLikeOptimisticUpdateProps) => {
+export const useFeedLikeOptimisticUpdate = ({ id }: UseFeedLikeOptimisticUpdateProps) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => apiFetch("/likes", {
       method: "POST",
@@ -29,7 +28,7 @@ export const useFeedLikeOptimisticUpdate = ({ id, queryClient }: UseFeedLikeOpti
 
       const oldData = queryClient.getQueryData<InfiniteData<FeedsResponse, InfiniteQueryPageParamsOptions>>(['feeds']);
 
-      if (!oldData) return;
+      if (!oldData) return { oldData: null };
 
       const newData = structuredClone(oldData);
 
@@ -53,7 +52,8 @@ export const useFeedLikeOptimisticUpdate = ({ id, queryClient }: UseFeedLikeOpti
   });
 }
 
-export const useCommentLikeOptimisticUpdate = ({ feedId, id, queryClient }: UseCommentLikeOptimisticUpdateProps) => {
+export const useCommentLikeOptimisticUpdate = ({ feedId, id }: UseCommentLikeOptimisticUpdateProps) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => apiFetch("/likes", {
       method: "POST",
@@ -67,7 +67,7 @@ export const useCommentLikeOptimisticUpdate = ({ feedId, id, queryClient }: UseC
 
       const oldData = queryClient.getQueryData<InfiniteData<CommentResponse, InfiniteQueryPageParamsOptions>>(['comments', feedId]);
 
-      if (!oldData) return;
+      if (!oldData) return { oldData: null };
 
       const newData = structuredClone(oldData);
 
@@ -86,7 +86,7 @@ export const useCommentLikeOptimisticUpdate = ({ feedId, id, queryClient }: UseC
     },
     onError: (error, variables, context) => {
       console.error("Error occurred:", error);
-      queryClient.setQueryData(['feeds', feedId], context?.oldData);
+      queryClient.setQueryData(['comments', feedId], context?.oldData);
     }
   });
 }

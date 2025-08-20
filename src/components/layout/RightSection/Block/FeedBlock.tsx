@@ -7,7 +7,6 @@ import { useContext, useRef, useState } from "react";
 import { SectionContext } from "../SectionContext";
 import { OptionsDropdown } from "@/components/common/OptionsDropdown/OptionsDropdown";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { useQueryClient } from "@tanstack/react-query";
 import { useFeedLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
 
 const FeedBlock = ({ props }: { props: Feed }) => {
@@ -26,12 +25,10 @@ const FeedBlock = ({ props }: { props: Feed }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   useClickOutside(dropdownRef, () => setDropdownOpen(false));
 
-  const queryClient = useQueryClient();
-
   const [liked, setLiked] = useState<boolean>(isLiked);
   const [count, setCount] = useState<number>(likeCount);
 
-  const likeMutation = useFeedLikeOptimisticUpdate({ id, queryClient });
+  const likeMutation = useFeedLikeOptimisticUpdate({ id });
 
   const handleToggleDropdown = () => {
     setDropdownOpen((prev) => !prev);

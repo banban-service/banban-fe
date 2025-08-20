@@ -5,7 +5,6 @@ import { FeedHeartButton } from "@/components/common/Button";
 import { MoreIcon } from "@/components/svg/MoreIcon";
 import { CornerDownRightIcon } from "@/components/svg/CornerDownRightIcon";
 import { CommentContent,  } from "@/types/comments";
-import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { useCommentLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
@@ -23,12 +22,10 @@ const CommentBlock = ({ props }: { props: CommentContent }) => {
   
   const formattedCreatedAt = new Date(props.createdAt).toLocaleDateString();
 
-  const queryClient = useQueryClient();
-
   const [liked, setLiked] = useState<boolean>(isLiked);
   const [count, setCount] = useState<number>(likeCount);
 
-  const likeMutation = useCommentLikeOptimisticUpdate({ feedId, id, queryClient });
+  const likeMutation = useCommentLikeOptimisticUpdate({ feedId, id });
 
   return (
     <StyledContainer>
