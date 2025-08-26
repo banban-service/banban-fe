@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Spinner } from "@/components/svg/Spinner";
 import useAuth from "@/hooks/useAuth";
 import { makePieData } from "@/lib/chart";
+import { dataForTest } from "@/mock/data/vote";
 
 export default function TodayTopicCard() {
   const { isLoggedIn } = useAuth();
@@ -65,8 +66,6 @@ export default function TodayTopicCard() {
 
   useEffect(() => {}, [isLoggedIn]);
 
-  if (isLoading) return <Spinner />;
-
   const selected =
     data?.voted_option_id === null
       ? "none"
@@ -87,35 +86,60 @@ export default function TodayTopicCard() {
         <TopicTitle as="h2">{data?.title}</TopicTitle>
       </TitleSection>
 
-      <VoteResultCircleContainer>
-        {data?.voted_option_id === null ? (
-          <VoteResultPlaceHolder />
-        ) : (
-          pieData && <VoteResultCircle pieData={pieData} />
-        )}
-      </VoteResultCircleContainer>
+      {
+        <>
+          {isLoading ? (
+            <SpinnerContainer>
+              <Spinner />
+            </SpinnerContainer>
+          ) : (
+            <>
+              <VoteResultCircleContainer>
+                {data?.voted_option_id === null ? (
+                  <VoteResultPlaceHolder />
+                ) : (
+                  pieData && (
+                    <VoteResultCircle
+                      // pieData={[
+                      //   ...pieData.filter((d) => !d.userSelected),
+                      //   ...pieData.filter((d) => d.userSelected),
+                      // ]}
+                      pieData={[
+                        ...dataForTest.filter((d) => !d.userSelected),
+                        ...dataForTest.filter((d) => d.userSelected),
+                      ]}
+                    />
+                  )
+                )}
+              </VoteResultCircleContainer>
 
-      <CountdownSection>
-        <CountdownText>⏰ 남은 시간: 14:29:09</CountdownText>
-        <CountdownDescription>00:00~23:59까지 투표 가능</CountdownDescription>
-      </CountdownSection>
+              <CountdownSection>
+                <CountdownText>⏰ 남은 시간: 14:29:09</CountdownText>
+                <CountdownDescription>
+                  00:00~23:59까지 투표 가능
+                </CountdownDescription>
+              </CountdownSection>
 
-      <SelectOptionGroup
-        selected={displayedSelection} // 낙관적 업데이트가 적용된 선택값 사용
-        rowGap="10px"
-        firstOptionString={data?.options[0].content || ""}
-        secondOptionString={data?.options[1].content || ""}
-        onClick={(state: selectOption) => {
-          if (displayedSelection === state) {
-            return;
-          }
-          if (data?.options[0].id && state === "firstOption") {
-            mutate({ id: data.options[0].id });
-          } else if (data?.options[1].id && state === "secondOption") {
-            mutate({ id: data.options[1].id });
-          }
-        }}
-      />
+              <SelectOptionGroup
+                selected={displayedSelection} // 낙관적 업데이트가 적용된 선택값 사용
+                rowGap="10px"
+                firstOptionString={data?.options[0].content || ""}
+                secondOptionString={data?.options[1].content || ""}
+                onClick={(state: selectOption) => {
+                  if (displayedSelection === state) {
+                    return;
+                  }
+                  if (data?.options[0].id && state === "firstOption") {
+                    mutate({ id: data.options[0].id });
+                  } else if (data?.options[1].id && state === "secondOption") {
+                    mutate({ id: data.options[1].id });
+                  }
+                }}
+              />
+            </>
+          )}
+        </>
+      }
     </Container>
   );
 }
@@ -174,4 +198,12 @@ const VoteResultCircleContainer = styled.div`
   margin: 8px;
   padding: 0px 10px;
   max-height: 280px;
+`;
+
+const SpinnerContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 471px;
 `;

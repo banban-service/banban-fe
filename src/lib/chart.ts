@@ -23,8 +23,7 @@ export function makePieData(
     (sum, opt) => sum + (opt.vote_count === null ? 0 : opt.vote_count),
     0,
   );
-
-  return options.map((option) => {
+  const data = options.map((option) => {
     const count = option.vote_count === null ? 0 : option.vote_count;
     const rawPercent = total > 0 ? (count / total) * 100 : 0;
 
@@ -39,6 +38,11 @@ export function makePieData(
       percent,
     };
   });
+
+  return [
+    ...data.filter((d) => !d.userSelected),
+    ...data.filter((d) => d.userSelected),
+  ];
 }
 
 export const calculateTextPosition = (
