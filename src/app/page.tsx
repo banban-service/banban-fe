@@ -40,7 +40,6 @@ export default function Home() {
           <FloatingInputModal
             onClose={handleCloseModal}
             onSubmit={handleSubmit}
-            userId="user123"
             actionType="피드"
           />
         )}
