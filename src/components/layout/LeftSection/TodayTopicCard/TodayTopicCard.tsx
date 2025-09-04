@@ -6,11 +6,12 @@ import VoteResultPlaceHolder from "./VoteResultPlaceHolder/VoteResultPlaceHolder
 import { usePoll } from "@/hooks/usePoll";
 import { useVote } from "@/hooks/useVote";
 import { useToast } from "@/components/common/Toast/useToast";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Spinner } from "@/components/svg/Spinner";
 import useAuth from "@/hooks/useAuth";
 import { makePieData } from "@/lib/chart";
 import { dataForTest } from "@/mock/data/vote";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TodayTopicCard() {
   const { isLoggedIn } = useAuth();
@@ -18,8 +19,12 @@ export default function TodayTopicCard() {
   const { data, isLoading } = usePoll();
   const [optimisticSelection, setOptimisticSelection] =
     useState<selectOption>("none");
+  const queryClient = useQueryClient();
 
-  const pieData = data ? makePieData(data.options, data.voted_option_id) : [];
+  const pieData = useMemo(() => {
+    if (!data) return [];
+    return makePieData(data.options, data.voted_option_id);
+  }, [data]);
 
   const { mutate } = useVote({
     onMutate: (variables) => {
@@ -43,7 +48,9 @@ export default function TodayTopicCard() {
         message: `투표 완료!`,
         duration: 300000,
       });
+      queryClient.invalidateQueries({ queryKey: ["polls"] });
     },
+
     onError: (error, variables, context) => {
       showToast({
         type: "error",

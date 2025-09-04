@@ -1,6 +1,6 @@
 import { CHART_CONFIG } from "@/constants/chart";
 import { calculateTextPosition } from "@/lib/chart";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import PercentageTexts from "./PercentageTexts";
 import ChartGradients from "./ChartGradients";
@@ -122,4 +122,4 @@ const VoteResultCircle = ({ pieData }: { pieData: PieData[] }) => {
   );
 };
 
-export default VoteResultCircle;
+export default memo(VoteResultCircle);

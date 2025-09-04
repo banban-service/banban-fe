@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useState } from "react";
 import styled from "styled-components";
 
 interface AvatarProps {
@@ -16,12 +17,13 @@ interface GradientBorderProps {
 }
 
 export const Avatar = ({ src, alt, size, background }: AvatarProps) => {
+  const [imgSrc, setImgSrc] = useState(src || "/no_img.png");
   return (
     <GradientBorder background={background}>
       <StyledImageWrapper size={size}>
         <Image
           role="img"
-          src={src}
+          src={src || imgSrc}
           alt={alt}
           width={size}
           height={size}
@@ -30,6 +32,7 @@ export const Avatar = ({ src, alt, size, background }: AvatarProps) => {
             width: "100%",
             height: "100%",
           }}
+          onError={() => setImgSrc("/no_img.png")}
         />
       </StyledImageWrapper>
     </GradientBorder>
