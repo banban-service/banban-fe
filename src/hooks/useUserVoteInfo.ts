@@ -2,12 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/apiFetch";
 import { PollOption, Poll } from "@/types/poll";
 import { User } from "@/types/auth";
-
-interface ApiResponse<T> {
-  code: number;
-  status: "SUCCESS" | "FAIL";
-  data: T;
-}
+import { ApiResponse } from "@/types/api";
 
 // User 타입을 확장하여 profile_image_url과 role 필드 추가
 interface UserProfile extends User {

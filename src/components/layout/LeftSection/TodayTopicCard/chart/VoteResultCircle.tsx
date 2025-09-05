@@ -1,6 +1,6 @@
 import { CHART_CONFIG } from "@/constants/chart";
 import { calculateTextPosition } from "@/lib/chart";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import PercentageTexts from "./PercentageTexts";
 import ChartGradients from "./ChartGradients";
@@ -24,38 +24,48 @@ const VoteResultCircle = ({ pieData }: { pieData: PieData[] }) => {
   );
 
   const uniqueId = useId();
-  const COLORS = [
-    `url(#${uniqueId}-pinkGradient)`,
-    `url(#${uniqueId}-blueGradient)`,
-  ];
-  const HIGHLIGHT_COLORS = [
-    `url(#${uniqueId}-pinkGradientStrong)`,
-    `url(#${uniqueId}-blueGradientStrong)`,
-  ];
 
-  const renderCell = (entry: PieData, index: number) => {
-    return (
-      <Cell
-        key={`cell-${entry.option}-${index}`}
-        fill={
-          entry.userSelected && showStroke
-            ? HIGHLIGHT_COLORS[index % HIGHLIGHT_COLORS.length]
-            : COLORS[index % COLORS.length]
-        }
-        style={{
-          transition: "fill 0.5s ease-in-out",
-          willChange: "fill",
-        }}
-        stroke={
-          entry.userSelected && entry.percent !== 100 && showStroke
-            ? "#fff"
-            : "none"
-        }
-        strokeWidth={entry.userSelected && showStroke ? 8 : 0}
-        filter="url(#shadow)"
-      />
-    );
-  };
+  const colors = useMemo(
+    () => ({
+      normal: [
+        `url(#${uniqueId}-pinkGradient)`,
+        `url(#${uniqueId}-blueGradient)`,
+      ],
+      highlight: [
+        `url(#${uniqueId}-pinkGradientStrong)`,
+        `url(#${uniqueId}-blueGradientStrong)`,
+      ],
+    }),
+    [uniqueId],
+  );
+
+  const renderCell = useCallback(
+    (entry: PieData, index: number) => {
+      const isUserSelected = entry.userSelected;
+      const shouldHighlight = isUserSelected && showStroke;
+      const shouldShowStroke =
+        isUserSelected && entry.percent !== 100 && showStroke;
+
+      const fillColor = shouldHighlight
+        ? colors.highlight[index % colors.highlight.length]
+        : colors.normal[index % colors.normal.length];
+
+      return (
+        <Cell
+          key={`cell-${entry.option}-${index}`}
+          fill={fillColor}
+          stroke={shouldShowStroke ? "#fff" : "none"}
+          strokeWidth={shouldShowStroke ? 8 : 0}
+          filter="url(#shadow)"
+          style={{
+            transition: "fill 0.5s ease-in-out",
+            willChange: "fill",
+          }}
+        />
+      );
+    },
+    [showStroke, colors],
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setShowStroke(true), animation.strokeDelay);
@@ -105,7 +115,7 @@ const VoteResultCircle = ({ pieData }: { pieData: PieData[] }) => {
             animationBegin={0}
             animationDuration={animation.duration}
           >
-            {pieData.map((entry, index) => renderCell(entry, index))}
+            {pieData.map(renderCell)}
           </Pie>
           <Tooltip />
         </PieChart>
