@@ -10,7 +10,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Spinner } from "@/components/svg/Spinner";
 import useAuth from "@/hooks/useAuth";
 import { makePieData } from "@/lib/chart";
-import { dataForTest } from "@/mock/data/vote";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function TodayTopicCard() {
@@ -105,18 +104,7 @@ export default function TodayTopicCard() {
                 {data?.voted_option_id === null ? (
                   <VoteResultPlaceHolder />
                 ) : (
-                  pieData && (
-                    <VoteResultCircle
-                      // pieData={[
-                      //   ...pieData.filter((d) => !d.userSelected),
-                      //   ...pieData.filter((d) => d.userSelected),
-                      // ]}
-                      pieData={[
-                        ...dataForTest.filter((d) => !d.userSelected),
-                        ...dataForTest.filter((d) => d.userSelected),
-                      ]}
-                    />
-                  )
+                  pieData && <VoteResultCircle pieData={pieData} />
                 )}
               </VoteResultCircleContainer>
 

@@ -38,11 +38,12 @@ export function makePieData(
       percent,
     };
   });
+  return data;
 
-  return [
-    ...data.filter((d) => !d.userSelected),
-    ...data.filter((d) => d.userSelected),
-  ];
+  // return [
+  //   ...data.filter((d) => !d.userSelected),
+  //   ...data.filter((d) => d.userSelected),
+  // ];
 }
 
 export const calculateTextPosition = (
