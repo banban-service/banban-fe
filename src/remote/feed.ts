@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/apiFetch";
+import { FeedResponse } from "@/types/api";
 
 export interface HotFeed {
   content: string;
@@ -8,11 +9,7 @@ export interface HotFeed {
   rank_change: number;
 }
 
-interface ApiResponse<T> {
-  feeds: T[];
-}
-
 export const fetchHotFeed = async (): Promise<HotFeed[]> => {
-  const response: ApiResponse<HotFeed> = await apiFetch("/feeds/hot");
+  const response: FeedResponse<HotFeed> = await apiFetch("/feeds/hot");
   return response.feeds;
 };
