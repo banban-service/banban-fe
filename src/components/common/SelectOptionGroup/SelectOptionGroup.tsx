@@ -27,7 +27,7 @@ export const SelectOptionGroup = ({
   return (
     <StyledSelectOptionGroup {...styleProps}>
       <StyledButton
-        disabled={selected !== "none"}
+        disabled={selected !== "firstOption" && selected !== "none"}
         isIdle={selected === "none"}
         isSelected={selected === "firstOption"}
         onClick={() => {
@@ -41,7 +41,7 @@ export const SelectOptionGroup = ({
         {firstOptionString}
       </StyledButton>
       <StyledButton
-        disabled={selected !== "none"}
+        disabled={selected !== "secondOption" && selected !== "none"}
         isIdle={selected === "none"}
         isSelected={selected === "secondOption"}
         onClick={() => {
@@ -73,7 +73,6 @@ const StyledButton = styled(DefaultButton).withConfig({
   display: flex;
   justify-content: center;
   cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
-
   position: relative;
   overflow: hidden;
 
@@ -117,6 +116,21 @@ const StyledButton = styled(DefaultButton).withConfig({
     color: transparent;
   }
 
+  /* 🔹 disabled 상태 */
+  &:disabled {
+    background-color: white !important;
+
+    &::before {
+      background: white;
+      opacity: 1;
+    }
+
+    & > div {
+      color: #b9b9b9;
+      background: none;
+    }
+  }
+
   ${({ isSelected, isIdle }) => {
     if (isIdle === true) {
       return css``;
@@ -124,9 +138,6 @@ const StyledButton = styled(DefaultButton).withConfig({
 
     if (isIdle === false && isSelected === false) {
       return css`
-        &::before {
-        }
-
         & > div {
           background: #808080;
           background-clip: text;
@@ -142,7 +153,6 @@ const StyledButton = styled(DefaultButton).withConfig({
           background-clip: text;
           color: transparent;
         }
-
         &::before {
           opacity: 1;
         }

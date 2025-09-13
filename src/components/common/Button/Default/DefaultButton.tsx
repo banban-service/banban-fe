@@ -48,6 +48,8 @@ const BackgroundStyle = styled.button.withConfig({
   &:disabled {
     border-color: #e9eaeb;
     color: #d5d7da;
+    cursor: default;
+    background-color: white;
   }
 `;
 
