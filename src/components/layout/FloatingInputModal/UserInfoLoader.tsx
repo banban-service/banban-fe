@@ -32,7 +32,7 @@ export const UserInfoLoader = memo(
       userAvatar,
       username,
       userVoteOptionId,
-    } = useUserVoteInfo();
+    } = useUserVoteInfo(today);
 
     const { data: pollData } = usePoll(today);
 

@@ -19,9 +19,7 @@ const fetchPollData = async (date: string): Promise<Poll> => {
   return response.data;
 };
 
-export const useUserVoteInfo = (date?: string) => {
-  const currentDate = date || new Date().toISOString().split("T")[0];
-
+export const useUserVoteInfo = (date: string) => {
   // 유저 프로필 정보 조회
   const {
     data: userProfile,
@@ -40,8 +38,8 @@ export const useUserVoteInfo = (date?: string) => {
     isLoading: isPollLoading,
     error: pollError,
   } = useQuery<Poll, Error>({
-    queryKey: ["poll", currentDate],
-    queryFn: () => fetchPollData(currentDate),
+    queryKey: ["poll", date],
+    queryFn: () => fetchPollData(date),
     staleTime: 1000 * 60, // 1분 캐시
     refetchOnWindowFocus: false,
     enabled: !!userProfile, // 유저 프로필이 로드된 후에만 실행

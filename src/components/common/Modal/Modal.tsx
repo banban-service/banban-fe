@@ -9,9 +9,15 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  isCloseButton?: boolean;
 }
 
-export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
+export const Modal = ({
+  isOpen,
+  onClose,
+  children,
+  isCloseButton = true,
+}: ModalProps) => {
   const [mounted, setMounted] = useState(false);
   const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
 
@@ -43,9 +49,11 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
         aria-labelledby="modal-title"
         aria-describedby="modal-content"
       >
-        <CloseButton onClick={onClose} aria-label="모달 닫기">
-          <CloseThickIcon color="#414651" width={12} height={12} />
-        </CloseButton>
+        {isCloseButton && (
+          <CloseButton onClick={onClose} aria-label="모달 닫기">
+            <CloseThickIcon color="#414651" width={12} height={12} />
+          </CloseButton>
+        )}
         {children}
       </ModalBox>
     </Dimmed>,
@@ -65,19 +73,12 @@ const Dimmed = styled.div`
 
 const ModalBox = styled.div`
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 20px;
-  min-width: 260px;
-  max-width: 50%;
-  max-height: 50%;
-  min-height: 200px;
-  background-color: white;
+  background: #fff;
+  border-radius: 16px;
   padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #e9eaeb;
-  box-shadow: 0px 12px 16px -4px rgba(10, 13, 18, 0.08);
+  width: 400px;
+  text-align: center;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 `;
 
 const CloseButton = styled.button`

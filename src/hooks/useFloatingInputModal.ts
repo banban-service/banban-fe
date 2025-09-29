@@ -35,14 +35,7 @@ export const useFloatingInputModal = ({
   // 초안 복원 (피드 상태에서만)
   useEffect(() => {
     if (actionType === "피드") {
-      const wasRestored = restoreDraft(setContent);
-      if (wasRestored) {
-        showToast({
-          type: "info",
-          message: "이전에 작성하던 내용을 불러왔습니다.",
-          duration: 2000,
-        });
-      }
+      restoreDraft(setContent);
     }
   }, [actionType, restoreDraft, showToast]);
 

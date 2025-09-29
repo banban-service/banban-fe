@@ -132,22 +132,25 @@ const Container = styled.section`
   max-width: 430px;
   background-color: white;
   border-radius: 8px;
-  padding: 18px 16px;
+  padding: 20px;
 `;
 
 const TitleSection = styled.div`
   display: flex;
+  height: 88px;
   flex-direction: column;
+  justify-content: center;
 `;
 
 const TitleLabel = styled.div`
   font-weight: 600;
-  margin-bottom: 10px;
+  padding: 10px;
 `;
 
 const TopicTitle = styled.div`
   width: 100%;
   font-weight: 900;
-  font-size: 1.5rem;
+  font-size: 24px;
+  padding: 10px;
   text-align: center;
 `;
