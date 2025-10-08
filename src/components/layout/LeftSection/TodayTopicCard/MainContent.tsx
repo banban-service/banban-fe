@@ -66,6 +66,7 @@ export default function MainContent({
 const VoteResultCircleContainer = styled.div`
   display: flex;
   justify-content: center;
+  min-height: 248px;
   max-height: 280px;
 `;
 

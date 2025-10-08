@@ -10,6 +10,7 @@ import { UserMenu } from "@/components/common/UserMenu/UserMenu";
 import Image from "next/image";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import HeaderSkeleton from "@/components/common/Skeleton/HeaderSkeleton";
+import Link from "next/link";
 
 interface HeaderProps {
   isNew: boolean;
@@ -49,8 +50,11 @@ export default function Header({
     return (
       <Container>
         <LogoArea>
-          <BanBanLogo />
+          <Link href="/">
+            <BanBanLogo />
+          </Link>
         </LogoArea>
+
         <Actions>
           {isLoggedIn ? (
             <ButtonsWrapper>

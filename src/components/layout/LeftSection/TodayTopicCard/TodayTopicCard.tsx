@@ -8,6 +8,7 @@ import { makePieData } from "@/lib/chart";
 import { useQueryClient } from "@tanstack/react-query";
 import MainContent from "./MainContent";
 import { useTodayISO } from "@/hooks/useTodayIso";
+import NoTopicState from "./NoTopicState";
 
 export interface Option {
   id: number;
@@ -48,7 +49,7 @@ function selectionToOptionId(
 export default function TodayTopicCard() {
   const { showToast } = useToast();
   const today = useTodayISO();
-  const { data, isLoading } = usePoll(today);
+  const { data, isLoading, isError } = usePoll(today);
   const queryClient = useQueryClient();
   const [optimisticSelection, setOptimisticSelection] =
     useState<selectOption>("none");
@@ -108,18 +109,27 @@ export default function TodayTopicCard() {
 
   return (
     <Container>
-      <TitleSection>
-        <TitleLabel>🔥 오늘의 주제는 :</TitleLabel>
-        <TopicTitle as="h2">{data?.title}</TopicTitle>
-      </TitleSection>
-      <MainContent
-        isLoading={isLoading}
-        pieData={pieData}
-        votedOptionId={data?.votedOptionId}
-        options={data?.options}
-        displayedSelection={displayedSelection}
-        handleVote={handleVote}
-      />
+      {isError || (!isLoading && data === undefined) ? (
+        <NoTopicState
+          message="오늘의 주제가 없습니다"
+          description="잠시 후 다시 시도해주세요"
+        />
+      ) : (
+        <>
+          <TitleSection>
+            <TitleLabel>🔥 오늘의 주제는 :</TitleLabel>
+            <TopicTitle as="h2">{data?.title}</TopicTitle>
+          </TitleSection>
+          <MainContent
+            isLoading={isLoading}
+            pieData={pieData}
+            votedOptionId={data?.votedOptionId}
+            options={data?.options}
+            displayedSelection={displayedSelection}
+            handleVote={handleVote}
+          />
+        </>
+      )}
     </Container>
   );
 }
@@ -130,6 +140,7 @@ const Container = styled.section`
   gap: 0.625rem;
   min-width: 340px;
   max-width: 430px;
+  min-height: 552px;
   background-color: white;
   border-radius: 8px;
   padding: 20px;
@@ -137,7 +148,7 @@ const Container = styled.section`
 
 const TitleSection = styled.div`
   display: flex;
-  height: 88px;
+  min-height: 88px;
   flex-direction: column;
   justify-content: center;
 `;
