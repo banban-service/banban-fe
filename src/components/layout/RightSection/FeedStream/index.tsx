@@ -90,9 +90,13 @@ export default function FeedStream() {
         <Fragment key={`page-${index}`}>
           {page?.data?.content?.map((item, idx, array) => {
             const isSecondFromLast = idx === array.length - 4;
+            const itemKey =
+              item.type === "AD"
+                ? `ad-${item.id}-${idx}`
+                : `feed-${item.id}`;
 
             return (
-              <Fragment key={`page-${index}-item-${idx}`}>
+              <Fragment key={itemKey}>
                 {isSecondFromLast && hasNextPage && <div ref={scrollTrigger} />}
                 {item.type === "USER" || item.type === "POLL" ? (
                   <Block type="feed" feedProps={item} pollData={todayPoll} />

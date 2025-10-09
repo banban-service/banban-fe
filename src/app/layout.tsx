@@ -4,8 +4,9 @@ import "../styles/globals.css";
 import { pretendardSans } from "../../public/fonts/variables";
 import { NextProvider } from "./providers";
 import GlobalModalRenderer from "@/components/common/GlobalModalRenderer";
-import Header from "@/components/layout/Header";
+import HeaderContainer from "@/components/layout/HeaderContainer";
 import StyledComponentsRegistry from "@/lib/registry";
+import NotificationListener from "@/components/notification/NotificationListener";
 
 export const metadata: Metadata = {
   title: "ban:ban",
@@ -25,7 +26,8 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <NextProvider>
             <AuthManager />
-            <Header isNew />
+            <NotificationListener />
+            <HeaderContainer />
             {children}
           </NextProvider>
           <div id="modal-root"></div>
