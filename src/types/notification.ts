@@ -29,10 +29,11 @@ export interface Notification {
 
 export interface SSEConnectedEvent {
   message: string;
+  user_id?: number; // 가이드 문서와 일치
 }
 
 export interface SSEHeartbeatEvent {
-  timestamp: string;
+  timestamp: number; // Unix timestamp (seconds)
 }
 
 export interface SSEErrorEvent {

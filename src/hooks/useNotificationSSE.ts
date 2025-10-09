@@ -124,7 +124,8 @@ export function useNotificationSSE({
       eventSource.addEventListener("heartbeat", (event) => {
         try {
           const data: SSEHeartbeatEvent = JSON.parse(event.data);
-          const timestamp = new Date(Number(data.timestamp) * 1000);
+          // timestamp는 이미 Unix timestamp (seconds)이므로 1000을 곱해 milliseconds로 변환
+          const timestamp = new Date(data.timestamp * 1000);
           setLastHeartbeat(timestamp);
           onHeartbeat?.(timestamp);
         } catch (error) {
