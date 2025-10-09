@@ -14,7 +14,7 @@ import { ReportModal } from "@/components/common/Report";
 import useReportMutation from "@/hooks/useReportMutation";
 import { useAuthStore } from "@/store/useAuthStore";
 
-const FeedBlock = ({ props, pollData }: { props: Feed; pollData: Poll }) => {
+const FeedBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
   const { user, createdAt, commentCount, content, likeCount, id, isLiked } =
     props;
 
