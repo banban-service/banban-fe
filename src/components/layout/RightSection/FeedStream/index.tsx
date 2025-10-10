@@ -8,9 +8,14 @@ import { useTodayISO } from "@/hooks/useTodayIso";
 import { usePoll } from "@/hooks/usePoll";
 import { useSearchParams } from "next/navigation";
 import { SectionContext } from "../SectionContext";
+import { useFeedFilterStore } from "@/store/useFeedFilterStore";
 
 export default function FeedStream() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFeeds();
+  const { sortBy, filterType } = useFeedFilterStore();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFeeds({
+    sort_by: sortBy,
+    filter_type: filterType,
+  });
   const today = useTodayISO();
   const { data: todayPoll } = usePoll(today);
 
