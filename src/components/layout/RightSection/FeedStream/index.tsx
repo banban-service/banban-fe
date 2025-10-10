@@ -4,7 +4,6 @@ import { useInView } from "react-intersection-observer";
 import { Fragment, useContext, useEffect, useRef } from "react";
 import { Block } from "../Block";
 import useScrollPositionStore from "@/store/useScrollPositionStore";
-import { useTodayISO } from "@/hooks/useTodayIso";
 import { usePoll } from "@/hooks/usePoll";
 import { useSearchParams } from "next/navigation";
 import { SectionContext } from "../SectionContext";
@@ -16,8 +15,7 @@ export default function FeedStream() {
     sort_by: sortBy,
     filter_type: filterType,
   });
-  const today = useTodayISO();
-  const { data: todayPoll } = usePoll(today);
+  const { data: todayPoll } = usePoll();
 
   const [scrollTrigger, isInView] = useInView({
     threshold: 0,

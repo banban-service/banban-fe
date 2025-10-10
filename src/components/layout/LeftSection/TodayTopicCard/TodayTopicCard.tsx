@@ -7,7 +7,6 @@ import { useMemo, useState, useCallback } from "react";
 import { makePieData } from "@/lib/chart";
 import { useQueryClient } from "@tanstack/react-query";
 import MainContent from "./MainContent";
-import { useTodayISO } from "@/hooks/useTodayIso";
 
 export interface Option {
   id: number;
@@ -47,8 +46,7 @@ function selectionToOptionId(
 
 export default function TodayTopicCard() {
   const { showToast } = useToast();
-  const today = useTodayISO();
-  const { data, isLoading } = usePoll(today);
+  const { data, isLoading } = usePoll();
   const queryClient = useQueryClient();
   const [optimisticSelection, setOptimisticSelection] =
     useState<selectOption>("none");

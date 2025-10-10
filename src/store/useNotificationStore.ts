@@ -10,96 +10,88 @@ interface NotificationState {
   notifications: Notification[];
   unreadCount: number;
   connectionStatus: NotificationConnectionStatus;
-  lastHeartbeat: number | null;
   isTimeout: boolean;
+  lastActivity: number | null;
+  reconnectAttempts: number;
   addNotification: (notification: Notification) => void;
-  incrementUnread: () => void;
+  setNotifications: (notifications: Notification[]) => void;
+  setUnreadCount: (count: number) => void;
   markAsRead: (notificationIds: number[]) => void;
-  markAllRead: () => void;
+  markAllAsRead: () => void;
   clearAll: () => void;
   setConnectionStatus: (status: NotificationConnectionStatus) => void;
-  setLastHeartbeat: (timestamp: number | null) => void;
-  setTimeoutState: (value: boolean) => void;
+  setIsTimeout: (value: boolean) => void;
+  setLastActivity: (timestamp: number | null) => void;
+  setReconnectAttempts: (count: number) => void;
+  resetConnectionState: () => void;
 }
 
 export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: [],
   unreadCount: 0,
   connectionStatus: "idle",
-  lastHeartbeat: null,
   isTimeout: false,
+  lastActivity: null,
+  reconnectAttempts: 0,
 
   addNotification: (notification) =>
     set((state) => {
-      const deduped = state.notifications.filter((item) => item.id !== notification.id);
-      deduped.unshift(notification);
-
+      const isDuplicate = state.notifications.some((n) => n.id === notification.id);
+      if (isDuplicate) {
+        return state;
+      }
+      const newNotifications = [notification, ...state.notifications].slice(
+        0,
+        MAX_NOTIFICATIONS,
+      );
       return {
-        notifications: deduped.slice(0, MAX_NOTIFICATIONS),
+        notifications: newNotifications,
+        unreadCount: state.unreadCount + 1,
       };
     }),
 
-  incrementUnread: () =>
-    set((state) => ({
-      unreadCount: state.unreadCount + 1,
-    })),
+  setNotifications: (notifications) => set({ notifications }),
+
+  setUnreadCount: (count) => set({ unreadCount: count }),
 
   markAsRead: (notificationIds) =>
     set((state) => {
-      if (notificationIds.length === 0) {
-        return state;
-      }
-
-      const unreadToSubtract = state.notifications.reduce((count, item) => {
-        if (!item.is_read && notificationIds.includes(item.id)) {
-          return count + 1;
+      let unreadCountToDecrease = 0;
+      const updatedNotifications = state.notifications.map((n) => {
+        if (notificationIds.includes(n.id) && !n.is_read) {
+          unreadCountToDecrease++;
+          return { ...n, is_read: true };
         }
-        return count;
-      }, 0);
+        return n;
+      });
 
       return {
-        notifications: state.notifications.map((item) =>
-          notificationIds.includes(item.id) ? { ...item, is_read: true } : item,
-        ),
-        unreadCount: Math.max(0, state.unreadCount - unreadToSubtract),
+        notifications: updatedNotifications,
+        unreadCount: Math.max(0, state.unreadCount - unreadCountToDecrease),
       };
     }),
 
-  markAllRead: () =>
-    set((state) => {
-      if (state.unreadCount === 0) {
-        return state;
-      }
-
-      return {
-        notifications: state.notifications.map((item) =>
-          item.is_read ? item : { ...item, is_read: true },
-        ),
-        unreadCount: 0,
-      };
-    }),
-
-  clearAll: () =>
-    set({
-      notifications: [],
+  markAllAsRead: () =>
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({ ...n, is_read: true })),
       unreadCount: 0,
-      lastHeartbeat: null,
-      isTimeout: false,
+    })),
+
+  clearAll: () => set({ notifications: [], unreadCount: 0 }),
+
+  setConnectionStatus: (status) => set({ connectionStatus: status }),
+
+  setIsTimeout: (value) => set({ isTimeout: value }),
+
+  setLastActivity: (timestamp) => set({ lastActivity: timestamp }),
+
+  setReconnectAttempts: (count) => set({ reconnectAttempts: count }),
+
+  resetConnectionState: () =>
+    set({
       connectionStatus: "idle",
+      isTimeout: false,
+      lastActivity: null,
+      reconnectAttempts: 0,
     }),
-
-  setConnectionStatus: (status) =>
-    set(() => ({
-      connectionStatus: status,
-    })),
-
-  setLastHeartbeat: (timestamp) =>
-    set(() => ({
-      lastHeartbeat: timestamp,
-    })),
-
-  setTimeoutState: (value) =>
-    set(() => ({
-      isTimeout: value,
-    })),
 }));

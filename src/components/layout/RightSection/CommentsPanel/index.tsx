@@ -5,12 +5,10 @@ import { useContext } from "react";
 import { SectionContext } from "../SectionContext";
 import { CommentStream } from "../CommentStream";
 import { usePoll } from "@/hooks/usePoll";
-import { useTodayISO } from "@/hooks/useTodayIso";
 
 const CommentsPanel = () => {
   const { targetFeed } = useContext(SectionContext);
-  const today = useTodayISO();
-  const { data: pollData } = usePoll(today);
+  const { data: pollData } = usePoll();
   return (
     <>
       <CommentTab />

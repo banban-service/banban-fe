@@ -6,7 +6,6 @@ import { Block } from "../Block";
 import { useContext } from "react";
 import { SectionContext } from "../SectionContext";
 import { usePoll } from "@/hooks/usePoll";
-import { useTodayISO } from "@/hooks/useTodayIso";
 
 const CommentStream = () => {
   const { targetFeed } = useContext(SectionContext);
@@ -14,8 +13,7 @@ const CommentStream = () => {
     feedId: targetFeed?.id || 0,
     size: 8,
   });
-  const today = useTodayISO();
-  const { data: pollData } = usePoll(today);
+  const { data: pollData } = usePoll();
 
   const [scrollTrigger, isInView] = useInView({
     threshold: 0,

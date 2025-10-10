@@ -1,120 +1,129 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import { useNotificationSSE } from "@/hooks/useNotificationSSE";
+import { useEffect } from "react";
+import useAuth from "@/hooks/useAuth";
+import { useNotificationWebSocket } from "@/hooks/useNotificationWebSocket";
 import { useNotificationStore } from "@/store/useNotificationStore";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useToast } from "@/components/common/Toast/useToast";
-import { logger } from "@/utils/logger";
 import type { Notification } from "@/types/notification";
+import type { WSNotificationMessage } from "@/types/notification";
+import { useRouter } from "next/navigation";
+import { logger } from "@/utils/logger";
+import { useToast } from "@/components/common/Toast/useToast";
 
-const HEARTBEAT_TIMEOUT_MS = 60_000;
+const TIMEOUT_THRESHOLD_MS = 70_000;
+
+function mapNotificationPayload(payload: WSNotificationMessage): Notification {
+  return {
+    id: payload.id,
+    user_id: payload.user_id,
+    notification_type: payload.notification_type,
+    type: payload.notification_type,
+    from_user_id: payload.from_user_id,
+    target_type: payload.target_type,
+    target_id: payload.target_id,
+    message: payload.message,
+    is_read: payload.is_read,
+    created_at: payload.created_at,
+    read_at: payload.read_at,
+  };
+}
 
 export default function NotificationListener() {
-  const { showToast } = useToast();
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const userId = useAuthStore((state) => state.user?.id);
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
+  const toast = useToast();
 
   const addNotification = useNotificationStore((state) => state.addNotification);
-  const incrementUnread = useNotificationStore((state) => state.incrementUnread);
-  const clearAll = useNotificationStore((state) => state.clearAll);
-  const setConnectionStatus = useNotificationStore((state) => state.setConnectionStatus);
-  const setLastHeartbeat = useNotificationStore((state) => state.setLastHeartbeat);
-  const setTimeoutState = useNotificationStore((state) => state.setTimeoutState);
+  const setConnectionStatus = useNotificationStore(
+    (state) => state.setConnectionStatus,
+  );
+  const setIsTimeout = useNotificationStore((state) => state.setIsTimeout);
+  const setLastActivity = useNotificationStore(
+    (state) => state.setLastActivity,
+  );
+  const setReconnectAttempts = useNotificationStore(
+    (state) => state.setReconnectAttempts,
+  );
+  const resetConnectionState = useNotificationStore(
+    (state) => state.resetConnectionState,
+  );
 
-  const timeoutNoticeShownRef = useRef(false);
-  const errorNoticeShownRef = useRef(false);
+  const {
+    status,
+    lastActivity,
+    reconnectAttempts,
+  } = useNotificationWebSocket({
+    enabled: isLoggedIn,
+    onNotification: (payload) => {
+      const notification = mapNotificationPayload(payload);
+      addNotification(notification);
 
-  const enabled = useMemo(() => isLoggedIn && !!userId, [isLoggedIn, userId]);
-
-  useEffect(() => {
-    if (!enabled) {
-      clearAll();
-      timeoutNoticeShownRef.current = false;
-      errorNoticeShownRef.current = false;
-    }
-  }, [enabled, clearAll]);
-
-  const handleNotification = (notification: Notification) => {
-    const storeState = useNotificationStore.getState();
-    const alreadyExists = storeState.notifications.some(
-      (item) => item.id === notification.id,
-    );
-
-    addNotification(notification);
-
-    if (!notification.is_read && !alreadyExists) {
-      incrementUnread();
-    }
-
-    showToast({ type: "info", message: notification.message });
-  };
-
-  const { status, lastHeartbeat } = useNotificationSSE({
-    enabled,
-    onNotification: handleNotification,
-    onError: ({ data }) => {
-      if (!enabled) return;
-
-      const message =
-        data?.message ?? "실시간 알림 연결 중 문제가 발생했습니다.";
-      if (!errorNoticeShownRef.current) {
-        showToast({ type: "error", message });
-        errorNoticeShownRef.current = true;
-      }
+      toast.showToast({
+        type: "info",
+        message: notification.message,
+        duration: 3000,
+        action: notification.target_type === "FEED"
+          ? {
+              label: "보기",
+              onClick: () => {
+                router.push(`/?feedId=${notification.target_id}&tab=comments`);
+              },
+            }
+          : undefined,
+      });
+    },
+    onConnected: (payload) => {
+      logger.info("✅ 실시간 알림 연결됨", payload);
+    },
+    onSystemMessage: (payload) => {
+      logger.info("WebSocket 시스템 메시지 수신", payload);
+    },
+    onError: (event, data) => {
+      logger.error("❌ 실시간 알림 연결 실패", { event, data });
+    },
+    onDisconnected: (event) => {
+      logger.warn("WebSocket 연결 종료", {
+        code: event.code,
+        reason: event.reason,
+      });
     },
   });
 
   useEffect(() => {
-    if (!enabled) return;
-
-    setConnectionStatus(status);
-
-    if (status === "connecting") {
-      setLastHeartbeat(null);
-      setTimeoutState(false);
-      timeoutNoticeShownRef.current = false;
+    if (!isLoggedIn) {
+      resetConnectionState();
     }
-
-    if (status === "connected") {
-      errorNoticeShownRef.current = false;
-    }
-
-    if (status === "error" || status === "disconnected") {
-      logger.warn("SSE 연결 상태 비정상", { status });
-    }
-  }, [
-    enabled,
-    status,
-    setConnectionStatus,
-    setLastHeartbeat,
-    setTimeoutState,
-  ]);
+  }, [isLoggedIn, resetConnectionState]);
 
   useEffect(() => {
-    if (!enabled) return;
+    setConnectionStatus(status);
+  }, [status, setConnectionStatus]);
 
-    if (!lastHeartbeat) {
-      return;
+  useEffect(() => {
+    setReconnectAttempts(reconnectAttempts);
+  }, [reconnectAttempts, setReconnectAttempts]);
+
+  useEffect(() => {
+    setLastActivity(lastActivity);
+  }, [lastActivity, setLastActivity]);
+
+  useEffect(() => {
+    if (lastActivity === null) {
+      setIsTimeout(false);
+      return () => undefined;
     }
 
-    setLastHeartbeat(lastHeartbeat.getTime());
-    setTimeoutState(false);
-    timeoutNoticeShownRef.current = false;
+    setIsTimeout(false);
 
     const timer = window.setTimeout(() => {
-      setTimeoutState(true);
-      if (!timeoutNoticeShownRef.current) {
-        showToast({
-          type: "warning",
-          message: "실시간 알림 연결이 지연되고 있습니다. 네트워크 상태를 확인해주세요.",
-        });
-        timeoutNoticeShownRef.current = true;
-      }
-    }, HEARTBEAT_TIMEOUT_MS);
+      const diff = Date.now() - lastActivity;
+      setIsTimeout(diff >= TIMEOUT_THRESHOLD_MS);
+    }, TIMEOUT_THRESHOLD_MS);
 
-    return () => window.clearTimeout(timer);
-  }, [enabled, lastHeartbeat, setLastHeartbeat, setTimeoutState, showToast]);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [lastActivity, setIsTimeout]);
 
   return null;
 }

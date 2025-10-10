@@ -6,7 +6,6 @@ import styled from "styled-components";
 import SegmentedControl from "./SegmentedControl";
 import ToggleButton from "./ToggleButton";
 import useAuth from "@/hooks/useAuth";
-import { useTodayISO } from "@/hooks/useTodayIso";
 import { usePoll } from "@/hooks/usePoll";
 
 const SORT_OPTIONS: { label: string; value: SortBy }[] = [
@@ -18,8 +17,7 @@ const SORT_OPTIONS: { label: string; value: SortBy }[] = [
 export default function FeedsTab() {
   const { sortBy, setSortBy, filterType, setFilterType } = useFeedFilterStore();
   const { isLoggedIn } = useAuth();
-  const today = useTodayISO();
-  const { data: pollData } = usePoll(today);
+  const { data: pollData } = usePoll();
 
   const itemLabels = SORT_OPTIONS.map((option) => option.label);
   const initialIdx = SORT_OPTIONS.findIndex((option) => option.value === sortBy);
