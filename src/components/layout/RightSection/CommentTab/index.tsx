@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { MoreIcon } from "@/components/svg/MoreIcon";
 import { ChevronLeftIcon } from "@/components/svg/ChevronLeftIcon";
 import { SectionContext } from "../SectionContext";
 import { useContext } from "react";
@@ -15,7 +14,6 @@ const CommentTab = () => {
         }}>
           <ChevronLeftIcon size={24} />
         </StyledBackButton>
-        <MoreIcon size={20} />
       </StyledCommentsTab>
     </StyledContainer>
   );
