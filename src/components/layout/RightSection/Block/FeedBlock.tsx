@@ -3,8 +3,7 @@ import { Avatar } from "@/components/common/Avatar";
 import { FeedHeartButton, FeedCommentButton } from "@/components/common/Button";
 import { MoreIcon } from "@/components/svg/MoreIcon";
 import type { Feed } from "@/types/feeds";
-import { useContext, useRef, useState } from "react";
-import { SectionContext } from "../SectionContext";
+import { useRef, useState } from "react";
 import { OptionsDropdown } from "@/components/common/OptionsDropdown/OptionsDropdown";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useFeedLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
@@ -13,14 +12,15 @@ import { Poll } from "@/types/poll";
 import { ReportModal } from "@/components/common/Report";
 import useReportMutation from "@/hooks/useReportMutation";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 
 const FeedBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
   const { user, createdAt, commentCount, content, likeCount, id, isLiked } =
     props;
 
+  const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const formattedCreatedAt = new Date(createdAt).toLocaleDateString();
-  const { setSectionStatus, setTargetFeed } = useContext(SectionContext);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isReportModalOpen, setReportModalOpen] = useState(false);
   useClickOutside(dropdownRef, () => setDropdownOpen(false));
@@ -124,8 +124,7 @@ const FeedBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
           <FeedCommentButton
             commentCount={commentCount}
             onClick={() => {
-              setTargetFeed(props);
-              setSectionStatus("comments");
+              router.push(`/feeds/${id}`);
             }}
           />
         </StyledIconButtonContainer>

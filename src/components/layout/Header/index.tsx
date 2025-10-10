@@ -122,6 +122,14 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
     setCommunityCardOpen(true);
   };
 
+  const handleLogoClick = () => {
+    setUserMenuOpen(false);
+    setNotificationOpen(false);
+    setProfileCardOpen(false);
+    setCommunityCardOpen(false);
+    router.push("/");
+  };
+
   if (pathname === "/login") return null;
 
   if (loading) return <HeaderSkeleton />;
@@ -129,7 +137,9 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
     return (
       <Container>
         <LogoArea>
-          <BanBanLogo />
+          <LogoButton type="button" aria-label="banban 홈으로" onClick={handleLogoClick}>
+            <BanBanLogo />
+          </LogoButton>
         </LogoArea>
         <Actions>
           {isLoggedIn ? (
@@ -247,6 +257,15 @@ const LogoArea = styled.div`
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+`;
+
+const LogoButton = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 `;
 
 const IconButton = styled.button<{ $active?: boolean }>`
