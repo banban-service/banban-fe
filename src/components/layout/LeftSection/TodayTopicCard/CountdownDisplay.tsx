@@ -53,6 +53,7 @@ export default function CountdownDisplay() {
 const CountdownSection = styled.div`
   display: flex;
   flex-direction: column;
+  min-height: 60px;
   padding: 4px;
   gap: 4px;
   text-align: center;

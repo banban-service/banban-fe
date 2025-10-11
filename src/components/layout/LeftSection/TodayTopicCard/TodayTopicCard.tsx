@@ -8,6 +8,10 @@ import { makePieData } from "@/lib/chart";
 import { useQueryClient } from "@tanstack/react-query";
 import MainContent from "./MainContent";
 import { useTodayISO } from "@/hooks/useTodayIso";
+import NoTopicState from "./NoTopicState";
+import useAuth from "@/hooks/useAuth";
+import LoginReqruiedModal from "./LoginRequiredModal";
+import { Spinner } from "@/components/svg/Spinner";
 
 export interface Option {
   id: number;
@@ -47,8 +51,10 @@ function selectionToOptionId(
 
 export default function TodayTopicCard() {
   const { showToast } = useToast();
+  const { isLoggedIn } = useAuth();
+  const [open, setOpen] = useState(false);
   const today = useTodayISO();
-  const { data, isLoading } = usePoll(today);
+  const { data, isLoading, isError } = usePoll(today);
   const queryClient = useQueryClient();
   const [optimisticSelection, setOptimisticSelection] =
     useState<selectOption>("none");
@@ -99,27 +105,52 @@ export default function TodayTopicCard() {
 
   const handleVote = useCallback(
     (selection: selectOption) => {
+      // 로그인 하지 않았을 경우
+      if (!isLoggedIn) {
+        setOpen(true);
+      }
+
       if (displayedSelection === selection) return;
+
       const optionId = selectionToOptionId(selection, data?.options);
       if (optionId) mutate({ id: optionId });
     },
-    [displayedSelection, data?.options, mutate],
+    [isLoggedIn, displayedSelection, data?.options, mutate],
   );
 
   return (
     <Container>
-      <TitleSection>
-        <TitleLabel>🔥 오늘의 주제는 :</TitleLabel>
-        <TopicTitle as="h2">{data?.title}</TopicTitle>
-      </TitleSection>
-      <MainContent
-        isLoading={isLoading}
-        pieData={pieData}
-        votedOptionId={data?.votedOptionId}
-        options={data?.options}
-        displayedSelection={displayedSelection}
-        handleVote={handleVote}
-      />
+      {isError || (!isLoading && data === undefined) ? (
+        <NoTopicState
+          message="오늘의 주제가 없습니다"
+          description="잠시 후 다시 시도해주세요"
+        />
+      ) : (
+        <>
+          {isLoading ? (
+            <SpinnerContainer>
+              <Spinner />
+            </SpinnerContainer>
+          ) : (
+            <>
+              <TitleSection>
+                <TitleLabel>🔥 오늘의 주제는 :</TitleLabel>
+                <TopicTitle as="h2">{data?.title}</TopicTitle>
+              </TitleSection>
+              <MainContent
+                pieData={pieData}
+                votedOptionId={data?.votedOptionId}
+                options={data?.options}
+                displayedSelection={displayedSelection}
+                handleVote={handleVote}
+              />
+            </>
+          )}
+          {open && (
+            <LoginReqruiedModal isOpen={open} onClose={() => setOpen(false)} />
+          )}
+        </>
+      )}
     </Container>
   );
 }
@@ -127,9 +158,11 @@ export default function TodayTopicCard() {
 const Container = styled.section`
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.625rem;
   min-width: 340px;
   max-width: 430px;
+  min-height: 552px;
   background-color: white;
   border-radius: 8px;
   padding: 20px;
@@ -137,7 +170,7 @@ const Container = styled.section`
 
 const TitleSection = styled.div`
   display: flex;
-  height: 88px;
+  min-height: 88px;
   flex-direction: column;
   justify-content: center;
 `;
@@ -153,4 +186,12 @@ const TopicTitle = styled.div`
   font-size: 24px;
   padding: 10px;
   text-align: center;
+`;
+
+const SpinnerContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 300px;
 `;
