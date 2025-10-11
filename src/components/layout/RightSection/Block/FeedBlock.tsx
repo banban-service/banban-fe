@@ -62,7 +62,7 @@ const FeedBlock = ({ props, pollData }: { props: Feed; pollData: Poll }) => {
     }, 0);
   };
 
-  const isMyFeed = isLoggedIn && me?.username === user.username;
+  const isMyFeed = me?.username === user.username;
 
   return (
     <StyledContainer>
@@ -78,7 +78,7 @@ const FeedBlock = ({ props, pollData }: { props: Feed; pollData: Poll }) => {
             <StyledTitle>{props.user.username}</StyledTitle>
             <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
-          {!isMyFeed && (
+          {!isMyFeed && isLoggedIn && (
             <StyledMoreButtonWrapper ref={dropdownRef}>
               <StyledMoreButton
                 onClick={handleToggleDropdown}

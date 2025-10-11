@@ -33,9 +33,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null });
 
     // 토큰이 있는 경우에만 프로필 API 호출
-    const token = typeof window !== "undefined"
-      ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
-      : null;
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
+        : null;
 
     if (!token) {
       logger.info("비로그인 상태 - 인증 체크 생략");
@@ -46,7 +47,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const { data }: UserInfoResponse = await apiFetch("/users/profile");
       set({ user: data, isLoggedIn: true, loading: false });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       logger.warn("인증 체크 실패 - 토큰 정리", error);
       // 401 에러 발생 시 만료된 토큰 정리
@@ -136,8 +136,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  logout: () => {
-    clearTokens();
-    set({ user: null, isLoggedIn: false, error: null });
+  logout: async () => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (e) {
+      logger.warn("서버 로그아웃 실패", e);
+    } finally {
+      clearTokens();
+      set({ user: null, isLoggedIn: false, error: null });
+    }
   },
 }));
