@@ -8,7 +8,6 @@ import {
 } from "@/components/common/SelectOptionGroup/SelectOptionGroup";
 import CountdownDisplay from "./CountdownDisplay";
 import VoteResultPlaceHolder from "./VoteResultPlaceHolder/VoteResultPlaceHolder";
-import { useAuthStore } from "@/store/useAuthStore";
 
 function VoteResultDisplay({
   pieData,
@@ -29,12 +28,14 @@ export default function MainContent({
   options,
   displayedSelection,
   handleVote,
+  isLoggedIn,
 }: {
   pieData: PieData[];
   votedOptionId: number | null | undefined;
   options?: Option[];
   displayedSelection: selectOption;
   handleVote: (selection: selectOption) => void;
+  isLoggedIn: boolean;
 }) {
   return (
     <>

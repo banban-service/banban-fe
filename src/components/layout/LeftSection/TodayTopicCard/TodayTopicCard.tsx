@@ -143,6 +143,7 @@ export default function TodayTopicCard() {
                 options={data?.options}
                 displayedSelection={displayedSelection}
                 handleVote={handleVote}
+                isLoggedIn={isLoggedIn}
               />
             </>
           )}
