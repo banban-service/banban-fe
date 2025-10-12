@@ -1,4 +1,3 @@
-import { Spinner } from "@/components/svg/Spinner";
 import React from "react";
 import styled from "styled-components";
 import VoteResultCircle, { PieData } from "./chart/VoteResultCircle";
@@ -9,7 +8,6 @@ import {
 } from "@/components/common/SelectOptionGroup/SelectOptionGroup";
 import CountdownDisplay from "./CountdownDisplay";
 import VoteResultPlaceHolder from "./VoteResultPlaceHolder/VoteResultPlaceHolder";
-import { useAuthStore } from "@/store/useAuthStore";
 
 function VoteResultDisplay({
   pieData,
@@ -25,30 +23,20 @@ function VoteResultDisplay({
 }
 
 export default function MainContent({
-  isLoading,
   pieData,
   votedOptionId,
   options,
   displayedSelection,
   handleVote,
+  isLoggedIn,
 }: {
-  isLoading: boolean;
   pieData: PieData[];
   votedOptionId: number | null | undefined;
   options?: Option[];
   displayedSelection: selectOption;
   handleVote: (selection: selectOption) => void;
+  isLoggedIn: boolean;
 }) {
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-
-  if (isLoading) {
-    return (
-      <SpinnerContainer>
-        <Spinner />
-      </SpinnerContainer>
-    );
-  }
-
   return (
     <>
       <VoteResultCircleContainer>
@@ -70,13 +58,6 @@ export default function MainContent({
 const VoteResultCircleContainer = styled.div`
   display: flex;
   justify-content: center;
+  min-height: 248px;
   max-height: 280px;
-`;
-
-const SpinnerContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 300px;
 `;

@@ -141,6 +141,7 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
             <BanBanLogo />
           </LogoButton>
         </LogoArea>
+
         <Actions>
           {isLoggedIn ? (
             <ButtonsWrapper>

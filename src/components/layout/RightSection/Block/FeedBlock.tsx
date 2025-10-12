@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 const FeedBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
   const { user, createdAt, commentCount, content, likeCount, id, isLiked } =
     props;
+  const { isLoggedIn, user: me } = useAuthStore();
 
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -34,7 +35,6 @@ const FeedBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
   const [reportDetail, setReportDetail] = useState<string>("");
 
   const reportMutation = useReportMutation();
-  const { isLoggedIn } = useAuthStore();
 
   const handleToggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -62,6 +62,8 @@ const FeedBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
     }, 0);
   };
 
+  const isMyFeed = me?.username === user.username;
+
   return (
     <StyledContainer>
       <Avatar
@@ -76,35 +78,37 @@ const FeedBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
             <StyledTitle>{props.user.username}</StyledTitle>
             <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
-          <StyledMoreButtonWrapper ref={dropdownRef}>
-            <StyledMoreButton
-              onClick={handleToggleDropdown}
-              aria-label="더보기 옵션 열기"
-            >
-              <MoreIcon />
-            </StyledMoreButton>
-            {isDropdownOpen && (
-              <OptionsDropdown
-                onHide={() => {
-                  handleCloseDropdown();
-                  // 관심 없음 처리 로직
-                }}
-                onReport={() => {
-                  handleCloseDropdown();
-                  setReportModalOpen(true);
-                }}
-              />
-            )}
-            {isReportModalOpen && (
-              <ReportModal
-                isOpen={isReportModalOpen}
-                onClose={() => setReportModalOpen(false)}
-                onReport={handleReport}
-                targetType="FEED"
-                targetId={id}
-              />
-            )}
-          </StyledMoreButtonWrapper>
+          {!isMyFeed && isLoggedIn && (
+            <StyledMoreButtonWrapper ref={dropdownRef}>
+              <StyledMoreButton
+                onClick={handleToggleDropdown}
+                aria-label="더보기 옵션 열기"
+              >
+                <MoreIcon />
+              </StyledMoreButton>
+              {isDropdownOpen && (
+                <OptionsDropdown
+                  onHide={() => {
+                    handleCloseDropdown();
+                    // 관심 없음 처리 로직
+                  }}
+                  onReport={() => {
+                    handleCloseDropdown();
+                    setReportModalOpen(true);
+                  }}
+                />
+              )}
+              {isReportModalOpen && (
+                <ReportModal
+                  isOpen={isReportModalOpen}
+                  onClose={() => setReportModalOpen(false)}
+                  onReport={handleReport}
+                  targetType="FEED"
+                  targetId={id}
+                />
+              )}
+            </StyledMoreButtonWrapper>
+          )}
         </StyledTitleContainer>
 
         <StyledBodyContainer>{content}</StyledBodyContainer>

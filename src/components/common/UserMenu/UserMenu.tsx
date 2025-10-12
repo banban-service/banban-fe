@@ -38,14 +38,14 @@ export const UserMenuComponent = forwardRef<HTMLDivElement, MenuProps>(
           onOpenCommunityInfo?.();
         },
       },
-      {
-        label: "팀 정보",
-        icon: <UsersIcon />,
-        onClick: () => {
-          console.log("팀 정보");
-          onClose();
-        },
-      },
+      // {
+      //   label: "팀 정보",
+      //   icon: <UsersIcon />,
+      //   onClick: () => {
+      //     console.log("팀 정보");
+      //     onClose();
+      //   },
+      // },
       {
         label: "로그아웃",
         icon: <LogoutIcon />,
