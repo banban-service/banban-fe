@@ -228,7 +228,7 @@ function AuthButtons({ handleLogin, handleRegister }: AuthButtonsInterface) {
 }
 
 const COLOR = {
-  background: "#f9f8ff",
+  background: "#F4F6F8",
   text: "#535862",
   primary: "#3f13ff",
   white: "#ffffff",
@@ -278,7 +278,7 @@ const IconButton = styled.button<{ $active?: boolean }>`
   border: none;
   border-radius: 100%;
   background-color: ${({ $active }) =>
-    $active ? "rgba(63, 19, 255, 0.12)" : "#f9f8ff"};
+    $active ? "rgba(63, 19, 255, 0.12)" : "#F4F6F8"};
   margin-right: 4px;
   cursor: pointer;
   transition: background-color 0.2s ease;
