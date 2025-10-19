@@ -66,3 +66,19 @@ export const markAllNotificationsAsRead = async (): Promise<MarkAllNotifications
 
   return res as MarkAllNotificationsAsReadResponse;
 };
+
+export interface DeleteReadNotificationsResponse {
+  code: number;
+  status: "SUCCESS" | "FAILURE";
+  data: {
+    deleted_count: number;
+  };
+}
+
+export const deleteReadNotifications = async (): Promise<DeleteReadNotificationsResponse> => {
+  const res = await apiFetch("/notifications/read", {
+    method: "DELETE",
+  });
+
+  return res as DeleteReadNotificationsResponse;
+};

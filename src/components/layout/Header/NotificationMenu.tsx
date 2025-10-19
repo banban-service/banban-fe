@@ -19,6 +19,7 @@ interface NotificationMenuProps {
   connectionStatus: NotificationConnectionStatus;
   isTimeout: boolean;
   onMarkAllRead: () => void;
+  onDeleteRead: () => void;
   onItemClick: (notification: Notification) => void;
 }
 
@@ -39,6 +40,7 @@ export default function NotificationMenu({
   connectionStatus,
   isTimeout,
   onMarkAllRead,
+  onDeleteRead,
   onItemClick,
 }: NotificationMenuProps) {
   const { ref: scrollTriggerRef } = useInView({
@@ -62,6 +64,13 @@ export default function NotificationMenu({
 
   const hasUnread = unreadCount > 0;
 
+  const readCount = useMemo(
+    () => allNotifications.filter((n) => n.isRead).length,
+    [allNotifications],
+  );
+
+  const hasRead = readCount > 0;
+
   const statusLabel = useMemo(() => {
     if (isTimeout) return "지연됨";
     return STATUS_LABELS[connectionStatus] ?? "상태 미확인";
@@ -81,6 +90,14 @@ export default function NotificationMenu({
         >
           모두 읽음
         </MarkAllButton>
+        <DeleteButton
+          type="button"
+          onClick={onDeleteRead}
+          disabled={!hasRead}
+          title={hasRead ? "읽은 알림을 모두 삭제합니다" : "읽은 알림이 없습니다"}
+        >
+          삭제
+        </DeleteButton>
       </MenuHeader>
 
       <MenuContent>
@@ -234,6 +251,25 @@ const MarkAllButton = styled.button`
 
   &:disabled {
     color: #cbd5f5;
+    cursor: not-allowed;
+  }
+`;
+
+const DeleteButton = styled.button`
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px 6px;
+
+  &:hover:not(:disabled) {
+    color: #dc2626;
+  }
+
+  &:disabled {
+    color: #fecaca;
     cursor: not-allowed;
   }
 `;

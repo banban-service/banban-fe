@@ -15,10 +15,11 @@ import NotificationMenu from "./NotificationMenu";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { Notification } from "@/types/notification";
-import { markNotificationsAsRead, markAllNotificationsAsRead } from "@/remote/notification";
+import { markNotificationsAsRead, markAllNotificationsAsRead, deleteReadNotifications } from "@/remote/notification";
 import { ProfileEditCard } from "@/components/profile/ProfileEditCard";
 import { CommunityInfoCard } from "@/components/communityInfo/CommunityInfoCard";
 import { logger } from "@/utils/logger";
+import { useToast } from "@/components/common/Toast/useToast";
 
 interface HeaderProps {
   isNew?: boolean;
@@ -34,6 +35,7 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const menuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
   useClickOutside(
@@ -149,6 +151,22 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
     }
   };
 
+  const handleDeleteRead = async () => {
+    try {
+      await deleteReadNotifications();
+      // React Query 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      logger.info("읽은 알림 삭제 완료");
+    } catch (error) {
+      logger.error("읽은 알림 삭제 실패", error);
+      toast.showToast({
+        type: "error",
+        message: "알림 삭제에 실패했습니다.",
+        duration: 3000,
+      });
+    }
+  };
+
   const hasUnreadIndicator = useMemo(() => {
     if (typeof isNew === "boolean") return isNew;
     return unreadCount > 0;
@@ -215,6 +233,7 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
                     connectionStatus={connectionStatus}
                     isTimeout={isTimeout}
                     onMarkAllRead={handleMarkAllRead}
+                    onDeleteRead={handleDeleteRead}
                     onItemClick={handleNotificationItemClick}
                   />
                 )}
