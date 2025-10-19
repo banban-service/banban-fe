@@ -12,6 +12,7 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import HeaderSkeleton from "@/components/common/Skeleton/HeaderSkeleton";
 import NotificationMenu from "./NotificationMenu";
 import { useNotificationStore } from "@/store/useNotificationStore";
+import { useNotifications } from "@/hooks/useNotifications";
 import type { Notification } from "@/types/notification";
 import { ProfileEditCard } from "@/components/profile/ProfileEditCard";
 import { CommunityInfoCard } from "@/components/communityInfo/CommunityInfoCard";
@@ -42,14 +43,24 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
   );
   useClickOutside(notificationRef, () => setNotificationOpen(false), "click");
 
-  const notifications = useNotificationStore((state) => state.notifications);
-  const unreadCount = useNotificationStore((state) => state.unreadCount);
   const connectionStatus = useNotificationStore(
     (state) => state.connectionStatus,
   );
   const isTimeout = useNotificationStore((state) => state.isTimeout);
   const markAsRead = useNotificationStore((state) => state.markAsRead);
   const markAllRead = useNotificationStore((state) => state.markAllAsRead);
+
+  const {
+    data: notificationsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useNotifications();
+
+  const unreadCount = useMemo(
+    () => notificationsData?.pages[0]?.data.unread_count ?? 0,
+    [notificationsData],
+  );
 
   const profileImageSrcState = user?.profileImageUrl || "/user.png";
   const [profileImageSrc, setProfileImageSrc] = useState(profileImageSrcState);
@@ -83,23 +94,26 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
 
   useEffect(() => {
     if (!isNotificationOpen) return;
-    const unreadIds = notifications
-      .filter((notification) => !notification.is_read)
+    const allNotifications = notificationsData?.pages?.flatMap(
+      (page) => page.data.notifications,
+    ) ?? [];
+    const unreadIds = allNotifications
+      .filter((notification) => !notification.isRead)
       .map((notification) => notification.id);
     if (unreadIds.length > 0) {
       markAsRead(unreadIds);
     }
-  }, [isNotificationOpen, notifications, markAsRead]);
+  }, [isNotificationOpen, notificationsData, markAsRead]);
 
   const handleNotificationItemClick = (notification: Notification) => {
-    if (!notification.is_read) {
+    if (!notification.isRead) {
       markAsRead([notification.id]);
     }
     setNotificationOpen(false);
 
     // 피드 관련 알림이면 해당 피드로 이동
-    if (notification.target_type === "FEED" && notification.target_id) {
-      router.push(`/feeds/${notification.target_id}`);
+    if (notification.targetType === "FEED" && notification.targetId) {
+      router.push(`/feeds/${notification.targetId}`);
     }
   };
 
@@ -162,7 +176,10 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
                 </IconButton>
                 {isNotificationOpen && (
                   <NotificationMenu
-                    notifications={notifications}
+                    data={notificationsData}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                     connectionStatus={connectionStatus}
                     isTimeout={isTimeout}
                     onMarkAllRead={markAllRead}

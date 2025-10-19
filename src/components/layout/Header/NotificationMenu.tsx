@@ -1,14 +1,21 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useCallback } from "react";
 import styled from "styled-components";
 import type {
   Notification,
   NotificationConnectionStatus,
 } from "@/types/notification";
+import { useInView } from "react-intersection-observer";
+import type { InfiniteData } from "@tanstack/react-query";
+import type { NotificationResponse } from "@/remote/notification";
+import { Avatar } from "@/components/common/Avatar";
 
 interface NotificationMenuProps {
-  notifications: Notification[];
+  data?: InfiniteData<NotificationResponse>;
+  fetchNextPage: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   connectionStatus: NotificationConnectionStatus;
   isTimeout: boolean;
   onMarkAllRead: () => void;
@@ -25,13 +32,35 @@ const STATUS_LABELS: Record<NotificationConnectionStatus, string> = {
 };
 
 export default function NotificationMenu({
-  notifications,
+  data,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
   connectionStatus,
   isTimeout,
   onMarkAllRead,
   onItemClick,
 }: NotificationMenuProps) {
-  const hasUnread = notifications.some((notification) => !notification.is_read);
+  const { ref: scrollTriggerRef } = useInView({
+    threshold: 0,
+    onChange: (inView) => {
+      if (inView && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+  });
+
+  const allNotifications = useMemo(
+    () => data?.pages?.flatMap((page) => page.data.notifications) ?? [],
+    [data],
+  );
+
+  const unreadCount = useMemo(
+    () => data?.pages[0]?.data.unread_count ?? 0,
+    [data],
+  );
+
+  const hasUnread = unreadCount > 0;
 
   const statusLabel = useMemo(() => {
     if (isTimeout) return "지연됨";
@@ -55,23 +84,45 @@ export default function NotificationMenu({
       </MenuHeader>
 
       <MenuContent>
-        {notifications.length === 0 ? (
+        {allNotifications.length === 0 ? (
           <EmptyState>받은 알림이 없습니다.</EmptyState>
         ) : (
-          <NotificationList>
-            {notifications.map((notification) => (
-              <NotificationItem
-                key={notification.id}
-                role="menuitem"
-                tabIndex={0}
-                onClick={() => onItemClick(notification)}
-                $unread={!notification.is_read}
+          <>
+            <NotificationList>
+              {allNotifications.map((notification) => (
+                <NotificationItem
+                  key={notification.id}
+                  role="menuitem"
+                  tabIndex={0}
+                  onClick={() => onItemClick(notification)}
+                  $unread={!notification.isRead}
+                >
+                  <AvatarWrapper>
+                    <Avatar
+                      src={notification.fromUser?.profileImage || ""}
+                      alt={notification.fromUser?.username || "사용자"}
+                      size={32}
+                    />
+                  </AvatarWrapper>
+                  <NotificationContent>
+                    <UserInfo>
+                      <Username>{notification.fromUser?.username}</Username>
+                      <Meta>{formatTimestamp(notification.createdAt)}</Meta>
+                    </UserInfo>
+                    <Message>{notification.message}</Message>
+                  </NotificationContent>
+                </NotificationItem>
+              ))}
+            </NotificationList>
+            {hasNextPage && (
+              <InfiniteScrollTrigger
+                ref={scrollTriggerRef}
+                data-fetching={isFetchingNextPage}
               >
-                <Message>{notification.message}</Message>
-                <Meta>{formatTimestamp(notification.created_at)}</Meta>
-              </NotificationItem>
-            ))}
-          </NotificationList>
+                {isFetchingNextPage ? "로딩 중..." : "더 불러오기"}
+              </InfiniteScrollTrigger>
+            )}
+          </>
         )}
       </MenuContent>
     </Menu>
@@ -200,6 +251,8 @@ const NotificationList = styled.ul`
 `;
 
 const NotificationItem = styled.li<{ $unread: boolean }>`
+  display: flex;
+  gap: 10px;
   padding: 12px 14px;
   border-bottom: 1px solid #f1f5f9;
   cursor: pointer;
@@ -217,17 +270,42 @@ const NotificationItem = styled.li<{ $unread: boolean }>`
   }
 `;
 
-const Message = styled.p`
-  margin: 0 0 4px 0;
-  font-size: 13px;
-  line-height: 1.4;
+const AvatarWrapper = styled.div`
+  flex-shrink: 0;
+`;
+
+const NotificationContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: space-between;
+`;
+
+const Username = styled.span`
+  font-weight: 600;
+  font-size: 12px;
   color: #0f172a;
+`;
+
+const Message = styled.p`
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #475569;
 `;
 
 const Meta = styled.span`
   display: block;
   font-size: 11px;
   color: #94a3b8;
+  white-space: nowrap;
 `;
 
 const EmptyState = styled.div`
@@ -235,4 +313,23 @@ const EmptyState = styled.div`
   text-align: center;
   font-size: 13px;
   color: #94a3b8;
+`;
+
+const InfiniteScrollTrigger = styled.div`
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 12px;
+  color: #94a3b8;
+  border-top: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #eef2ff;
+  }
+
+  &[data-fetching="true"] {
+    cursor: not-allowed;
+    color: #cbd5e1;
+  }
 `;

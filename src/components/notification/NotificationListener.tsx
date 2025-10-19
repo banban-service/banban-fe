@@ -16,16 +16,13 @@ const TIMEOUT_THRESHOLD_MS = 70_000;
 function mapNotificationPayload(payload: WSNotificationMessage): Notification {
   return {
     id: payload.id,
-    user_id: payload.user_id,
-    notification_type: payload.notification_type,
     type: payload.notification_type,
-    from_user_id: payload.from_user_id,
-    target_type: payload.target_type,
-    target_id: payload.target_id,
+    targetType: payload.target_type,
+    targetId: payload.target_id,
     message: payload.message,
-    is_read: payload.is_read,
-    created_at: payload.created_at,
-    read_at: payload.read_at,
+    isRead: payload.is_read,
+    createdAt: payload.created_at,
+    readAt: payload.read_at,
   };
 }
 
