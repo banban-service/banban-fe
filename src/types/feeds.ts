@@ -1,12 +1,12 @@
 export type SortBy = "created" | "like" | "comment";
 export type SortOrder = "asc" | "desc";
 export type FilterType = "all" | "same_vote";
-export type FeedType = "NORMAL" | "AD";
+export type FeedType = "USER" | "AD" | "NOTICE";
 
 interface User {
   id: number;
   username: string;
-  profile_image: string | null;
+  profileImage: string | null;
 }
 
 interface AdMeta {
@@ -21,14 +21,14 @@ interface Feed {
   type: FeedType;
   user: User | null;
   content: string;
-  ad_url: string | null;
-  ad_meta: AdMeta | null;
-  created_at: string;
-  like_count: number;
-  comment_count: number;
-  is_liked: boolean;
-  is_mine: boolean;
-  user_vote_option_id: number | null;
+  adUrl: string | null;
+  adMeta: AdMeta | null;
+  createdAt: string;
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
+  isMine: boolean;
+  userVoteOptionId: number | null;
 }
 
 export interface HotFeedAuthor {

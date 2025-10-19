@@ -21,19 +21,19 @@ const FeedBlockComponent = ({
   props: Feed;
   pollData?: Poll;
 }) => {
-  const { user, created_at, comment_count, content, like_count, id, is_liked } =
+  const { user, createdAt, commentCount, content, likeCount, id, isLiked } =
     props;
   const { isLoggedIn, user: me } = useAuthStore();
 
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const formattedCreatedAt = new Date(created_at).toLocaleDateString();
+  const formattedCreatedAt = new Date(createdAt).toLocaleDateString();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isReportModalOpen, setReportModalOpen] = useState(false);
   useClickOutside(dropdownRef, () => setDropdownOpen(false));
 
-  const [liked, setLiked] = useState<boolean>(is_liked);
-  const [count, setCount] = useState<number>(like_count);
+  const [liked, setLiked] = useState<boolean>(isLiked);
+  const [count, setCount] = useState<number>(likeCount);
 
   const likeMutation = useFeedLikeOptimisticUpdate({ id });
 
@@ -77,7 +77,7 @@ const FeedBlockComponent = ({
   return (
     <StyledContainer>
       <Avatar
-        src={user?.profile_image || ""}
+        src={user?.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={avatarBackground}
@@ -140,7 +140,7 @@ const FeedBlockComponent = ({
             onLoginRequired={handleLoginRequired}
           />
           <FeedCommentButton
-            commentCount={comment_count}
+            commentCount={commentCount}
             onClick={() => {
               router.push(`/feeds/${id}`);
             }}

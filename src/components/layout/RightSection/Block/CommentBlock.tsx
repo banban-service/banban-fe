@@ -72,7 +72,7 @@ const CommentBlock = ({
       <StyledLeftPadding />
       <CornerDownRightIcon size={30} color="#DADADA" />
       <Avatar
-        src={author.profile_image || ""}
+        src={author.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={avatarBackground}
