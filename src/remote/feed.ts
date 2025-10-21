@@ -35,8 +35,16 @@ export const getFeeds = async (
   return await apiFetch(url);
 };
 
-export const getHotFeed = async (): Promise<HotFeedSnapshot> => {
-  return apiFetch<HotFeedSnapshot>("/feeds/hot");
+export const getHotFeed = async (pollId?: number): Promise<HotFeedSnapshot> => {
+  const queryParams = new URLSearchParams();
+  if (typeof pollId === "number") {
+    queryParams.append("poll_id", pollId.toString());
+  }
+
+  const queryString = queryParams.toString();
+  const url = queryString ? `/feeds/hot?${queryString}` : "/feeds/hot";
+
+  return apiFetch<HotFeedSnapshot>(url);
 };
 
 /**

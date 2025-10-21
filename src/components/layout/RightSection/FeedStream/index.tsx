@@ -91,22 +91,18 @@ export default function FeedStream() {
       )}
 
       {!isPollLoading && !feedsEnabled && !isPollError && (
-        <div className="flex h-full items-center justify-center text-sm text-slate-500">
-          오늘의 투표가 없어 관련 피드를 불러오지 않았습니다.
-        </div>
+        <StatusNotice>
+          {"오늘의 주제가 없습니다\n잠시 후 다시 시도해주세요"}
+        </StatusNotice>
       )}
-
       {!isPollLoading && isPollError && (
-        <div className="flex h-full items-center justify-center text-sm text-red-500">
-          투표 정보를 불러오지 못해 피드를 표시할 수 없습니다.
-        </div>
+        <StatusNotice>
+          {"투표 정보를 불러오지 못했습니다\n잠시 후 다시 확인해주세요"}
+        </StatusNotice>
       )}
-
       {feedsEnabled &&
         (isFeedsLoading ? (
-          <div className="flex h-full items-center justify-center text-sm text-slate-500">
-            피드를 불러오는 중입니다...
-          </div>
+          <StatusNotice>피드를 불러오는 중입니다...</StatusNotice>
         ) : (
           <>
             {data?.pages?.map((page, index) => (
@@ -143,11 +139,13 @@ export default function FeedStream() {
             ))}
             <div className="flex h-30 items-center justify-center">
               {isFetchingNextPage ? (
-                <div>로딩중...</div>
+                <StatusNotice compact>
+                  추가 피드를 불러오는 중입니다...
+                </StatusNotice>
               ) : (
-                <p className="text-gray-500">
+                <StatusNotice muted compact>
                   {hasNextPage ? "" : "불러올 피드가 없습니다"}
-                </p>
+                </StatusNotice>
               )}
             </div>
           </>
@@ -170,4 +168,18 @@ const StyledFeedStreamContainer = styled.div`
   & > :first-child {
     margin-top: 10px;
   }
+`;
+
+const StatusNotice = styled.div<{ muted?: boolean; compact?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: ${({ compact }) => (compact ? "auto" : "240px")};
+  padding: ${({ compact }) => (compact ? "0" : "32px 16px")};
+  font-size: ${({ compact }) => (compact ? "12px" : "15px")};
+  font-weight: 500;
+  color: ${({ muted }) => (muted ? "#9ca3af" : "#6b7280")};
+  text-align: center;
+  white-space: pre-line;
 `;
