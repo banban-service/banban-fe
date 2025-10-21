@@ -9,11 +9,33 @@ import { useFeedFilterStore } from "@/store/useFeedFilterStore";
 
 export default function FeedStream() {
   const { sortBy, filterType } = useFeedFilterStore();
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFeeds({
-    sort_by: sortBy,
-    filter_type: filterType,
-  });
-  const { data: todayPoll } = usePoll();
+  const {
+    data: todayPoll,
+    isLoading: isPollLoading,
+    isError: isPollError,
+  } = usePoll();
+  const pollId = todayPoll?.id;
+
+  const feedsEnabled = typeof pollId === "number";
+
+  const feedsQuery = useFeeds(
+    {
+      sort_by: sortBy,
+      filter_type: filterType,
+      poll_id: pollId,
+    },
+    {
+      enabled: feedsEnabled,
+    },
+  );
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isFeedsLoading,
+  } = feedsQuery;
 
   const [scrollTrigger, isInView] = useInView({
     threshold: 0,
@@ -23,10 +45,11 @@ export default function FeedStream() {
   const { scrollPosition, setScrollPosition } = useScrollPositionStore();
 
   useEffect(() => {
+    if (!feedsEnabled) return;
     if (hasNextPage && isInView) {
       fetchNextPage();
     }
-  }, [isInView, hasNextPage]);
+  }, [isInView, hasNextPage, feedsEnabled, fetchNextPage]);
 
   useEffect(() => {
     if (scrollPosition > 0) {
@@ -61,33 +84,74 @@ export default function FeedStream() {
 
   return (
     <StyledFeedStreamContainer ref={scrollRef}>
-      {data?.pages?.map((page, index) => (
-        <Fragment key={`page-${index}`}>
-          {page?.data?.content?.map((item, idx, array) => {
-            const isSecondFromLast = idx === array.length - 4;
-            const itemKey =
-              item.type === "AD" ? `ad-${item.id}-${idx}` : `feed-${item.id}`;
+      {isPollLoading && (
+        <div className="flex h-full items-center justify-center text-sm text-slate-500">
+          오늘의 투표를 불러오는 중입니다...
+        </div>
+      )}
 
-            return (
-              <Fragment key={itemKey}>
-                {isSecondFromLast && hasNextPage && <div ref={scrollTrigger} />}
-                {item.type === "USER" || item.type === "NOTICE" ? (
-                  <Block type="feed" feedProps={item} pollData={todayPoll} />
-                ) : (
-                  <Block type="ad" feedProps={item} pollData={todayPoll} />
-                )}
-              </Fragment>
-            );
-          })}
-        </Fragment>
-      ))}
-      <div className="flex justify-center items-center h-30">
-        {isFetchingNextPage ? (
-          <div>로딩중...</div>
+      {!isPollLoading && !feedsEnabled && !isPollError && (
+        <div className="flex h-full items-center justify-center text-sm text-slate-500">
+          오늘의 투표가 없어 관련 피드를 불러오지 않았습니다.
+        </div>
+      )}
+
+      {!isPollLoading && isPollError && (
+        <div className="flex h-full items-center justify-center text-sm text-red-500">
+          투표 정보를 불러오지 못해 피드를 표시할 수 없습니다.
+        </div>
+      )}
+
+      {feedsEnabled &&
+        (isFeedsLoading ? (
+          <div className="flex h-full items-center justify-center text-sm text-slate-500">
+            피드를 불러오는 중입니다...
+          </div>
         ) : (
-          <p className="text-gray-500">불러올 피드가 없습니다</p>
-        )}
-      </div>
+          <>
+            {data?.pages?.map((page, index) => (
+              <Fragment key={`page-${index}`}>
+                {page?.data?.content?.map((item, idx, array) => {
+                  const isSecondFromLast = idx === array.length - 4;
+                  const itemKey =
+                    item.type === "AD"
+                      ? `ad-${item.id}-${idx}`
+                      : `feed-${item.id}`;
+
+                  return (
+                    <Fragment key={itemKey}>
+                      {isSecondFromLast && hasNextPage && (
+                        <div ref={scrollTrigger} />
+                      )}
+                      {item.type === "USER" || item.type === "NOTICE" ? (
+                        <Block
+                          type="feed"
+                          feedProps={item}
+                          pollData={todayPoll}
+                        />
+                      ) : (
+                        <Block
+                          type="ad"
+                          feedProps={item}
+                          pollData={todayPoll}
+                        />
+                      )}
+                    </Fragment>
+                  );
+                })}
+              </Fragment>
+            ))}
+            <div className="flex h-30 items-center justify-center">
+              {isFetchingNextPage ? (
+                <div>로딩중...</div>
+              ) : (
+                <p className="text-gray-500">
+                  {hasNextPage ? "" : "불러올 피드가 없습니다"}
+                </p>
+              )}
+            </div>
+          </>
+        ))}
     </StyledFeedStreamContainer>
   );
 }

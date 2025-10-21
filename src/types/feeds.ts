@@ -63,6 +63,7 @@ interface FeedsRequest {
   sort_by?: SortBy;
   sort_order?: SortOrder;
   filter_type?: FilterType;
+  poll_id?: number;
 }
 
 interface FeedsResponse {

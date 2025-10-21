@@ -12,9 +12,10 @@ import {
  * @returns 피드 목록 응답
  */
 export const getFeeds = async (
-    params: FeedsRequest = {},
+  params: FeedsRequest = {},
 ): Promise<FeedsResponse> => {
-  const {last_id, size = 20, sort_by, sort_order, filter_type} = params;
+  const { last_id, size = 20, sort_by, sort_order, filter_type, poll_id } =
+    params;
 
   // 쿼리 파라미터 생성
   const queryParams = new URLSearchParams();
@@ -24,6 +25,9 @@ export const getFeeds = async (
   if (sort_by) queryParams.append("sort_by", sort_by);
   if (sort_order) queryParams.append("sort_order", sort_order);
   if (filter_type) queryParams.append("filter_type", filter_type);
+  if (typeof poll_id === "number") {
+    queryParams.append("poll_id", poll_id.toString());
+  }
 
   const queryString = queryParams.toString();
   const url = queryString ? `/feeds/?${queryString}` : "/feeds/";
