@@ -5,6 +5,7 @@ import styled from "styled-components";
 import type {
   Notification,
   NotificationConnectionStatus,
+  NotificationType,
 } from "@/types/notification";
 import { useInView } from "react-intersection-observer";
 import type { InfiniteData } from "@tanstack/react-query";
@@ -113,17 +114,18 @@ export default function NotificationMenu({
                   tabIndex={0}
                   onClick={() => onItemClick(notification)}
                   $unread={!notification.isRead}
+                  $type={notification.type}
                   aria-label={`${notification.fromUser?.username}: ${notification.message}${
                     !notification.isRead ? " (읽지 않은 알림)" : " (읽은 알림)"
                   }`}
                 >
-                  <AvatarWrapper $unread={!notification.isRead}>
+                  <AvatarWrapper $unread={!notification.isRead} $type={notification.type}>
                     <Avatar
                       src={notification.fromUser?.profileImage || ""}
                       alt={notification.fromUser?.username || "사용자"}
                       size={32}
                     />
-                    {!notification.isRead && <UnreadIndicator />}
+                    {!notification.isRead && <UnreadIndicator $type={notification.type} />}
                   </AvatarWrapper>
                   <NotificationContent>
                     <UserInfo>
@@ -320,22 +322,37 @@ const NotificationList = styled.ul`
   padding: 0;
 `;
 
-const NotificationItem = styled.li<{ $unread: boolean }>`
+const NotificationItem = styled.li<{ $unread: boolean; $type: NotificationType }>`
   display: flex;
   gap: 10px;
   padding: 12px 14px;
   border-bottom: 1px solid #f1f5f9;
-  border-left: ${({ $unread }) => ($unread ? "2px solid #6366f1" : "2px solid transparent")};
+  border-left: ${({ $unread, $type }) =>
+    $unread
+      ? $type === "MENTION"
+        ? "2px solid #10b981"
+        : "2px solid #6366f1"
+      : "2px solid transparent"};
   padding-left: 12px;
   cursor: pointer;
-  background: ${({ $unread }) => ($unread ? "#eef6ff" : "transparent")};
+  background: ${({ $unread, $type }) =>
+    $unread
+      ? $type === "MENTION"
+        ? "#ecfdf5"
+        : "#eef6ff"
+      : "transparent"};
   transition:
     background 0.2s ease,
     border-left-color 0.2s ease,
     transform 0.2s ease;
 
   &:hover {
-    background: ${({ $unread }) => ($unread ? "#e0efff" : "#eef2ff")};
+    background: ${({ $unread, $type }) =>
+      $unread
+        ? $type === "MENTION"
+          ? "#d1fae5"
+          : "#e0efff"
+        : "#eef2ff"};
   }
 
   &:last-child {
@@ -343,7 +360,7 @@ const NotificationItem = styled.li<{ $unread: boolean }>`
   }
 `;
 
-const AvatarWrapper = styled.div<{ $unread: boolean }>`
+const AvatarWrapper = styled.div<{ $unread: boolean; $type: NotificationType }>`
   position: relative;
   flex-shrink: 0;
   display: flex;
@@ -388,14 +405,14 @@ const Meta = styled.span`
   white-space: nowrap;
 `;
 
-const UnreadIndicator = styled.div`
+const UnreadIndicator = styled.div<{ $type: NotificationType }>`
   position: absolute;
   bottom: -2px;
   right: -2px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #6366f1;
+  background: ${({ $type }) => ($type === "MENTION" ? "#10b981" : "#6366f1")};
   border: 2px solid #ffffff;
   box-shadow: 0 0 0 1px #e2e8f0;
 `;
