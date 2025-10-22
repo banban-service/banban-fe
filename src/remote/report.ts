@@ -13,7 +13,12 @@ export const postReport = async ({
   reasonCode,
   reasonDetail,
 }: ReportRequest) => {
-  const body: Record<string, any> = {
+  const body: {
+    target_type: string;
+    target_id: number;
+    reason_code: string;
+    reason_detail?: string;
+  } = {
     target_type: targetType,
     target_id: targetId,
     reason_code: reasonCode,

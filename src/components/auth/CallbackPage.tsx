@@ -20,19 +20,7 @@ export default function CallbackPage({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // 1 URL에서 인증 코드 추출
   useEffect(() => {
-    extractAuthCodeFromUrl();
-  }, []);
-
-  // 2 인증 후 응답 처리
-  useEffect(() => {
-    if (authCode !== "") {
-      handleLogin(authCode);
-    }
-  }, [authCode]);
-
-  const extractAuthCodeFromUrl = () => {
     const code = searchParams?.get("code");
 
     if (!code) {
@@ -40,30 +28,45 @@ export default function CallbackPage({
       setIsLoading(false);
       return;
     }
-    setAuthCode(code);
-  };
 
-  const handleLogin = async (code: string) => {
-    const state = searchParams?.get("state") || undefined;
-    try {
-      await login({
-        code,
-        provider,
-        state,
-      });
-    } catch (err) {
-      console.error("로그인 실패:", err);
-      setError("로그인 요청에 실패했습니다.");
-      showToast({
-        type: "error",
-        message: "로그인 처리 실패: " + (err as Error).message,
-        duration: 1000,
-      });
-    } finally {
-      setIsLoading(false);
-      router.replace("/");
-    }
-  };
+    setAuthCode(code);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!authCode) return;
+
+    let isActive = true;
+
+    const performLogin = async () => {
+      const state = searchParams?.get("state") || undefined;
+      try {
+        await login({
+          code: authCode,
+          provider,
+          state,
+        });
+      } catch (err) {
+        console.error("로그인 실패:", err);
+        if (!isActive) return;
+        setError("로그인 요청에 실패했습니다.");
+        showToast({
+          type: "error",
+          message: "로그인 처리 실패: " + (err as Error).message,
+          duration: 1000,
+        });
+      } finally {
+        if (!isActive) return;
+        setIsLoading(false);
+        router.replace("/");
+      }
+    };
+
+    void performLogin();
+
+    return () => {
+      isActive = false;
+    };
+  }, [authCode, login, provider, router, searchParams, showToast]);
 
   if (isLoading) {
     return <div className="text-base-white text-center pt-5">Loading...</div>;

@@ -23,7 +23,7 @@ const CommentStream = () => {
     if (hasNextPage && isInView) {
       fetchNextPage();
     }
-  }, [isInView, hasNextPage]);
+  }, [fetchNextPage, hasNextPage, isInView]);
 
   const totalComments = data?.pages?.reduce(
     (acc, page) => acc + (page?.data?.content?.length || 0),

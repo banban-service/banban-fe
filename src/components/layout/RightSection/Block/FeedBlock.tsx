@@ -60,7 +60,7 @@ const FeedBlockComponent = ({
       showToast({ type: "success", message: "피드가 수정되었습니다.", duration: 3000 });
       setEditModalOpen(false);
     },
-    onError: (error) => {
+    onError: () => {
       showToast({ type: "error", message: "피드 수정에 실패했습니다.", duration: 3000 });
     },
   });
@@ -72,7 +72,7 @@ const FeedBlockComponent = ({
       showToast({ type: "success", message: "피드가 삭제되었습니다.", duration: 3000 });
       setDeleteModalOpen(false);
     },
-    onError: (error) => {
+    onError: () => {
       showToast({ type: "error", message: "피드 삭제에 실패했습니다.", duration: 3000 });
     },
   });

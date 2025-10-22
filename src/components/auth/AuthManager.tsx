@@ -10,7 +10,7 @@ export default function AuthManager() {
     if (typeof window !== "undefined") {
       checkAuth();
     }
-  }, []);
+  }, [checkAuth]);
 
   return null;
 }

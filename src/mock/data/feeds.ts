@@ -11,7 +11,7 @@ const mockFeeds: MockFeed[] = Array.from({ length: 106 }, (_, i): MockFeed => {
     author: {
       user_id: id + 100,
       username: isAdFeed ? 'Ad' : `User${id}`,
-      profile_image: `https://picsum.photos/200/200?random=${id}`,
+      profileImage: `https://picsum.photos/200/200?random=${id}`,
     },
     content: `This is a mock feed content number ${id}. It's designed to test the UI and data fetching.`,
     ad_url: isAdFeed ? `https://picsum.photos/600/400?random=${id}` : null,

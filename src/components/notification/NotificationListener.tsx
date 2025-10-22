@@ -68,24 +68,24 @@ export default function NotificationListener() {
         message: notification.message,
         duration: 3000,
         action:
-          notification.target_type === "FEED"
+          notification.targetType === "FEED"
             ? {
                 label: "보기",
                 onClick: () => {
                   queryClient.invalidateQueries({
-                    queryKey: ["comments", notification.target_id],
+                    queryKey: ["comments", notification.targetId],
                   });
-                  router.push(`/feeds/${notification.target_id}`);
+                  router.push(`/feeds/${notification.targetId}`);
                 },
               }
-            : notification.target_type === "COMMENT" && notification.related_id
+            : notification.targetType === "COMMENT" && notification.relatedId
             ? {
                 label: "보기",
                 onClick: () => {
                   queryClient.invalidateQueries({
-                    queryKey: ["comments", notification.related_id],
+                    queryKey: ["comments", notification.relatedId],
                   });
-                  router.push(`/feeds/${notification.related_id}`);
+                  router.push(`/feeds/${notification.relatedId}`);
                 },
               }
             : undefined,

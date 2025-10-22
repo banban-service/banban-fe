@@ -424,15 +424,14 @@ export async function resetAdminPollCache(): Promise<AdminPollCachePurgeResult> 
   });
 
   const data = res.data ?? {};
-  const rawPatterns =
+  const rawPatterns = (data.deleted_patterns ??
     data.patterns ??
-    data.deleted_patterns ??
-    ([] as Array<{
-      pattern?: string;
-      keyPattern?: string;
-      deleted?: number;
-      deletedCount?: number;
-    }>);
+    []) as Array<{
+    pattern?: string;
+    keyPattern?: string;
+    deleted?: number;
+    deletedCount?: number;
+  }>;
 
   const patterns: PollCachePatternStat[] = rawPatterns.map((p) => ({
     pattern: p.pattern ?? p.keyPattern ?? "(unknown)",

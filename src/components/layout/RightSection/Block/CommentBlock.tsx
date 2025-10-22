@@ -5,6 +5,7 @@ import {MoreIcon} from "@/components/svg/MoreIcon";
 import {CornerDownRightIcon} from "@/components/svg/CornerDownRightIcon";
 import {CommentContent} from "@/types/comments";
 import {useEffect, useRef, useState} from "react";
+import type { ReactElement } from "react";
 import {OptionsDropdown} from "@/components/common/OptionsDropdown/OptionsDropdown";
 import {useClickOutside} from "@/hooks/useClickOutside";
 import {ReportModal} from "@/components/common/Report";
@@ -24,13 +25,13 @@ import type { CommentUser } from "@/types/comments";
 function formatCommentWithMentions(
   content: string,
   mentionedUsers: CommentUser[]
-): (string | React.ReactNode)[] {
+): (string | ReactElement)[] {
   if (!mentionedUsers || mentionedUsers.length === 0) {
     return [content];
   }
 
   const mentions = mentionedUsers.map((user) => `@${user.username}`);
-  let parts: (string | React.ReactNode)[] = [content];
+  let parts: (string | ReactElement)[] = [content];
 
   mentions.forEach((mention, mentionIndex) => {
     parts = parts.flatMap((part, partIndex) => {

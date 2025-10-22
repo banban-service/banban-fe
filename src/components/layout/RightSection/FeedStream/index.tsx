@@ -12,7 +12,6 @@ export default function FeedStream() {
   const {
     data: todayPoll,
     isLoading: isPollLoading,
-    isError: isPollError,
   } = usePoll();
   const pollId = todayPoll?.id;
 
@@ -52,35 +51,33 @@ export default function FeedStream() {
   }, [isInView, hasNextPage, feedsEnabled, fetchNextPage]);
 
   useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
     if (scrollPosition > 0) {
-      scrollRef.current?.scrollTo(0, scrollPosition);
+      container.scrollTo(0, scrollPosition);
     }
 
-    const handleScrollEnd = () => {
-      setScrollPosition(scrollRef.current?.scrollTop || 0);
+    let timeoutId: number | undefined;
+
+    const handleScroll = () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      timeoutId = window.setTimeout(() => {
+        setScrollPosition(container.scrollTop || 0);
+      }, 200);
     };
 
-    const debounce = (callback: () => void, wait: number) => {
-      let timeout: number;
-
-      return () => {
-        clearTimeout(timeout);
-        timeout = window.setTimeout(callback, wait);
-      };
-    };
-
-    scrollRef.current?.addEventListener(
-      "scroll",
-      debounce(handleScrollEnd, 200),
-    );
+    container.addEventListener("scroll", handleScroll);
 
     return () => {
-      scrollRef.current?.removeEventListener(
-        "scroll",
-        debounce(handleScrollEnd, 200),
-      );
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      container.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [scrollPosition, setScrollPosition]);
 
   const isLoading = isPollLoading || (feedsEnabled && isFeedsLoading);
   const hasData = feedsEnabled && data?.pages?.length && data.pages[0]?.data?.content?.length;

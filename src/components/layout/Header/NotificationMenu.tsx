@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useCallback } from "react";
+import { useMemo } from "react";
+import type { ReactElement } from "react";
 import styled from "styled-components";
 import type {
   Notification,
@@ -175,11 +176,9 @@ function formatTimestamp(value: string) {
   return date.toLocaleString();
 }
 
-function formatNotificationMessage(
-  message: string,
-): (string | React.ReactNode)[] {
+function formatNotificationMessage(message: string): (string | ReactElement)[] {
   const keywords = ["새 댓글", "멘션"];
-  let parts: (string | React.ReactNode)[] = [message];
+  let parts: (string | ReactElement)[] = [message];
 
   keywords.forEach((keyword) => {
     parts = parts.flatMap((part, partIndex) => {

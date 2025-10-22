@@ -61,6 +61,7 @@ export const UserInfoLoader = memo(
       userAvatar,
       hasVoted,
       votedOptionContent,
+      textColor,
       onUserLoaded,
     ]);
 

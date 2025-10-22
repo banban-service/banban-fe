@@ -16,7 +16,7 @@ const mockReplies: MockReplyContent[] = (() => {
         author: {
           user_id: 1000 + ((feedId + i) % 50),
           username: `User${((feedId + i) % 50) + 1}`,
-          profile_image: `https://picsum.photos/200/200?random=${feedId + i}`,
+          profileImage: `https://picsum.photos/200/200?random=${feedId + i}`,
         },
         created_at: created_at,
         updated_at: created_at,
@@ -27,14 +27,14 @@ const mockReplies: MockReplyContent[] = (() => {
           {
             user_id: 1000 + ((feedId + i + 1) % 50),
             username: `User${((feedId + i + 1) % 50) + 1}`,
-            profile_image: `https://picsum.photos/200/200?random=${
+            profileImage: `https://picsum.photos/200/200?random=${
               feedId + i + 1
             }`,
           },
           {
             user_id: 1000 + ((feedId + i + 2) % 50),
             username: `User${((feedId + i + 2) % 50) + 1}`,
-            profile_image: `https://picsum.photos/200/200?random=${
+            profileImage: `https://picsum.photos/200/200?random=${
               feedId + i + 2
             }`,
           },
