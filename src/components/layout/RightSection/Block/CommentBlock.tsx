@@ -75,8 +75,6 @@ const CommentBlock = ({
 
   const [isDropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [isReportModalOpen, setReportModalOpen] = useState<boolean>(false);
-  const [reportReason, setReportReason] = useState<string>("");
-  const [reportDetail, setReportDetail] = useState<string>("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const likeMutation = useCommentLikeOptimisticUpdate({feedId, id});
@@ -199,16 +197,12 @@ const CommentBlock = ({
   };
 
   const handleReport = (reason: string, detail?: string) => {
-    setReportReason(reason);
-    setReportDetail(detail || "");
-    setTimeout(() => {
-      reportMutation.mutate({
-        targetType: "COMMENT",
-        targetId: id,
-        reasonCode: reportReason,
-        reasonDetail: reportDetail,
-      });
-    }, 0);
+    reportMutation.mutate({
+      targetType: "COMMENT",
+      targetId: id,
+      reasonCode: reason,
+      reasonDetail: detail,
+    });
   };
 
   return (

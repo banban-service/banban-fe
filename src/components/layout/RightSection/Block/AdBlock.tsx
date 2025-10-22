@@ -12,8 +12,6 @@ const AdBlock = ({ props }: { props: Feed }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isReportModalOpen, setReportModalOpen] = useState(false);
-  const [reportReason, setReportReason] = useState<string>("");
-  const [reportDetail, setReportDetail] = useState<string>("");
 
   const reportMutation = useReportMutation();
 
@@ -28,16 +26,12 @@ const AdBlock = ({ props }: { props: Feed }) => {
   };
 
   const handleReport = (reason: string, detail?: string) => {
-    setReportReason(reason);
-    setReportDetail(detail || "");
-    setTimeout(() => {
-      reportMutation.mutate({
-        targetType: "FEED",
-        targetId: props.id,
-        reasonCode: reportReason,
-        reasonDetail: reportDetail,
-      });
-    }, 0);
+    reportMutation.mutate({
+      targetType: "FEED",
+      targetId: props.id,
+      reasonCode: reason,
+      reasonDetail: detail,
+    });
   };
 
   return (

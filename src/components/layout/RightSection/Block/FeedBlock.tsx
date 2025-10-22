@@ -50,8 +50,6 @@ const FeedBlockComponent = ({
       props.userVoteOptionId,
       pollData,
   );
-  const [reportReason, setReportReason] = useState<string>("");
-  const [reportDetail, setReportDetail] = useState<string>("");
 
   const reportMutation = useReportMutation();
 
@@ -111,16 +109,12 @@ const FeedBlockComponent = ({
   };
 
   const handleReport = (reason: string, detail?: string) => {
-    setReportReason(reason);
-    setReportDetail(detail || "");
-    setTimeout(() => {
-      reportMutation.mutate({
-        targetType: "FEED",
-        targetId: id,
-        reasonCode: reportReason,
-        reasonDetail: reportDetail,
-      });
-    }, 0);
+    reportMutation.mutate({
+      targetType: "FEED",
+      targetId: id,
+      reasonCode: reason,
+      reasonDetail: detail,
+    });
   };
 
   const isMyFeed = me?.username === user?.username;

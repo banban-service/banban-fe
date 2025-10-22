@@ -49,10 +49,19 @@ export const ReportModal = ({
   };
 
   const handleDetailSubmit = () => {
-    if (detailText.trim()) {
-      onReport("ETC", detailText.trim(), targetType, targetId);
-      handleClose();
+    const trimmed = detailText.trim();
+
+    if (!trimmed) {
+      return;
     }
+
+    if (trimmed.length > 500) {
+      alert("상세 사유는 500자 이내여야 합니다.");
+      return;
+    }
+
+    onReport("ETC", trimmed, targetType, targetId);
+    handleClose();
   };
 
   const handleClose = () => {
@@ -90,14 +99,20 @@ export const ReportModal = ({
                 value={detailText}
                 onChange={(e) => setDetailText(e.target.value)}
                 placeholder="신고 사유를 자세히 입력해주세요..."
+                maxLength={500}
               />
+              <CharCounterWrapper>
+                <CharCounter $isOver={detailText.length > 500}>
+                  {detailText.length}/500
+                </CharCounter>
+              </CharCounterWrapper>
               <ButtonContainer>
                 <CancelButton onClick={() => setIsDetailMode(false)}>
                   취소
                 </CancelButton>
                 <SubmitButton
                   onClick={handleDetailSubmit}
-                  disabled={!detailText.trim()}
+                  disabled={!detailText.trim() || detailText.length > 500}
                 >
                   신고하기
                 </SubmitButton>
@@ -259,6 +274,17 @@ const DetailTextarea = styled.textarea`
   &::placeholder {
     color: #9ca3af;
   }
+`;
+
+const CharCounterWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 4px;
+`;
+
+const CharCounter = styled.span<{ $isOver: boolean }>`
+  font-size: 12px;
+  color: ${(props) => (props.$isOver ? "#ef4444" : "#9ca3af")};
 `;
 
 const ButtonContainer = styled.div`
