@@ -11,11 +11,7 @@ import NoTopicState from "./NoTopicState";
 import { Spinner } from "@/components/svg/Spinner";
 import LoginReqruiedModal from "./LoginRequiredModal";
 import useAuth from "@/hooks/useAuth";
-
-export interface Option {
-  id: number;
-  content: string;
-}
+import { PollOption } from "@/types/poll";
 
 const VOTE_TOAST = {
   success: { type: "success" as const, message: "투표 완료!" },
@@ -25,27 +21,33 @@ const VOTE_TOAST = {
 
 function optionIdToSelection(
   optionId: number | null | undefined,
-  options?: Option[],
+  options?: PollOption[],
 ): selectOption {
-  if (!optionId || !options) return "none";
-  if (options[0]?.id === optionId) return "firstOption";
-  if (options[1]?.id === optionId) return "secondOption";
-  return "none";
+  if (optionId == null || !options?.length) return "none";
+
+  const matched = options.find((opt) => opt.id === optionId);
+  if (!matched) return "none";
+
+  return matched.optionOrder === 1 ? "firstOption" : "secondOption";
 }
 
 function selectionToOptionId(
   selection: selectOption,
-  options?: Option[],
+  options?: PollOption[],
 ): number | null {
-  if (!options) return null;
-  switch (selection) {
-    case "firstOption":
-      return options[0]?.id ?? null;
-    case "secondOption":
-      return options[1]?.id ?? null;
-    default:
-      return null;
-  }
+  if (!options?.length) return null;
+
+  const orderMap: Record<selectOption, number | null> = {
+    firstOption: 1,
+    secondOption: 2,
+    none: null,
+  };
+
+  const order = orderMap[selection];
+  if (order == null) return null;
+
+  const matched = options.find((opt) => opt.optionOrder === order);
+  return matched?.id ?? null;
 }
 
 export default function TodayTopicCard() {
@@ -176,15 +178,16 @@ const TitleSection = styled.div`
 
 const TitleLabel = styled.div`
   font-weight: 600;
-  padding: 10px;
+  padding: 4px;
 `;
 
 const TopicTitle = styled.div`
   width: 100%;
   font-weight: 900;
   font-size: 24px;
-  padding: 10px;
+  padding: 4px;
   text-align: center;
+  line-height: 1.3;
 `;
 
 const SpinnerContainer = styled.div`

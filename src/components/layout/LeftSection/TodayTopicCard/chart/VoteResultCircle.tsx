@@ -11,6 +11,7 @@ export type PieData = {
   count: number;
   userSelected: boolean;
   percent: number;
+  optionOrder: number;
 };
 
 const { dimensions, outerRadius, angles, animation } = CHART_CONFIG;
@@ -47,8 +48,8 @@ const VoteResultCircle = ({ pieData }: { pieData: PieData[] }) => {
         isUserSelected && entry.percent !== 100 && showStroke;
 
       const fillColor = shouldHighlight
-        ? colors.highlight[index % colors.highlight.length]
-        : colors.normal[index % colors.normal.length];
+        ? colors.highlight[entry.optionOrder === 1 ? 0 : 1]
+        : colors.normal[entry.optionOrder === 1 ? 0 : 1];
 
       return (
         <Cell
