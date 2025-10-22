@@ -136,6 +136,9 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
     // 피드 관련 알림이면 해당 피드로 이동
     if (notification.targetType === "FEED" && notification.targetId) {
       router.push(`/feeds/${notification.targetId}`);
+    } else if (notification.targetType === "COMMENT" && notification.relatedId) {
+      // 댓글 관련 알림이면 해당 피드로 이동 (relatedId는 feedId)
+      router.push(`/feeds/${notification.relatedId}`);
     }
   };
 

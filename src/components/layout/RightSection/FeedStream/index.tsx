@@ -125,11 +125,11 @@ export default function FeedStream() {
           ))}
           <div className="flex h-30 items-center justify-center">
             {isFetchingNextPage ? (
-              <StatusNotice compact>
+              <StatusNotice $compact>
                 추가 피드를 불러오는 중입니다...
               </StatusNotice>
             ) : (
-              <StatusNotice muted compact>
+              <StatusNotice $muted $compact>
                 {hasNextPage ? "" : "불러올 피드가 없습니다"}
               </StatusNotice>
             )}
@@ -158,16 +158,16 @@ const StyledFeedStreamContainer = styled.div`
   }
 `;
 
-const StatusNotice = styled.div<{ muted?: boolean; compact?: boolean }>`
+const StatusNotice = styled.div<{ $muted?: boolean; $compact?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: ${({ compact }) => (compact ? "auto" : "240px")};
-  padding: ${({ compact }) => (compact ? "0" : "32px 16px")};
-  font-size: ${({ compact }) => (compact ? "12px" : "15px")};
+  min-height: ${({ $compact }) => ($compact ? "auto" : "240px")};
+  padding: ${({ $compact }) => ($compact ? "0" : "32px 16px")};
+  font-size: ${({ $compact }) => ($compact ? "12px" : "15px")};
   font-weight: 500;
-  color: ${({ muted }) => (muted ? "#9ca3af" : "#6b7280")};
+  color: ${({ $muted }) => ($muted ? "#9ca3af" : "#6b7280")};
   text-align: center;
   white-space: pre-line;
 `;

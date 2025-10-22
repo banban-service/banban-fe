@@ -133,7 +133,7 @@ export default function NotificationMenu({
                       <Meta>{formatTimestamp(notification.createdAt)}</Meta>
                     </UserInfo>
                     <Message $unread={!notification.isRead}>
-                      {notification.message}
+                      {formatNotificationMessage(notification.message)}
                     </Message>
                   </NotificationContent>
                 </NotificationItem>
@@ -171,6 +171,32 @@ function formatTimestamp(value: string) {
   if (days < 7) return `${days}일 전`;
 
   return date.toLocaleString();
+}
+
+function formatNotificationMessage(
+  message: string,
+): (string | React.ReactNode)[] {
+  const keywords = ["새 댓글", "멘션"];
+  let parts: (string | React.ReactNode)[] = [message];
+
+  keywords.forEach((keyword) => {
+    parts = parts.flatMap((part, partIndex) => {
+      if (typeof part !== "string") return [part];
+
+      const regex = new RegExp(`(${keyword})`, "g");
+      const split = part.split(regex);
+
+      return split.map((text, idx) =>
+        text === keyword ? (
+          <strong key={`${partIndex}-${idx}`}>{text}</strong>
+        ) : (
+          text
+        ),
+      );
+    });
+  });
+
+  return parts;
 }
 
 const Menu = styled.div`

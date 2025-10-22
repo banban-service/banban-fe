@@ -34,6 +34,7 @@ export interface Notification {
   type: NotificationType;
   targetType: TargetType;
   targetId: number;
+  relatedId?: number;
   fromUser?: FromUser;
   message: string;
   isRead: boolean;
@@ -54,6 +55,7 @@ export interface WSNotificationMessage extends WSMessage {
   from_user_id?: number;
   target_type: TargetType;
   target_id: number;
+  related_id?: number;
   message: string;
   is_read: boolean;
   created_at: string;

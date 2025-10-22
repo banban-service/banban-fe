@@ -19,6 +19,7 @@ function mapNotificationPayload(payload: WSNotificationMessage): Notification {
     type: payload.notification_type,
     targetType: payload.target_type,
     targetId: payload.target_id,
+    relatedId: payload.related_id,
     message: payload.message,
     isRead: payload.is_read,
     createdAt: payload.created_at,
@@ -66,17 +67,28 @@ export default function NotificationListener() {
         type: "info",
         message: notification.message,
         duration: 3000,
-        action: notification.target_type === "FEED"
-          ? {
-              label: "보기",
-              onClick: () => {
-                queryClient.invalidateQueries({
-                  queryKey: ["comments", notification.target_id],
-                });
-                router.push(`/feeds/${notification.target_id}`);
-              },
-            }
-          : undefined,
+        action:
+          notification.target_type === "FEED"
+            ? {
+                label: "보기",
+                onClick: () => {
+                  queryClient.invalidateQueries({
+                    queryKey: ["comments", notification.target_id],
+                  });
+                  router.push(`/feeds/${notification.target_id}`);
+                },
+              }
+            : notification.target_type === "COMMENT" && notification.related_id
+            ? {
+                label: "보기",
+                onClick: () => {
+                  queryClient.invalidateQueries({
+                    queryKey: ["comments", notification.related_id],
+                  });
+                  router.push(`/feeds/${notification.related_id}`);
+                },
+              }
+            : undefined,
       });
     },
     onConnected: (payload) => {
