@@ -171,7 +171,7 @@ const TitleSection = styled.div`
   display: flex;
   min-height: 88px;
   flex-direction: column;
-  justify-content: center;
+  min-height: 70px;
 `;
 
 const TitleLabel = styled.div`

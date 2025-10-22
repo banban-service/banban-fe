@@ -4,14 +4,20 @@ import { Feed } from "@/types/feeds";
 import { useVoteOptionColor } from "@/hooks/useVoteOptionColor";
 import { Poll } from "@/types/poll";
 
-const CommentHeadBlock = ({ props, pollData }: { props: Feed; pollData?: Poll }) => {
+const CommentHeadBlock = ({
+  props,
+  pollData,
+}: {
+  props: Feed;
+  pollData?: Poll;
+}) => {
   const formattedCreatedAt = new Date(props.createdAt).toLocaleDateString();
   const avatarBackground = useVoteOptionColor(props.userVoteOptionId, pollData);
 
   return (
     <StyledContainer>
       <Avatar
-        src={props.user.profileImage || ""}
+        src={props.user?.profileImage || ""}
         alt="사용자 프로필 이미지"
         size={40}
         background={avatarBackground}
@@ -19,7 +25,7 @@ const CommentHeadBlock = ({ props, pollData }: { props: Feed; pollData?: Poll })
       <StyledContentContainer>
         <StyledTitleContainer>
           <StyledTitleWrapper>
-            <StyledTitle>{props.user.username}</StyledTitle>
+            <StyledTitle>{props.user?.username}</StyledTitle>
             <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
           </StyledTitleWrapper>
         </StyledTitleContainer>
@@ -27,7 +33,7 @@ const CommentHeadBlock = ({ props, pollData }: { props: Feed; pollData?: Poll })
       </StyledContentContainer>
     </StyledContainer>
   );
-}
+};
 
 const StyledContainer = styled.div`
   display: flex;

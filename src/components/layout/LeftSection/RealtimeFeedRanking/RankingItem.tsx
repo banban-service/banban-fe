@@ -21,7 +21,7 @@ export default function RankingItem({
         <Rank $highlight={rank <= 3}>{rank}</Rank>
         <div>{title}</div>
       </Left>
-      {figure === 0 ? (
+      {figure === undefined || figure === 0 ? (
         <FigureSpacer />
       ) : (
         <Figure $increase={figure > 0}>

@@ -1,8 +1,8 @@
 "use client";
 
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import {logger} from "@/utils/logger";
+import { logger } from "@/utils/logger";
 import type {
   NotificationConnectionStatus,
   WSConnectedMessage,
@@ -59,7 +59,10 @@ function resolveBaseWebSocketUrl(): string | null {
       apiUrl.pathname = `${apiUrl.pathname.replace(/\/$/, "")}${WS_ENDPOINT}`;
       return apiUrl.toString();
     } catch (error) {
-      logger.warn("WebSocket URL 파싱 실패, window.location 기반으로 대체", error);
+      logger.warn(
+        "WebSocket URL 파싱 실패, window.location 기반으로 대체",
+        error,
+      );
     }
   }
 
@@ -70,18 +73,21 @@ function resolveBaseWebSocketUrl(): string | null {
 function appendToken(url: string, token?: string | null) {
   if (!token) return url;
   try {
-    const target = new URL(url, typeof window !== "undefined" ? window.location.href : undefined);
+    const target = new URL(
+      url,
+      typeof window !== "undefined" ? window.location.href : undefined,
+    );
     target.searchParams.set("token", token);
     return target.toString();
   } catch (error) {
-    logger.warn("토큰을 WebSocket URL에 추가하지 못했습니다.", {error});
+    logger.warn("토큰을 WebSocket URL에 추가하지 못했습니다.", { error });
     const separator = url.includes("?") ? "&" : "?";
     return `${url}${separator}token=${encodeURIComponent(token)}`;
   }
 }
 
 export function useNotificationWebSocket(
-    options: UseNotificationWebSocketOptions,
+  options: UseNotificationWebSocketOptions,
 ): UseNotificationWebSocketResult {
   const {
     enabled,
@@ -103,10 +109,11 @@ export function useNotificationWebSocket(
   const [lastActivity, setLastActivity] = useState<number | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
-  const connectRef = useRef<() => void>(() => {
-  });
-  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const connectRef = useRef<() => void>(() => {});
+  // const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // const pingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const reconnectTimerRef = useRef<number | null>(null);
+  const pingTimerRef = useRef<number | null>(null);
   const shouldReconnectRef = useRef(false);
   const baseUrl = useMemo(resolveBaseWebSocketUrl, []);
   const handlersRef = useRef<{
@@ -162,45 +169,47 @@ export function useNotificationWebSocket(
   }, [clearReconnectTimer, clearPingTimer]);
 
   const scheduleReconnect = useCallback(
-      (reason?: string) => {
-        if (!autoReconnect || !shouldReconnectRef.current) {
-          logger.info("WebSocket 재연결이 비활성화되어 시도하지 않습니다.", {reason});
-          return;
+    (reason?: string) => {
+      if (!autoReconnect || !shouldReconnectRef.current) {
+        logger.info("WebSocket 재연결이 비활성화되어 시도하지 않습니다.", {
+          reason,
+        });
+        return;
+      }
+
+      setStatus("reconnecting");
+
+      setReconnectAttempts((prev) => {
+        const nextAttempt = prev + 1;
+        if (nextAttempt > maxReconnectAttempts) {
+          logger.error("WebSocket: 최대 재연결 시도 횟수 초과", {
+            maxReconnectAttempts,
+          });
+          setStatus("error");
+          return prev;
         }
 
-        setStatus("reconnecting");
+        const delay = Math.min(
+          reconnectBaseDelay * 2 ** (nextAttempt - 1),
+          reconnectMaxDelay,
+        );
+        logger.info("WebSocket 재연결 예약", { attempt: nextAttempt, delay });
 
-        setReconnectAttempts((prev) => {
-          const nextAttempt = prev + 1;
-          if (nextAttempt > maxReconnectAttempts) {
-            logger.error("WebSocket: 최대 재연결 시도 횟수 초과", {
-              maxReconnectAttempts,
-            });
-            setStatus("error");
-            return prev;
-          }
+        clearReconnectTimer();
+        reconnectTimerRef.current = window.setTimeout(() => {
+          connectRef.current();
+        }, delay);
 
-          const delay = Math.min(
-            reconnectBaseDelay * 2 ** (nextAttempt - 1),
-            reconnectMaxDelay,
-          );
-          logger.info("WebSocket 재연결 예약", { attempt: nextAttempt, delay });
-
-          clearReconnectTimer();
-          reconnectTimerRef.current = window.setTimeout(() => {
-            connectRef.current();
-          }, delay);
-
-          return nextAttempt;
-        });
-      },
-      [
-        autoReconnect,
-        maxReconnectAttempts,
-        reconnectBaseDelay,
-        reconnectMaxDelay,
-        clearReconnectTimer,
-      ],
+        return nextAttempt;
+      });
+    },
+    [
+      autoReconnect,
+      maxReconnectAttempts,
+      reconnectBaseDelay,
+      reconnectMaxDelay,
+      clearReconnectTimer,
+    ],
   );
 
   const handleMessage = useCallback((event: MessageEvent<string>) => {
@@ -272,9 +281,9 @@ export function useNotificationWebSocket(
     }
 
     const token =
-        typeof window !== "undefined"
-            ? window.localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
-            : null;
+      typeof window !== "undefined"
+        ? window.localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
+        : null;
 
     if (!token) {
       logger.warn("WebSocket: 액세스 토큰이 없어 연결을 중단합니다.");
@@ -341,18 +350,28 @@ export function useNotificationWebSocket(
       setStatus("error");
       scheduleReconnect("exception");
     }
-  }, [baseUrl, cleanupSocket, clearPingTimer, handleMessage, pingIntervalMs, scheduleReconnect]);
+  }, [
+    baseUrl,
+    cleanupSocket,
+    clearPingTimer,
+    handleMessage,
+    pingIntervalMs,
+    scheduleReconnect,
+  ]);
 
   useEffect(() => {
     connectRef.current = connect;
   }, [connect]);
 
-  const disconnect = useCallback((finalStatus: NotificationConnectionStatus = "disconnected") => {
-    shouldReconnectRef.current = false;
-    cleanupSocket();
-    setIsConnected(false);
-    setStatus(finalStatus);
-  }, [cleanupSocket]);
+  const disconnect = useCallback(
+    (finalStatus: NotificationConnectionStatus = "disconnected") => {
+      shouldReconnectRef.current = false;
+      cleanupSocket();
+      setIsConnected(false);
+      setStatus(finalStatus);
+    },
+    [cleanupSocket],
+  );
 
   const sendMessage = useCallback((message: WSMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
