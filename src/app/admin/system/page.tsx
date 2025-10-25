@@ -18,11 +18,15 @@ import {
   getAdminSystem,
   invalidateHotFeedCache,
   resetAdminPollCache,
+  getPendingReports,
+  getRecentActivityLogs,
 } from "@/remote/admin";
 import type {
   AdminHealthDetailed,
   AdminPollCachePurgeResult,
   AdminSystemData,
+  AdminReportsData,
+  ActivityLogsPage,
 } from "@/types/admin";
 import { useState } from "react";
 import { Modal } from "@/components/common/Modal/Modal";
@@ -30,6 +34,10 @@ import { useToast } from "@/components/common/Toast/useToast";
 
 const badgeClass =
   "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-slate-800";
+
+const tableHeaderClass =
+  "px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500";
+const tableCellClass = "px-4 py-2 text-sm text-slate-700";
 
 export default function AdminSystemPage() {
   const qc = useQueryClient();
@@ -62,6 +70,24 @@ export default function AdminSystemPage() {
     queryKey: ["admin", "metrics"],
     queryFn: getAdminMetrics,
     staleTime: 10_000,
+  });
+
+  const {
+    data: reports,
+    isLoading: reportsLoading,
+    error: reportsError,
+  } = useQuery<AdminReportsData>({
+    queryKey: ["admin", "reports", "pending", 5, 0],
+    queryFn: () => getPendingReports(5, 0),
+  });
+
+  const {
+    data: logs,
+    isLoading: logsLoading,
+    error: logsError,
+  } = useQuery<ActivityLogsPage>({
+    queryKey: ["admin", "activity-logs", 1, 5],
+    queryFn: () => getRecentActivityLogs(1, 5),
   });
 
   const [confirm, setConfirm] = useState<null | "all" | "hot" | "poll">(null);
@@ -157,61 +183,63 @@ export default function AdminSystemPage() {
             </p>
           )}
           {system && (
-            <div className="grid gap-4 lg:grid-cols-3">
-              <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-                <SectionLabel className="mb-2 text-slate-700">
-                  성능
-                </SectionLabel>
-                <dl className="space-y-1 text-sm text-slate-700">
-                  <div>
-                    <dt className="text-slate-500">status</dt>
-                    <dd className="font-semibold text-slate-900">
-                      {system.performance.status} ({system.performance.grade})
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-slate-500">avg</dt>
-                    <dd className="font-semibold text-slate-900">
-                      {system.performance.avgResponseTimeMs}ms
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-slate-500">error</dt>
-                    <dd className="font-semibold text-slate-900">
-                      {(system.performance.errorRate * 100).toFixed(2)}%
-                    </dd>
-                  </div>
-                </dl>
+            <div className="space-y-4">
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-100">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">성능</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">상태</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">평균 응답시간</th>
+                      <th className="px-4 py-3 text-right font-semibold text-slate-700">에러율</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="px-4 py-3 text-slate-600">Server</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        {system.performance.status} ({system.performance.grade})
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        {system.performance.avgResponseTimeMs}ms
+                      </td>
+                      <td className="px-4 py-3 text-right font-semibold text-slate-900">
+                        {(system.performance.errorRate * 100).toFixed(2)}%
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-100">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">캐시</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">상태</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Hit Rate</th>
+                      <th className="px-4 py-3 text-right font-semibold text-slate-700">Hit / Miss</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="px-4 py-3 text-slate-600">Redis</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        {system.cache.status}
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        {(system.cache.hitRate * 100).toFixed(1)}%
+                      </td>
+                      <td className="px-4 py-3 text-right font-semibold text-slate-900">
+                        {system.cache.totalHits} / {system.cache.totalMisses}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-                <SectionLabel className="mb-2 text-slate-700">
-                  캐시
-                </SectionLabel>
-                <dl className="space-y-1 text-sm text-slate-700">
-                  <div>
-                    <dt className="text-slate-500">status</dt>
-                    <dd className="font-semibold text-slate-900">
-                      {system.cache.status}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-slate-500">hit</dt>
-                    <dd className="font-semibold text-slate-900">
-                      {(system.cache.hitRate * 100).toFixed(1)}%
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-slate-500">H/M</dt>
-                    <dd className="font-semibold text-slate-900">
-                      {system.cache.totalHits} / {system.cache.totalMisses}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-                <SectionLabel className="mb-2 text-slate-700">
+                <SectionLabel className="mb-3 text-slate-700">
                   권장사항
                 </SectionLabel>
                 <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
@@ -237,62 +265,164 @@ export default function AdminSystemPage() {
           )}
           {health && (
             <>
-              <div className="grid gap-4 lg:grid-cols-3">
-                <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-                  <SectionLabel className="mb-2 text-slate-700">
-                    Database
-                  </SectionLabel>
-                  <span
-                    className={`${badgeClass} ${statusColor(
-                      health.services.database?.status,
-                    )}`}
-                  >
-                    {health.services.database?.status || "unknown"}
-                  </span>
-                  <div className="mt-2 text-xs text-slate-500">
-                    type: {health.services.database?.type || "-"}
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-                  <SectionLabel className="mb-2 text-slate-700">
-                    Redis
-                  </SectionLabel>
-                  <span
-                    className={`${badgeClass} ${statusColor(
-                      health.services.redis?.status,
-                    )}`}
-                  >
-                    {health.services.redis?.status || "unknown"}
-                  </span>
-                  <div className="mt-2 text-xs text-slate-500">
-                    ver: {health.services.redis?.redisVersion || "-"},{" "}
-                    uptime: {health.services.redis?.uptimeDays ?? "-"}d
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-                  <SectionLabel className="mb-2 text-slate-700">
-                    OCI Storage
-                  </SectionLabel>
-                  <span
-                    className={`${badgeClass} ${statusColor(
-                      health.services.ociStorage?.status,
-                    )}`}
-                  >
-                    {health.services.ociStorage?.status || "unknown"}
-                  </span>
-                  <div className="mt-2 text-xs text-slate-500">
-                    ns: {health.services.ociStorage?.namespace || "-"}, region:{" "}
-                    {health.services.ociStorage?.region || "-"}
-                  </div>
-                </div>
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-100">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">서비스</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">상태</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">상세정보</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="px-4 py-3 font-semibold text-slate-900">Database</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`${badgeClass} ${statusColor(
+                            health.services.database?.status,
+                          )}`}
+                        >
+                          {health.services.database?.status || "unknown"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        type: {health.services.database?.type || "-"}
+                      </td>
+                    </tr>
+                    <tr className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="px-4 py-3 font-semibold text-slate-900">Redis</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`${badgeClass} ${statusColor(
+                            health.services.redis?.status,
+                          )}`}
+                        >
+                          {health.services.redis?.status || "unknown"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        ver: {health.services.redis?.redisVersion || "-"}, uptime:{" "}
+                        {health.services.redis?.uptimeDays ?? "-"}d
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50">
+                      <td className="px-4 py-3 font-semibold text-slate-900">OCI Storage</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`${badgeClass} ${statusColor(
+                            health.services.ociStorage?.status,
+                          )}`}
+                        >
+                          {health.services.ociStorage?.status || "unknown"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        ns: {health.services.ociStorage?.namespace || "-"}, region:{" "}
+                        {health.services.ociStorage?.region || "-"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
               <div className="mt-4 rounded-xl bg-slate-50/80 px-4 py-3 text-sm text-slate-600">
                 env: {health.environment || "-"} · version:{" "}
                 {health.version || "-"}
               </div>
             </>
+          )}
+        </AdminCard>
+
+        <AdminCard>
+          <AdminCardTitle>대기 중 신고</AdminCardTitle>
+          {reportsLoading && <p className="text-sm text-slate-500">로딩 중...</p>}
+          {reportsError && (
+            <p className="text-sm text-red-600">
+              {(reportsError as Error).message}
+            </p>
+          )}
+          {!reportsLoading && !reportsError && (
+            <div className="overflow-hidden rounded-xl border border-slate-200">
+              <table className="min-w-full divide-y divide-slate-200 text-sm">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className={tableHeaderClass}>ID</th>
+                    <th className={tableHeaderClass}>대상</th>
+                    <th className={tableHeaderClass}>사유</th>
+                    <th className={tableHeaderClass}>상태</th>
+                    <th className={tableHeaderClass}>신고일</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white/95">
+                  {(reports?.reports ?? []).length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="px-4 py-6 text-center text-sm text-slate-500"
+                      >
+                        대기 중인 신고가 없습니다.
+                      </td>
+                    </tr>
+                  ) : (
+                    (reports?.reports ?? []).map((r) => (
+                      <tr key={r.id} className="hover:bg-slate-50/70">
+                        <td className={tableCellClass}>{r.id}</td>
+                        <td className={tableCellClass}>
+                          {r.targetType} #{r.targetId}
+                        </td>
+                        <td className={tableCellClass}>{r.reason}</td>
+                        <td className={tableCellClass}>
+                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                            {r.status}
+                          </span>
+                        </td>
+                        <td className={`${tableCellClass} whitespace-nowrap`}>
+                          {new Date(r.createdAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </AdminCard>
+
+        <AdminCard>
+          <AdminCardTitle>최근 활동 로그</AdminCardTitle>
+          {logsLoading && <p className="text-sm text-slate-500">로딩 중...</p>}
+          {logsError && (
+            <p className="text-sm text-red-600">
+              {(logsError as Error).message}
+            </p>
+          )}
+          {!logsLoading && !logsError && logs && (
+            <ul className="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white/95 text-sm">
+              {(logs.logs ?? []).length === 0 ? (
+                <li className="px-4 py-6 text-center text-slate-500">
+                  로그가 없습니다.
+                </li>
+              ) : (
+                (logs.logs ?? []).map((log) => (
+                  <li
+                    key={log.id}
+                    className="flex flex-col gap-1 px-4 py-3 lg:flex-row lg:items-center lg:justify-between"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold text-slate-900">
+                        {log.activityType}
+                      </span>
+                      <span className="text-sm text-slate-500">
+                        by {log.userId} · {log.targetType} #{log.targetId}
+                      </span>
+                    </div>
+                    <span className="text-xs text-slate-400 lg:text-sm">
+                      {new Date(log.createdAt).toLocaleString()}
+                    </span>
+                  </li>
+                ))
+              )}
+            </ul>
           )}
         </AdminCard>
 
