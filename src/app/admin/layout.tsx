@@ -5,12 +5,11 @@ import { usePathname } from "next/navigation";
 import AdminGuard from "@/components/admin/AdminGuard";
 
 const NAV_ITEMS = [
-  { href: "/admin", label: "대시보드" },
+  { href: "/admin/system", label: "시스템" },
   { href: "/admin/reports", label: "신고 관리" },
   { href: "/admin/polls", label: "투표 관리" },
   { href: "/admin/notifications", label: "알림 관리" },
   { href: "/admin/activity-logs", label: "활동 로그" },
-  { href: "/admin/system", label: "시스템" },
 ];
 
 const linkBase =
@@ -35,7 +34,7 @@ export default function AdminLayout({
     <AdminGuard>
       <div className="min-h-screen bg-slate-50">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-16 pt-20 lg:flex-row lg:px-8 lg:pt-24">
-          <aside className="hidden w-full max-w-[240px] flex-shrink-0 rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm lg:block">
+          <aside className="hidden w-full max-w-[240px] flex-shrink-0 rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm sticky self-start top-24 lg:block">
             <div className="mb-4 text-sm font-semibold text-slate-500">
               관리자 메뉴
             </div>
