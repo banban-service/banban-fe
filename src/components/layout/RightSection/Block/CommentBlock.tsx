@@ -1,30 +1,30 @@
 import styled from "styled-components";
-import {Avatar} from "@/components/common/Avatar";
-import {FeedHeartButton} from "@/components/common/Button";
-import {MoreIcon} from "@/components/svg/MoreIcon";
-import {CornerDownRightIcon} from "@/components/svg/CornerDownRightIcon";
-import {CommentContent} from "@/types/comments";
-import {useEffect, useRef, useState} from "react";
+import { Avatar } from "@/components/common/Avatar";
+import { FeedHeartButton } from "@/components/common/Button";
+import { MoreIcon } from "@/components/svg/MoreIcon";
+import { CornerDownRightIcon } from "@/components/svg/CornerDownRightIcon";
+import { CommentContent } from "@/types/comments";
+import { useEffect, useRef, useState } from "react";
 import type { ReactElement } from "react";
-import {OptionsDropdown} from "@/components/common/OptionsDropdown/OptionsDropdown";
-import {useClickOutside} from "@/hooks/useClickOutside";
-import {ReportModal} from "@/components/common/Report";
+import { OptionsDropdown } from "@/components/common/OptionsDropdown/OptionsDropdown";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { ReportModal } from "@/components/common/Report";
 
-import {useCommentLikeOptimisticUpdate} from "@/hooks/useLikeOptimisticUpdate";
-import {useVoteOptionColor} from "@/hooks/useVoteOptionColor";
-import {Poll} from "@/types/poll";
+import { useCommentLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
+import { useVoteOptionColor } from "@/hooks/useVoteOptionColor";
+import { Poll } from "@/types/poll";
 import useReportMutation from "@/hooks/useReportMutation";
-import {useAuthStore} from "@/store/useAuthStore";
-import {ConfirmModal} from "@/components/common/ConfirmModal/ConfirmModal";
-import {useToast} from "@/components/common/Toast/useToast";
-import {deleteComment, updateComment} from "@/remote/comment";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {CommentComposer} from "@/components/layout/RightSection/CommentInputBar/CommentComposer";
+import { useAuthStore } from "@/store/useAuthStore";
+import { ConfirmModal } from "@/components/common/ConfirmModal/ConfirmModal";
+import { useToast } from "@/components/common/Toast/useToast";
+import { deleteComment, updateComment } from "@/remote/comment";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CommentComposer } from "@/components/layout/RightSection/CommentInputBar/CommentComposer";
 import type { CommentUser } from "@/types/comments";
 
 function formatCommentWithMentions(
   content: string,
-  mentionedUsers: CommentUser[]
+  mentionedUsers: CommentUser[],
 ): (string | ReactElement)[] {
   if (!mentionedUsers || mentionedUsers.length === 0) {
     return [content];
@@ -45,7 +45,7 @@ function formatCommentWithMentions(
           <strong key={`${partIndex}-${mentionIndex}-${idx}`}>{text}</strong>
         ) : (
           text
-        )
+        ),
       );
     });
   });
@@ -54,9 +54,9 @@ function formatCommentWithMentions(
 }
 
 const CommentBlock = ({
-                        props,
-                        pollData,
-                      }: {
+  props,
+  pollData,
+}: {
   props: CommentContent;
   pollData?: Poll;
 }) => {
@@ -78,13 +78,13 @@ const CommentBlock = ({
   const [isReportModalOpen, setReportModalOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const likeMutation = useCommentLikeOptimisticUpdate({feedId, id});
+  const likeMutation = useCommentLikeOptimisticUpdate({ feedId, id });
   const avatarBackground = useVoteOptionColor(userVoteOptionId, pollData);
 
   const reportMutation = useReportMutation();
   const queryClient = useQueryClient();
-  const {showToast} = useToast();
-  const {isLoggedIn} = useAuthStore();
+  const { showToast } = useToast();
+  const { isLoggedIn } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -98,7 +98,7 @@ const CommentBlock = ({
   const updateMutation = useMutation({
     mutationFn: (newContent: string) => updateComment(id, newContent),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["comments", feedId]});
+      queryClient.invalidateQueries({ queryKey: ["comments", feedId] });
       showToast({
         type: "success",
         message: "댓글이 수정되었습니다.",
@@ -118,7 +118,7 @@ const CommentBlock = ({
   const deleteMutation = useMutation({
     mutationFn: () => deleteComment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["comments", feedId]});
+      queryClient.invalidateQueries({ queryKey: ["comments", feedId] });
       showToast({
         type: "success",
         message: "댓글이 삭제되었습니다.",
@@ -207,107 +207,107 @@ const CommentBlock = ({
   };
 
   return (
-      <StyledContainer>
-        <StyledLeftPadding/>
-        <CornerDownRightIcon size={30} color="#DADADA"/>
-        <Avatar
-            src={author.profileImage || ""}
-            alt="사용자 프로필 이미지"
-            size={40}
-            background={avatarBackground}
-        />
-        <StyledContentContainer>
-          <StyledTitleContainer>
-            <StyledTitleWrapper>
-              <StyledTitle>{author.username}</StyledTitle>
-              <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
-            </StyledTitleWrapper>
-            {isLoggedIn && (
-                <StyledMoreButtonWrapper ref={dropdownRef}>
-                  <StyledMoreButton
-                      onClick={handleToggleDropdown}
-                      aria-label="더보기 옵션 열기"
-                  >
-                    <MoreIcon/>
-                  </StyledMoreButton>
-                  {isDropdownOpen && (
-                      <OptionsDropdown
-                          isMyFeed={isMyComment}
-                          onHide={() => {
-                            handleCloseDropdown();
-                            // 관심 없음 처리 로직
-                          }}
-                          onReport={() => {
-                            handleCloseDropdown();
-                            setReportModalOpen(true);
-                          }}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
-                      />
-                  )}
-                  {isReportModalOpen && (
-                      <ReportModal
-                          isOpen={isReportModalOpen}
-                          onClose={() => setReportModalOpen(false)}
-                          onReport={handleReport}
-                          targetType="COMMENT"
-                          targetId={id}
-                      />
-                  )}
-                </StyledMoreButtonWrapper>
-            )}
-          </StyledTitleContainer>
-
-          <StyledBodyContainer>
-            {isEditing ? (
-                <CommentComposer
-                    variant="edit"
-                    value={editContent}
-                    onChange={setEditContent}
-                    onSubmit={handleEditSubmit}
-                    onCancel={handleCancelEdit}
-                    isSubmitting={updateMutation.isPending}
-                    autoFocus
-                    placeholder="수정할 내용을 입력하세요..."
+    <StyledContainer>
+      <StyledLeftPadding />
+      <CornerDownRightIcon size={30} color="#DADADA" />
+      <Avatar
+        src={author.profileImage || ""}
+        alt="사용자 프로필 이미지"
+        size={40}
+        background={avatarBackground}
+      />
+      <StyledContentContainer>
+        <StyledTitleContainer>
+          <StyledTitleWrapper>
+            <StyledTitle>{author.username}</StyledTitle>
+            <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
+          </StyledTitleWrapper>
+          {isLoggedIn && (
+            <StyledMoreButtonWrapper ref={dropdownRef}>
+              <StyledMoreButton
+                onClick={handleToggleDropdown}
+                aria-label="더보기 옵션 열기"
+              >
+                <MoreIcon />
+              </StyledMoreButton>
+              {isDropdownOpen && (
+                <OptionsDropdown
+                  isMyFeed={isMyComment}
+                  onHide={() => {
+                    handleCloseDropdown();
+                    // 관심 없음 처리 로직
+                  }}
+                  onReport={() => {
+                    handleCloseDropdown();
+                    setReportModalOpen(true);
+                  }}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
                 />
-            ) : (
-                formatCommentWithMentions(content, mentionedUsers)
-            )}
-          </StyledBodyContainer>
-
-          {!isEditing && (
-              <StyledIconButtonContainer>
-                <FeedHeartButton
-                    likeCount={likeCount}
-                    isLiked={isLiked}
-                    isLoggedIn={isLoggedIn}
-                    onClick={() => {
-                      likeMutation.mutate();
-                    }}
-                    onLoginRequired={handleLoginRequired}
+              )}
+              {isReportModalOpen && (
+                <ReportModal
+                  isOpen={isReportModalOpen}
+                  onClose={() => setReportModalOpen(false)}
+                  onReport={handleReport}
+                  targetType="COMMENT"
+                  targetId={id}
                 />
-              </StyledIconButtonContainer>
+              )}
+            </StyledMoreButtonWrapper>
           )}
+        </StyledTitleContainer>
 
-          {isDeleteModalOpen && (
-              <ConfirmModal
-                  isOpen={isDeleteModalOpen}
-                  onClose={() => setDeleteModalOpen(false)}
-                  onConfirm={handleConfirmDelete}
-                  title="댓글을 삭제하시겠습니까?"
-                  message="삭제된 댓글은 복구할 수 없습니다."
-                  confirmText="삭제"
-                  cancelText="취소"
-                  isDanger={true}
-              />
+        <StyledBodyContainer>
+          {isEditing ? (
+            <CommentComposer
+              variant="edit"
+              value={editContent}
+              onChange={setEditContent}
+              onSubmit={handleEditSubmit}
+              onCancel={handleCancelEdit}
+              isSubmitting={updateMutation.isPending}
+              autoFocus
+              placeholder="수정할 내용을 입력하세요..."
+            />
+          ) : (
+            formatCommentWithMentions(content, mentionedUsers)
           )}
-        </StyledContentContainer>
-      </StyledContainer>
+        </StyledBodyContainer>
+
+        {!isEditing && (
+          <StyledIconButtonContainer>
+            <FeedHeartButton
+              likeCount={likeCount}
+              isLiked={isLiked}
+              isLoggedIn={isLoggedIn}
+              onClick={() => {
+                likeMutation.mutate();
+              }}
+              onLoginRequired={handleLoginRequired}
+            />
+          </StyledIconButtonContainer>
+        )}
+
+        {isDeleteModalOpen && (
+          <ConfirmModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={handleConfirmDelete}
+            title="댓글을 삭제하시겠습니까?"
+            message="삭제된 댓글은 복구할 수 없습니다."
+            confirmText="삭제"
+            cancelText="취소"
+            isDanger={true}
+          />
+        )}
+      </StyledContentContainer>
+    </StyledContainer>
   );
 };
 
 const StyledLeftPadding = styled.div`
-  padding: 0 5px;
+  padding: 0 3px;
 `;
 
 const StyledContainer = styled.div`
@@ -379,4 +379,4 @@ const StyledMoreButtonWrapper = styled.div`
   align-items: center;
 `;
 
-export {CommentBlock};
+export { CommentBlock };

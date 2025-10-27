@@ -20,7 +20,9 @@ export default function FeedsTab() {
   const { data: pollData } = usePoll();
 
   const itemLabels = SORT_OPTIONS.map((option) => option.label);
-  const initialIdx = SORT_OPTIONS.findIndex((option) => option.value === sortBy);
+  const initialIdx = SORT_OPTIONS.findIndex(
+    (option) => option.value === sortBy,
+  );
 
   const handleTabClick = (idx: number) => {
     setSortBy(SORT_OPTIONS[idx].value);
@@ -53,8 +55,8 @@ export default function FeedsTab() {
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  padding: 5px 0 15px 0;
+  justify-content: space-between;
+  padding: 12px 0px 12px 8px;
 `;
 
 const StyledSquad = styled.div`

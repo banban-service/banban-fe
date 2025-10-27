@@ -52,12 +52,10 @@ export const Avatar = ({ src, alt, size, background }: AvatarProps) => {
           role="img"
           src={url || "/no_img.png"}
           alt={alt}
-          width={size}
-          height={size}
+          width={url == "/no_img.png" ? 30 : size}
+          height={url == "/no_img.png" ? 30 : size}
           style={{
             objectFit: "cover",
-            width: "100%",
-            height: "100%",
             objectPosition: "center",
           }}
           onError={() => setUrl("/no_img.png")}

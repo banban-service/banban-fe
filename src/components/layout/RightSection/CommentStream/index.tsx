@@ -25,10 +25,11 @@ const CommentStream = () => {
     }
   }, [fetchNextPage, hasNextPage, isInView]);
 
-  const totalComments = data?.pages?.reduce(
-    (acc, page) => acc + (page?.data?.content?.length || 0),
-    0
-  ) || 0;
+  const totalComments =
+    data?.pages?.reduce(
+      (acc, page) => acc + (page?.data?.content?.length || 0),
+      0,
+    ) || 0;
 
   return (
     <StyledFeedStreamContainer>
@@ -56,7 +57,7 @@ const CommentStream = () => {
         {isFetchingNextPage ? (
           <div>로딩중...</div>
         ) : totalComments === 0 ? (
-          <p className="text-gray-500">불러올 댓글이 없습니다</p>
+          <p className="text-[#9ca3af] text-[12px]">불러올 댓글이 없습니다</p>
         ) : null}
       </div>
     </StyledFeedStreamContainer>

@@ -19,7 +19,7 @@ interface AuthState {
     state?: string;
   }) => Promise<boolean>;
   logout: () => void;
-  checkAuth: () => Promise<void>;
+  checkAuth: (options?: { silent?: boolean }) => Promise<void>;
   refreshToken: () => Promise<boolean>;
 }
 
@@ -29,8 +29,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   loading: true,
   error: null,
 
-  checkAuth: async () => {
-    set({ loading: true, error: null });
+  checkAuth: async (options) => {
+    const silent = options?.silent ?? false;
+
+    if (!silent) {
+      set({ loading: true, error: null });
+    } else {
+      set({ error: null });
+    }
 
     // 토큰이 있는 경우에만 프로필 API 호출
     const token =
@@ -40,7 +46,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     if (!token) {
       logger.info("비로그인 상태 - 인증 체크 생략");
-      set({ user: null, isLoggedIn: false, loading: false });
+      set(() => ({
+        user: null,
+        isLoggedIn: false,
+        ...(silent ? {} : { loading: false }),
+        error: null,
+      }));
       return;
     }
 
@@ -54,7 +65,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       }
-      set({ user: null, isLoggedIn: false, loading: false });
+      set(() => ({
+        user: null,
+        isLoggedIn: false,
+        ...(silent ? {} : { loading: false }),
+        error: null,
+      }));
     }
   },
 
@@ -83,7 +99,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       saveAccessToken(data.data.access_token);
 
       // 토큰 갱신 후 사용자 정보 다시 가져오기
-      await get().checkAuth();
+      await get().checkAuth({ silent: true });
 
       logger.info("토큰 갱신 및 사용자 상태 업데이트 성공");
       return true;

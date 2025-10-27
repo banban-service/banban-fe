@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 
-export default function CountdownDisplay() {
+export default function CountdownDisplay({ hasVoted }: { hasVoted: boolean }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
   const VOTING_PERIOD = "00:00~23:59까지 투표 가능";
 
@@ -48,22 +48,40 @@ export default function CountdownDisplay() {
 
   return (
     <CountdownSection>
-      <CountdownText>⏰ 남은 시간: {timeLeft}</CountdownText>
-      <CountdownDescription>{VOTING_PERIOD}</CountdownDescription>
+      <CountdownText>
+        <SmallText>⏰ 투표 종료까지 </SmallText>
+        <div>남은 시간 : {timeLeft}</div>
+      </CountdownText>
+      {!hasVoted && (
+        <CountdownDescription>{VOTING_PERIOD}</CountdownDescription>
+      )}
     </CountdownSection>
   );
 }
 
 const CountdownSection = styled.div`
+  width: fit-content;
   display: flex;
   flex-direction: column;
   min-height: 56px;
   gap: 2px;
   text-align: center;
+  align-self: center;
 `;
 
 const CountdownText = styled.div`
-  font-size: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2rem;
+  color: #00000060;
+  gap: 0;
+  line-height: 1.3;
+`;
+
+const SmallText = styled.div`
+  width: fit-content;
+  align-self: baseline;
+  font-size: 14px;
   color: #00000060;
 `;
 
