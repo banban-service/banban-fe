@@ -4,7 +4,7 @@ import { useFeedFilterStore } from "@/store/useFeedFilterStore";
 import type { SortBy } from "@/types/feeds";
 import styled from "styled-components";
 import SegmentedControl from "./SegmentedControl";
-import ToggleButton from "./ToggleButton";
+import FilterChip from "./FilterChip";
 import useAuth from "@/hooks/useAuth";
 import { usePoll } from "@/hooks/usePoll";
 
@@ -28,8 +28,8 @@ export default function FeedsTab() {
     setSortBy(SORT_OPTIONS[idx].value);
   };
 
-  const handleSquadToggle = (isChecked: boolean) => {
-    setFilterType(isChecked ? "same_vote" : "all");
+  const handleSquadToggle = () => {
+    setFilterType(filterType === "same_vote" ? "all" : "same_vote");
   };
 
   const isSquadDisabled = !isLoggedIn || !pollData?.hasVoted;
@@ -41,13 +41,11 @@ export default function FeedsTab() {
         initialIdx={initialIdx}
         onItemClick={handleTabClick}
       />
-      <StyledSquad>
-        <ToggleButton
-          isChecked={filterType === "same_vote"}
-          onChange={handleSquadToggle}
-          disabled={isSquadDisabled}
-        />
-      </StyledSquad>
+      <FilterChip
+        active={filterType === "same_vote"}
+        onClick={handleSquadToggle}
+        disabled={isSquadDisabled}
+      />
     </StyledContainer>
   );
 }
@@ -55,14 +53,10 @@ export default function FeedsTab() {
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  padding: 12px 0px 12px 8px;
-`;
-
-const StyledSquad = styled.div`
-  display: flex;
-  padding: 4px 16px;
-
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 8px;
 `;
+
+
