@@ -38,3 +38,11 @@ export const updateProfileImage = async ({ file }: { file: File }) => {
 
   return response;
 };
+
+export const deleteProfileImage = async () => {
+  const response = await apiFetch("/users/profile/image", {
+    method: "DELETE",
+  });
+
+  return response;
+};

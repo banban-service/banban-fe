@@ -42,7 +42,10 @@ export const ProfileEditCard = ({ onClose }: { onClose: () => void }) => {
       </ProfileHeader>
 
       <ProfileContent>
-        <ProfileImageContainer imageUrl={user?.profileImageUrl} />
+        <ProfileImageContainer 
+          imageUrl={user?.profileImageUrl} 
+          hasCustomImage={user?.hasCustomProfileImage}
+        />
         <ProfileUserName>@{user?.username}</ProfileUserName>
 
         <NicknameSection>

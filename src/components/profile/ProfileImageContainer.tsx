@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { AddIcon } from "../svg";
 import { useToast } from "../common/Toast/useToast";
 import { useUploadProfileImage } from "@/hooks/useUploadProfileImage";
+import { useDeleteProfileImage } from "@/hooks/useDeleteProfileImage";
 
 export interface RegisterRequestType {
   email: string;
@@ -18,9 +19,11 @@ export interface RegisterRequestType {
 export default function ProfileImageContainer({
   imageUrl,
   setImageUrl,
+  hasCustomImage,
 }: {
   imageUrl?: string | null;
   setImageUrl?: React.Dispatch<React.SetStateAction<RegisterRequestType>>;
+  hasCustomImage?: boolean;
 }) {
   const { showToast } = useToast();
 
@@ -31,9 +34,34 @@ export default function ProfileImageContainer({
     !hasError && (imageUrl || newImage) ? imageUrl || newImage : "/no_img.png";
 
   const uploadProfileImageMutation = useUploadProfileImage();
+  const deleteProfileImageMutation = useDeleteProfileImage();
 
   // 프로필 편집 모드인지 회원가입 모드인지 판단
   const isProfileEditMode = !setImageUrl;
+
+  const handleDeleteImage = () => {
+    if (!isProfileEditMode) return;
+    
+    deleteProfileImageMutation.mutate(undefined, {
+      onSuccess: () => {
+        setNewImage(undefined);
+        setHasError(false);
+        showToast({
+          type: "success",
+          message: "프로필 이미지가 삭제되었습니다.",
+          duration: 3000,
+        });
+      },
+      onError: (error) => {
+        console.error("프로필 이미지 삭제 실패:", error);
+        showToast({
+          type: "error",
+          message: "프로필 이미지 삭제에 실패했습니다.",
+          duration: 3000,
+        });
+      },
+    });
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputFile = e.target?.files?.[0];
@@ -121,6 +149,8 @@ export default function ProfileImageContainer({
     };
   }, [newImage]);
 
+  const isLoading = uploadProfileImageMutation.isPending || deleteProfileImageMutation.isPending;
+
   return (
     <Container>
       <ProfileImageWrapper>
@@ -140,10 +170,8 @@ export default function ProfileImageContainer({
           position: "absolute",
           right: 0,
           bottom: 0,
-          opacity: uploadProfileImageMutation.isPending ? 0.5 : 1,
-          cursor: uploadProfileImageMutation.isPending
-            ? "not-allowed"
-            : "pointer",
+          opacity: isLoading ? 0.5 : 1,
+          cursor: isLoading ? "not-allowed" : "pointer",
         }}
       >
         <input
@@ -151,16 +179,25 @@ export default function ProfileImageContainer({
           accept="image/jpeg, image/jpg, image/bmp, image/webp, image/png, image/gif"
           onChange={handleFileChange}
           className="hidden"
-          disabled={uploadProfileImageMutation.isPending}
+          disabled={isLoading}
         />
         <Wrapper>
-          {uploadProfileImageMutation.isPending ? (
+          {isLoading ? (
             <span style={{ fontSize: "10px", color: "white" }}>...</span>
           ) : (
             <AddIcon width={15} height={15} color="white" />
           )}
         </Wrapper>
       </label>
+      {isProfileEditMode && hasCustomImage && (
+        <DeleteButton
+          onClick={handleDeleteImage}
+          disabled={isLoading}
+          style={{ opacity: isLoading ? 0.5 : 1 }}
+        >
+          ✕
+        </DeleteButton>
+      )}
     </Container>
   );
 }
@@ -198,4 +235,30 @@ const Wrapper = styled.div`
   border-radius: 100%;
   padding: 8px;
   cursor: pointer;
+`;
+
+const DeleteButton = styled.button`
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background-color: #ff4444;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  font-size: 12px;
+  width: 31px;
+  height: 31px;
+  
+  &:hover:not(:disabled) {
+    background-color: #cc0000;
+  }
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
