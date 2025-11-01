@@ -5,7 +5,6 @@ import {
   selectOption,
   SelectOptionGroup,
 } from "@/components/common/SelectOptionGroup/SelectOptionGroup";
-import CountdownDisplay from "./CountdownDisplay";
 import VoteResultPlaceHolder from "./VoteResultPlaceHolder/VoteResultPlaceHolder";
 import { PollOption } from "@/types/poll";
 
@@ -49,7 +48,6 @@ export default function MainContent({
       <VoteResultCircleContainer>
         <VoteResultDisplay pieData={pieData} votedOptionId={votedOptionId} />
       </VoteResultCircleContainer>
-      <CountdownDisplay hasVoted={true} />
       <SelectOptionGroup
         selected={displayedSelection}
         rowGap="10px"

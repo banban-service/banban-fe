@@ -59,34 +59,44 @@ export default function RealtimeFeedRanking() {
       )}
 
       {hotFeedEnabled && !isHotFeedLoading && !isHotFeedError && (
-        <RankingList>
-          {sortedFeeds.map((item: HotFeed) => {
-            const figure = item.rankChange ?? 0;
-            const handleSelect = () => {
-              router.push(`/feeds/${item.feedId}`);
-            };
+        <>
+          {sortedFeeds.length === 0 ? (
+            <StatusMessage>
+              아직 순위에 오른 피드가 없습니다.
+              <br />
+              투표하고 좋아요를 눌러 핫 피드를 만들어보세요!
+            </StatusMessage>
+          ) : (
+            <RankingList>
+              {sortedFeeds.map((item: HotFeed) => {
+                const figure = item.rankChange ?? 0;
+                const handleSelect = () => {
+                  router.push(`/feeds/${item.feedId}`);
+                };
 
-            return (
-              <li key={item.feedId}>
-                <RankingItem
-                  rank={item.rank}
-                  title={item.content}
-                  figure={figure}
-                  onSelect={handleSelect}
-                />
-              </li>
-            );
-          })}
-          {Array.from({ length: restNum }, (_, index) => (
-            <li key={index}>
-              <RankingItem
-                rank={sortedFeeds.length + index + 1}
-                title={"-"}
-                figure={0}
-              />
-            </li>
-          ))}
-        </RankingList>
+                return (
+                  <li key={item.feedId}>
+                    <RankingItem
+                      rank={item.rank}
+                      title={item.content}
+                      figure={figure}
+                      onSelect={handleSelect}
+                    />
+                  </li>
+                );
+              })}
+              {Array.from({ length: restNum }, (_, index) => (
+                <li key={index}>
+                  <RankingItem
+                    rank={sortedFeeds.length + index + 1}
+                    title={"-"}
+                    figure={0}
+                  />
+                </li>
+              ))}
+            </RankingList>
+          )}
+        </>
       )}
 
       {hotFeedEnabled && (isHotFeedLoading || isHotFeedError) && (

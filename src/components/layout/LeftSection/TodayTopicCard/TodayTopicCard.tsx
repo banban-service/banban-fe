@@ -117,10 +117,10 @@ const Container = styled.section`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.625rem;
+  gap: 1rem;
   min-width: 340px;
   max-width: 430px;
-  min-height: 552px;
+  min-height: 480px;
   background-color: white;
   border-radius: 8px;
   padding: 20px;
@@ -129,12 +129,11 @@ const Container = styled.section`
 const TitleSection = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 70px;
+  gap: 8px;
 `;
 
 const TitleLabel = styled.div`
   font-weight: 600;
-  margin-bottom: 8px;
 `;
 
 const TopicTitle = styled.div`
@@ -142,7 +141,6 @@ const TopicTitle = styled.div`
   font-weight: 800;
   font-size: 24px;
   padding: 4px;
-  margin-bottom: 4px;
   text-align: center;
   line-height: 1.3;
 `;
