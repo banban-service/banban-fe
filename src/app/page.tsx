@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import styled from "styled-components";
 import LeftSection from "@/components/layout/LeftSection/LeftSection";
 import RightSection from "@/components/layout/RightSection/RightSection";
+import MobileTabBar from "@/components/layout/MobileTabBar/MobileTabBar";
 import { SectionContext } from "@/components/layout/RightSection/SectionContext";
+import { media } from "@/constants/breakpoints";
 import type { Feed } from "@/types/feeds";
 import FloatingButtonWithModal from "@/components/common/FloatingButtonWithModal";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -16,6 +18,9 @@ export default function Home() {
     "feeds",
   );
   const [targetFeed, setTargetFeed] = useState<Feed | null>(null);
+  const [mobileActiveTab, setMobileActiveTab] = useState<"poll" | "feeds">(
+    "poll",
+  );
   const { isLoggedIn } = useAuthStore();
   const { data: pollData, isLoading: isPollLoading } = usePoll();
 
@@ -43,10 +48,17 @@ export default function Home() {
 
   return (
     <SectionContext.Provider value={sectionContextValue}>
-      <div className="relative mx-auto w-fit">
-        <div className="flex gap-6 pt-[60px] h-[100dvh]">
-          <LeftSection />
-          <RightSection />
+      <ContentContainer>
+        <MainContentWrapper>
+          {/* 데스크톱: 둘 다 표시, 모바일: 탭 기반으로 표시 */}
+          {mobileActiveTab === "poll" && <LeftSection />}
+          {mobileActiveTab === "feeds" && <RightSection />}
+
+          {/* 데스크톱에서는 둘 다 표시 */}
+          <DesktopOnly>
+            <LeftSection />
+            <RightSection />
+          </DesktopOnly>
 
           {/* 메인 화면에서만 피드 작성 플러스 버튼 표시 (투표 완료 시에만) */}
           {isLoggedIn && pollData?.hasVoted && (
@@ -55,11 +67,79 @@ export default function Home() {
               targetFeed={null}
             />
           )}
-        </div>
-      </div>
+        </MainContentWrapper>
+      </ContentContainer>
+      <MobileTabBar
+        activeTab={mobileActiveTab}
+        onTabChange={setMobileActiveTab}
+      />
     </SectionContext.Provider>
   );
 }
+
+const ContentContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 60px;
+
+  ${media.mobile} {
+    padding-bottom: 56px;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  ${media.tablet} {
+    height: 100dvh;
+    gap: 16px;
+    padding: 60px 24px 0 24px;
+  }
+
+  ${media.desktop} {
+    height: 100dvh;
+    gap: 24px;
+    padding: 60px 0 0 0;
+  }
+`;
+
+const MainContentWrapper = styled.div`
+  display: flex;
+  gap: 24px;
+  width: fit-content;
+  height: fit-content;
+
+  ${media.mobile} {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: calc(100dvh - 116px);
+    overflow-y: auto;
+  }
+
+  ${media.tablet} {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+  }
+
+  ${media.desktop} {
+    display: flex;
+    gap: 24px;
+    width: fit-content;
+    height: fit-content;
+  }
+`;
+
+const DesktopOnly = styled.div`
+  display: none;
+
+  ${media.desktop} {
+    display: flex;
+    gap: 24px;
+  }
+`;
 
 const FullScreenContainer = styled.div`
   display: flex;

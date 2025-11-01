@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "@/constants/breakpoints";
 import FeedsPanel from "./FeedsPanel";
 import { useRef, useContext } from "react";
 import { useCalculatedHeight } from "./hooks/useCalculateHeight";
@@ -19,7 +20,6 @@ export default function RightSection() {
 }
 
 const StyledContainer = styled.div<{ $calculatedHeight?: number }>`
-  width: 430px;
   height: ${(props) =>
     props.$calculatedHeight !== 0 ? `${props.$calculatedHeight}px` : "100%"};
 
@@ -37,4 +37,17 @@ const StyledContainer = styled.div<{ $calculatedHeight?: number }>`
   padding: 10px 10px 0 10px;
   border-radius: 8px 8px 0 0;
   margin-top: 12px;
+
+  ${media.mobile} {
+    width: 100%;
+  }
+
+  ${media.tablet} {
+    width: 100%;
+    flex: 1;
+  }
+
+  ${media.desktop} {
+    width: 430px;
+  }
 `;

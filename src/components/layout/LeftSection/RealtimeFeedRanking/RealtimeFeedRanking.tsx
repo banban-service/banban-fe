@@ -2,6 +2,7 @@
 
 import ZapIcon from "@/components/svg/ZapIcon";
 import styled from "styled-components";
+import { media } from "@/constants/breakpoints";
 import RankingItem from "./RankingItem";
 import useHotFeed from "@/hooks/useHotFeed";
 import { useMemo } from "react";
@@ -114,11 +115,23 @@ const Container = styled.section`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-width: 340px;
-  max-width: 430px;
   background-color: white;
   border-radius: 8px;
   padding: 12px 16px;
+
+  ${media.mobile} {
+    width: 100%;
+    padding: 12px 12px;
+    border-radius: 0;
+  }
+
+  ${media.tablet} {
+    width: 100%;
+  }
+
+  ${media.desktop} {
+    width: 430px;
+  }
 `;
 
 const IconWrapper = styled.span`

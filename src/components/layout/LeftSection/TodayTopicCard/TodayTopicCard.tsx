@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useMemo, useState, useCallback } from "react";
 import useAuth from "@/hooks/useAuth";
 import { usePoll } from "@/hooks/usePoll";
+import { media } from "@/constants/breakpoints";
 
 import MainContent from "./MainContent";
 import NoTopicState from "./NoTopicState";
@@ -118,12 +119,25 @@ const Container = styled.section`
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
-  min-width: 340px;
-  max-width: 430px;
   min-height: 480px;
   background-color: white;
   border-radius: 8px;
   padding: 20px;
+
+  ${media.mobile} {
+    width: 100%;
+    min-height: auto;
+    padding: 16px 12px;
+    border-radius: 0;
+  }
+
+  ${media.tablet} {
+    width: 100%;
+  }
+
+  ${media.desktop} {
+    width: 430px;
+  }
 `;
 
 const TitleSection = styled.div`
