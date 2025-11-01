@@ -240,6 +240,12 @@ const ModalButton = styled.button<ModalButtonProps>`
   ${({ $fullWidth }) => ($fullWidth ? "width: 100%;" : "min-width: 120px;")}
 
   ${({ $variant = "primary" }) => variantStyles[$variant]}
+
+  &:disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
 `;
 
 type ModalComponent = FC<ModalProps> & {

@@ -90,8 +90,22 @@ export const ProfileEditModal = ({
     uploadProfileImageMutation.isPending ||
     deleteProfileImageMutation.isPending;
 
+  const hasChanges = useMemo(() => {
+    const hasUsernameChange = newUsername && newUsername !== user?.username;
+    const hasImageChange = pendingFile !== null || isDeleted;
+    return hasUsernameChange || hasImageChange;
+  }, [newUsername, user?.username, pendingFile, isDeleted]);
+
+  const handleClose = () => {
+    setPendingFile(null);
+    setIsDeleted(false);
+    setDefaultImagePreviewUrl(null);
+    setNewUsername(user?.username);
+    onClose();
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCloseButton={true} width="400px">
+    <Modal isOpen={isOpen} onClose={handleClose} isCloseButton={true} width="400px">
       <Modal.Layout>
         <ModalHeader>
           <ModalTitle>프로필 편집</ModalTitle>
@@ -138,20 +152,9 @@ export const ProfileEditModal = ({
           </RightSection>
         </ContentWrapper>
 
-        <Modal.Actions direction="row">
+        <Modal.Actions direction="column">
           <Modal.Button
-            $variant="secondary"
-            onClick={() => {
-              setPendingFile(null);
-              setIsDeleted(false);
-              setDefaultImagePreviewUrl(null);
-              onClose();
-            }}
-          >
-            취소
-          </Modal.Button>
-          <Modal.Button
-            disabled={isLoading || !newUsername}
+            disabled={isLoading || !newUsername || !hasChanges}
             onClick={handleSave}
           >
             {isLoading ? "저장 중" : "저장"}
