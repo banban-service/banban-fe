@@ -1,5 +1,5 @@
 import type { Feed } from "@/types/feeds";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { OptionsDropdown } from "@/components/common/OptionsDropdown/OptionsDropdown";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useFeedLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
@@ -43,6 +43,11 @@ export const FeedBlock = ({
 
   const [liked, setLiked] = useState<boolean>(isLiked);
   const [count, setCount] = useState<number>(likeCount);
+
+  useEffect(() => {
+    setLiked(isLiked);
+    setCount(likeCount);
+  }, [isLiked, likeCount]);
 
   const likeMutation = useFeedLikeOptimisticUpdate({ id });
 

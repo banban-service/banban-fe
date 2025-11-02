@@ -67,7 +67,7 @@ export default function Header({ isNew }: HeaderProps) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useNotifications();
+  } = useNotifications({ enabled: isLoggedIn });
 
   const unreadCount = useMemo(
     () => notificationsData?.pages[0]?.data.unreadCount ?? 0,

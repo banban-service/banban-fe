@@ -2,7 +2,13 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getNotifications } from "@/remote/notification";
 import type { NotificationResponse } from "@/remote/notification";
 
-export const useNotifications = () => {
+interface UseNotificationsOptions {
+  enabled?: boolean;
+}
+
+export const useNotifications = (options: UseNotificationsOptions = {}) => {
+  const { enabled = true } = options;
+
   return useInfiniteQuery<NotificationResponse>({
     queryKey: ["notifications"],
     queryFn: ({ pageParam }) =>
@@ -16,5 +22,6 @@ export const useNotifications = () => {
         lastPage.data.notifications[lastPage.data.notifications.length - 1];
       return lastNotification?.id ?? undefined;
     },
+    enabled,
   });
 };

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { apiFetch } from "@/lib/apiFetch";
+import { ApiError, apiFetch } from "@/lib/apiFetch";
 import { getToken } from "@/remote/auth";
 import { UserInfoResponse } from "@/types/api";
 import { TokenRequestResponse, User } from "@/types/auth";
@@ -61,13 +61,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       logger.warn("인증 체크 실패", error);
 
+      const status = error instanceof ApiError ? error.status : undefined;
       const message =
         error instanceof Error
           ? error.message
           : "알 수 없는 오류가 발생했습니다.";
 
       if (silent) {
-        // 백그라운드 체크에서는 상태를 유지하고 호출자에게만 실패 알림
         throw error instanceof Error ? error : new Error(message);
       }
 
@@ -75,12 +75,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         typeof window !== "undefined" &&
         !!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
-      const shouldAttemptRefresh =
-        tokenExists &&
-        (message.includes("로그인이 필요합니다.") ||
-          message.includes("인증이 만료되었습니다"));
-
-      if (shouldAttemptRefresh) {
+      if (tokenExists && status && [401, 403].includes(status)) {
         const refreshed = await get().refreshToken();
         if (refreshed) {
           set({ loading: false, error: null });
@@ -88,11 +83,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
       }
 
-      const shouldLogout =
-        message.includes("로그인이 필요합니다.") ||
-        message.includes("인증이 만료되었습니다");
-
-      if (shouldLogout) {
+      if (status && [401, 403].includes(status)) {
         if (typeof window !== "undefined") {
           clearTokens();
         }

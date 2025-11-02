@@ -30,7 +30,6 @@ export default function RootLayout({
             <Header />
             {children}
           </NextProvider>
-          <div id="modal-root"></div>
           <GlobalModalRenderer />
         </StyledComponentsRegistry>
       </body>
