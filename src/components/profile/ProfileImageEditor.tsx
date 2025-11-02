@@ -2,7 +2,6 @@
 import styled from "styled-components";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { EditIcon } from "@/components/svg";
 
 interface ProfileImageEditorProps {
   imageUrl?: string | null;
@@ -26,7 +25,6 @@ export const ProfileImageEditor = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [newImage, setNewImage] = useState<string | undefined>(undefined);
   const [hasError, setHasError] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
 
   const displayImage = isDeleted
     ? defaultImageUrl || null
@@ -107,7 +105,6 @@ export const ProfileImageEditor = ({
     setNewImage(url);
     setHasError(false);
     onFileSelect(processedFile);
-    setShowMenu(false);
   };
 
   const handleUploadClick = () => {
@@ -118,7 +115,6 @@ export const ProfileImageEditor = ({
     setNewImage(undefined);
     setHasError(false);
     onDelete();
-    setShowMenu(false);
   };
 
   return (

@@ -65,7 +65,7 @@ export default function Home() {
   return (
     <SectionContext.Provider value={sectionContextValue}>
       <PageIndicator currentPage={mobileActiveTab} />
-      <ContentContainer ref={swipeRef} {...swipeHandlers}>
+      <ContentContainer {...swipeHandlers} ref={swipeRef}>
         <MainContentWrapper>
           {/* 모바일에서만 탭 기반 렌더링 */}
           <MobileOnly>

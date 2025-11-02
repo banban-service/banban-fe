@@ -78,6 +78,7 @@ export const useUserVoteInfo = (date?: string) => {
       profileImageUrl: "",
       usernameUpdatedAt: null,
       role: "",
+      hasCustomProfileImage: false,
     },
     pollData: pollData || null,
     votedOption: votedOption || null,

@@ -3,8 +3,6 @@ import { compressImage } from "@/utils/compress";
 import Image from "next/image";
 import styled from "styled-components";
 import { useToast } from "../common/Toast/useToast";
-import { useUploadProfileImage } from "@/hooks/useUploadProfileImage";
-import { useDeleteProfileImage } from "@/hooks/useDeleteProfileImage";
 
 export interface RegisterRequestType {
   email: string;

@@ -3,13 +3,11 @@ import styled from "styled-components";
 import { Input } from "../common/Input";
 
 interface ProfileInfoFormProps {
-  username?: string;
   newUsername?: string;
   onUsernameChange: (username: string) => void;
 }
 
 export const ProfileInfoForm = ({
-  username,
   newUsername,
   onUsernameChange,
 }: ProfileInfoFormProps) => {

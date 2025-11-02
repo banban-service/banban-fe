@@ -10,7 +10,6 @@ import { useDeleteProfileImage } from "@/hooks/useDeleteProfileImage";
 import { getDefaultProfileImagePreview } from "@/remote/user";
 import { useToast } from "../common/Toast/useToast";
 import { DefaultButton } from "../common/Button";
-import { getProfileImageUrl } from "@/remote/user";
 
 export const ProfileEditCard = ({ onClose }: { onClose: () => void }) => {
   const { user } = useAuth();
@@ -23,7 +22,6 @@ export const ProfileEditCard = ({ onClose }: { onClose: () => void }) => {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isImageEditMode, setIsImageEditMode] = useState(false);
   const [defaultImagePreviewUrl, setDefaultImagePreviewUrl] = useState<string | null>(null);
-  const [isLoadingDefaultImage, setIsLoadingDefaultImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = async () => {
@@ -79,20 +77,17 @@ export const ProfileEditCard = ({ onClose }: { onClose: () => void }) => {
 
   const handleDeleteImage = async () => {
     try {
-      setIsLoadingDefaultImage(true);
       const previewUrl = await getDefaultProfileImagePreview();
       setDefaultImagePreviewUrl(previewUrl);
       setIsDeleted(true);
       setPendingFile(null);
       setIsImageEditMode(false);
-    } catch (err) {
+    } catch {
       showToast({
         type: "error",
         message: "기본 이미지 조회 실패",
         duration: 2000,
       });
-    } finally {
-      setIsLoadingDefaultImage(false);
     }
   };
 

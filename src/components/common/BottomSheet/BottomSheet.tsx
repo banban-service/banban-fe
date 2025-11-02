@@ -8,11 +8,9 @@ interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
-  defaultSnapPoint?: number; // 0~1 범위, 기본값 0.9 (90%)
   maxHeight?: number; // vh 단위, 기본값 90
 }
 
-const SNAP_POINTS = [0.4, 0.9]; // 40%, 90%
 const DRAG_VELOCITY_THRESHOLD = 500;
 const DRAG_DISTANCE_THRESHOLD = 100;
 
@@ -20,12 +18,11 @@ export const BottomSheet = ({
   isOpen,
   onClose,
   children,
-  defaultSnapPoint = 0.9,
   maxHeight = 90,
 }: BottomSheetProps) => {
   const handleDragEnd = (
     event: MouseEvent | TouchEvent | PointerEvent,
-    info: any,
+    info: { velocity: { y: number }; offset: { y: number } },
   ) => {
     const { velocity, offset } = info;
 

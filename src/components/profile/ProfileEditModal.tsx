@@ -28,7 +28,6 @@ export const ProfileEditModal = ({
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isDeleted, setIsDeleted] = useState(false);
   const [defaultImagePreviewUrl, setDefaultImagePreviewUrl] = useState<string | null>(null);
-  const [isLoadingDefaultImage, setIsLoadingDefaultImage] = useState(false);
 
   // 초기 상태의 기본 이미지 URL 저장 (커스텀이 아닐 때)
   const defaultImageUrl = useMemo(() => {
@@ -125,19 +124,16 @@ export const ProfileEditModal = ({
               }}
               onDelete={async () => {
                 try {
-                  setIsLoadingDefaultImage(true);
                   const previewUrl = await getDefaultProfileImagePreview();
                   setDefaultImagePreviewUrl(previewUrl);
                   setIsDeleted(true);
                   setPendingFile(null);
-                } catch (err) {
+                } catch {
                   showToast({
                     type: "error",
                     message: "기본 이미지 조회 실패",
                     duration: 2000,
                   });
-                } finally {
-                  setIsLoadingDefaultImage(false);
                 }
               }}
             />
@@ -145,7 +141,6 @@ export const ProfileEditModal = ({
 
           <RightSection>
             <ProfileInfoForm
-              username={user?.username}
               newUsername={newUsername}
               onUsernameChange={setNewUsername}
             />
