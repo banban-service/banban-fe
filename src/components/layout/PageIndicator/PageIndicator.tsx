@@ -37,6 +37,6 @@ const Bar = styled.div<{ $isActive: boolean }>`
   flex: 1;
   height: 100%;
   background-color: ${(props) =>
-    props.$isActive ? "#ff474f" : "rgba(255, 71, 79, 0.2)"};
+    props.$isActive ? "#3f13ff" : "rgba(63, 19, 255, 0.2)"};
   transition: background-color 0.3s ease;
 `;
