@@ -59,18 +59,56 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { data }: UserInfoResponse = await apiFetch("/users/profile");
       set({ user: data, isLoggedIn: true, loading: false });
     } catch (error) {
-      logger.warn("인증 체크 실패 - 토큰 정리", error);
-      // 401 에러 발생 시 만료된 토큰 정리
-      if (typeof window !== "undefined") {
-        localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+      logger.warn("인증 체크 실패", error);
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다.";
+
+      if (silent) {
+        // 백그라운드 체크에서는 상태를 유지하고 호출자에게만 실패 알림
+        throw error instanceof Error ? error : new Error(message);
       }
-      set(() => ({
-        user: null,
-        isLoggedIn: false,
-        ...(silent ? {} : { loading: false }),
-        error: null,
-      }));
+
+      const tokenExists =
+        typeof window !== "undefined" &&
+        !!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+
+      const shouldAttemptRefresh =
+        tokenExists &&
+        (message.includes("로그인이 필요합니다.") ||
+          message.includes("인증이 만료되었습니다"));
+
+      if (shouldAttemptRefresh) {
+        const refreshed = await get().refreshToken();
+        if (refreshed) {
+          set({ loading: false, error: null });
+          return;
+        }
+      }
+
+      const shouldLogout =
+        message.includes("로그인이 필요합니다.") ||
+        message.includes("인증이 만료되었습니다");
+
+      if (shouldLogout) {
+        if (typeof window !== "undefined") {
+          clearTokens();
+        }
+        set({
+          user: null,
+          isLoggedIn: false,
+          loading: false,
+          error: null,
+        });
+        return;
+      }
+
+      set({
+        loading: false,
+        error: message,
+      });
     }
   },
 
@@ -95,8 +133,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return false;
       }
 
-      const data: TokenRequestResponse = await res.json();
-      saveAccessToken(data.data.access_token);
+      let data: TokenRequestResponse | null = null;
+      const hasBody = res.headers.get("content-length") !== "0";
+      if (res.status !== 204 && hasBody) {
+        try {
+          data = await res.json();
+        } catch (error) {
+          logger.warn("토큰 갱신 응답 파싱 실패", error);
+          return false;
+        }
+      }
+
+      const accessToken = data?.data?.access_token;
+      if (accessToken) {
+        saveAccessToken(accessToken);
+      }
 
       // 토큰 갱신 후 사용자 정보 다시 가져오기
       await get().checkAuth({ silent: true });
@@ -105,8 +156,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return true;
     } catch (error) {
       logger.error("토큰 갱신 중 예외 발생", error);
-      // 토큰 갱신 실패시 로그아웃 처리
-      get().logout();
       return false;
     }
   },
