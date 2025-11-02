@@ -31,10 +31,9 @@ import STORAGE_KEYS from "@/constants/storageKeys";
 
 interface HeaderProps {
   isNew?: boolean;
-  onRegister?: () => void;
 }
 
-export default function Header({ isNew, onRegister }: HeaderProps) {
+export default function Header({ isNew }: HeaderProps) {
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
   const [isNotificationOpen, setNotificationOpen] = useState(false);
   const [isProfileCardOpen, setProfileCardOpen] = useState(false);
@@ -71,7 +70,7 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useNotifications();
+  } = useNotifications({ enabled: isLoggedIn });
 
   const unreadCount = useMemo(
     () => notificationsData?.pages[0]?.data.unreadCount ?? 0,
@@ -119,7 +118,6 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
   };
 
   const handleLogin = () => router.push("/login");
-  const handleRegister = () => onRegister?.();
   const handleNotificationToggle = () => {
     setUserMenuOpen(false);
     setProfileCardOpen(false);
@@ -330,7 +328,7 @@ export default function Header({ isNew, onRegister }: HeaderProps) {
           ) : (
             <AuthButtons
               handleLogin={handleLogin}
-              handleRegister={handleRegister}
+              handleRegister={handleLogin}
             />
           )}
         </Actions>

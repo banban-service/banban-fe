@@ -1,34 +1,34 @@
-import type {Feed} from "@/types/feeds";
-import React, {useRef, useState} from "react";
-import {OptionsDropdown} from "@/components/common/OptionsDropdown/OptionsDropdown";
-import {useClickOutside} from "@/hooks/useClickOutside";
-import {useFeedLikeOptimisticUpdate} from "@/hooks/useLikeOptimisticUpdate";
-import {useVoteOptionColor} from "@/hooks/useVoteOptionColor";
-import {Poll} from "@/types/poll";
-import {Avatar} from "@/components/common/Avatar";
-import {FeedCommentButton, FeedHeartButton} from "@/components/common/Button";
-import {ReportModal} from "@/components/common/Report";
+import type { Feed } from "@/types/feeds";
+import React, { useEffect, useRef, useState } from "react";
+import { OptionsDropdown } from "@/components/common/OptionsDropdown/OptionsDropdown";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { useFeedLikeOptimisticUpdate } from "@/hooks/useLikeOptimisticUpdate";
+import { useVoteOptionColor } from "@/hooks/useVoteOptionColor";
+import { Poll } from "@/types/poll";
+import { Avatar } from "@/components/common/Avatar";
+import { FeedCommentButton, FeedHeartButton } from "@/components/common/Button";
+import { ReportModal } from "@/components/common/Report";
 import useReportMutation from "@/hooks/useReportMutation";
-import {useAuthStore} from "@/store/useAuthStore";
-import {useRouter} from "next/navigation";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 import styled from "styled-components";
-import {MoreIcon} from "@/components/svg/MoreIcon";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {updateFeed, deleteFeed} from "@/remote/feed";
-import {ConfirmModal} from "@/components/common/ConfirmModal/ConfirmModal";
-import {FloatingInputModal} from "@/components/layout/FloatingInputModal";
-import {useToast} from "@/components/common/Toast/useToast";
+import { MoreIcon } from "@/components/svg/MoreIcon";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateFeed, deleteFeed } from "@/remote/feed";
+import { ConfirmModal } from "@/components/common/ConfirmModal/ConfirmModal";
+import { FloatingInputModal } from "@/components/layout/FloatingInputModal";
+import { useToast } from "@/components/common/Toast/useToast";
 
-const FeedBlockComponent = ({
-                              props,
-                              pollData,
-                            }: {
+export const FeedBlock = ({
+  props,
+  pollData,
+}: {
   props: Feed;
   pollData?: Poll;
 }) => {
-  const {user, createdAt, commentCount, content, likeCount, id, isLiked} =
-      props;
-  const {isLoggedIn, user: me} = useAuthStore();
+  const { user, createdAt, commentCount, content, likeCount, id, isLiked } =
+    props;
+  const { isLoggedIn, user: me } = useAuthStore();
 
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -44,12 +44,14 @@ const FeedBlockComponent = ({
   const [liked, setLiked] = useState<boolean>(isLiked);
   const [count, setCount] = useState<number>(likeCount);
 
-  const likeMutation = useFeedLikeOptimisticUpdate({id});
+  useEffect(() => {
+    setLiked(isLiked);
+    setCount(likeCount);
+  }, [isLiked, likeCount]);
 
-  const avatarBackground = useVoteOptionColor(
-      props.userVoteOptionId,
-      pollData,
-  );
+  const likeMutation = useFeedLikeOptimisticUpdate({ id });
+
+  const avatarBackground = useVoteOptionColor(props.userVoteOptionId, pollData);
 
   const reportMutation = useReportMutation();
 
@@ -57,11 +59,19 @@ const FeedBlockComponent = ({
     mutationFn: (newContent: string) => updateFeed(id, newContent),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feeds"] });
-      showToast({ type: "success", message: "피드가 수정되었습니다.", duration: 3000 });
+      showToast({
+        type: "success",
+        message: "피드가 수정되었습니다.",
+        duration: 3000,
+      });
       setEditModalOpen(false);
     },
     onError: () => {
-      showToast({ type: "error", message: "피드 수정에 실패했습니다.", duration: 3000 });
+      showToast({
+        type: "error",
+        message: "피드 수정에 실패했습니다.",
+        duration: 3000,
+      });
     },
   });
 
@@ -69,11 +79,19 @@ const FeedBlockComponent = ({
     mutationFn: () => deleteFeed(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feeds"] });
-      showToast({ type: "success", message: "피드가 삭제되었습니다.", duration: 3000 });
+      showToast({
+        type: "success",
+        message: "피드가 삭제되었습니다.",
+        duration: 3000,
+      });
       setDeleteModalOpen(false);
     },
     onError: () => {
-      showToast({ type: "error", message: "피드 삭제에 실패했습니다.", duration: 3000 });
+      showToast({
+        type: "error",
+        message: "피드 삭제에 실패했습니다.",
+        duration: 3000,
+      });
     },
   });
 
@@ -120,109 +138,109 @@ const FeedBlockComponent = ({
   const isMyFeed = me?.username === user?.username;
 
   return (
-      <StyledContainer>
-        <Avatar
-            src={user?.profileImage || ""}
-            alt="사용자 프로필 이미지"
-            size={40}
-            background={avatarBackground}
-        />
+    <StyledContainer>
+      <Avatar
+        src={user?.profileImage || ""}
+        alt="사용자 프로필 이미지"
+        size={40}
+        background={avatarBackground}
+      />
 
-        <StyledContentContainer>
-          <StyledTitleContainer>
-            <StyledTitleWrapper>
-              <StyledTitle>{user?.username}</StyledTitle>
-              <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
-            </StyledTitleWrapper>
+      <StyledContentContainer>
+        <StyledTitleContainer>
+          <StyledTitleWrapper>
+            <StyledTitle>{user?.username}</StyledTitle>
+            <StyledCreatedAt>{formattedCreatedAt}</StyledCreatedAt>
+          </StyledTitleWrapper>
 
-            {isLoggedIn && (
-                <StyledMoreButtonWrapper ref={dropdownRef}>
-                  <StyledMoreButton
-                      onClick={handleToggleDropdown}
-                      aria-label="더보기 옵션 열기"
-                  >
-                    <MoreIcon/>
-                  </StyledMoreButton>
+          {isLoggedIn && (
+            <StyledMoreButtonWrapper ref={dropdownRef}>
+              <StyledMoreButton
+                onClick={handleToggleDropdown}
+                aria-label="더보기 옵션 열기"
+              >
+                <MoreIcon />
+              </StyledMoreButton>
 
-                  {isDropdownOpen && (
-                      <OptionsDropdown
-                          isMyFeed={isMyFeed}
-                          onHide={() => {
-                            handleCloseDropdown();
-                            // 관심 없음 처리 로직을 여기에 추가할 수 있음
-                          }}
-                          onReport={() => {
-                            handleCloseDropdown();
-                            setReportModalOpen(true);
-                          }}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
-                      />
-                  )}
+              {isDropdownOpen && (
+                <OptionsDropdown
+                  isMyFeed={isMyFeed}
+                  onHide={() => {
+                    handleCloseDropdown();
+                    // 관심 없음 처리 로직을 여기에 추가할 수 있음
+                  }}
+                  onReport={() => {
+                    handleCloseDropdown();
+                    setReportModalOpen(true);
+                  }}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              )}
 
-                  {isReportModalOpen && (
-                      <ReportModal
-                          isOpen={isReportModalOpen}
-                          onClose={() => setReportModalOpen(false)}
-                          onReport={handleReport}
-                          targetType="FEED"
-                          targetId={id}
-                      />
-                  )}
-                </StyledMoreButtonWrapper>
-            )}
-          </StyledTitleContainer>
-
-          <StyledBodyContainer>{content}</StyledBodyContainer>
-
-          <StyledIconButtonContainer>
-            <FeedHeartButton
-                likeCount={count}
-                isLiked={liked}
-                isLoggedIn={isLoggedIn}
-                onClick={() => {
-                  setCount(liked ? count - 1 : count + 1);
-                  setLiked(!liked);
-                  likeMutation.mutate();
-                }}
-                onLoginRequired={handleLoginRequired}
-            />
-            <FeedCommentButton
-                commentCount={commentCount}
-                onClick={() => {
-                  router.push(`/feeds/${id}`);
-                }}
-            />
-          </StyledIconButtonContainer>
-
-          {isEditModalOpen && (
-              <FloatingInputModal
-                  onClose={() => setEditModalOpen(false)}
-                  onSubmit={handleEditSubmit}
-                  actionType="피드"
-                  editMode={true}
-                  initialContent={content}
-              />
+              {isReportModalOpen && (
+                <ReportModal
+                  isOpen={isReportModalOpen}
+                  onClose={() => setReportModalOpen(false)}
+                  onReport={handleReport}
+                  targetType="FEED"
+                  targetId={id}
+                />
+              )}
+            </StyledMoreButtonWrapper>
           )}
+        </StyledTitleContainer>
 
-          {isDeleteModalOpen && (
-              <ConfirmModal
-                  isOpen={isDeleteModalOpen}
-                  onClose={() => setDeleteModalOpen(false)}
-                  onConfirm={handleConfirmDelete}
-                  title="피드를 삭제하시겠습니까?"
-                  message="삭제된 피드는 복구할 수 없습니다."
-                  confirmText="삭제"
-                  cancelText="취소"
-                  isDanger={true}
-              />
-          )}
-        </StyledContentContainer>
-      </StyledContainer>
+        <StyledBodyContainer>{content}</StyledBodyContainer>
+
+        <StyledIconButtonContainer>
+          <FeedHeartButton
+            likeCount={count}
+            isLiked={liked}
+            isLoggedIn={isLoggedIn}
+            onClick={() => {
+              setCount(liked ? count - 1 : count + 1);
+              setLiked(!liked);
+              likeMutation.mutate();
+            }}
+            onLoginRequired={handleLoginRequired}
+          />
+          <FeedCommentButton
+            commentCount={commentCount}
+            onClick={() => {
+              router.push(`/feeds/${id}`);
+            }}
+          />
+        </StyledIconButtonContainer>
+
+        {isEditModalOpen && (
+          <FloatingInputModal
+            onClose={() => setEditModalOpen(false)}
+            onSubmit={handleEditSubmit}
+            actionType="피드"
+            editMode={true}
+            initialContent={content}
+          />
+        )}
+
+        {isDeleteModalOpen && (
+          <ConfirmModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={handleConfirmDelete}
+            title="피드를 삭제하시겠습니까?"
+            message="삭제된 피드는 복구할 수 없습니다."
+            confirmText="삭제"
+            cancelText="취소"
+            isDanger={true}
+          />
+        )}
+      </StyledContentContainer>
+    </StyledContainer>
   );
 };
 
-export const FeedBlock = React.memo(FeedBlockComponent);
+// export const FeedBlock = React.memo(FeedBlockComponent);
 
 const StyledContainer = styled.div`
   display: flex;

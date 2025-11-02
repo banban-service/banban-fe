@@ -7,6 +7,15 @@ import camelcaseKeys from "camelcase-keys";
 
 let refreshPromise: Promise<boolean> | null = null;
 
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.name = "ApiError";
+  }
+}
+
 export async function apiFetch<T>(
   url: string,
   options: RequestInit = {},
@@ -87,7 +96,7 @@ export async function apiFetch<T>(
         url,
         hasToken: !!token,
       });
-      throw new Error("로그인이 필요합니다.");
+      throw new ApiError(401, "로그인이 필요합니다.");
     }
 
     // refreshPromise가 없으면 새로 생성
@@ -105,7 +114,7 @@ export async function apiFetch<T>(
 
     if (!success) {
       logger.error("토큰 갱신 실패, 로그아웃 처리", { url });
-      throw new Error("인증이 만료되었습니다. 다시 로그인해주세요.");
+      throw new ApiError(401, "인증이 만료되었습니다. 다시 로그인해주세요.");
     }
 
     logger.info("토큰 갱신 성공, 원래 요청 재시도", { url });
@@ -138,7 +147,7 @@ export async function apiFetch<T>(
     });
   }
 
-  throw new Error(errorMessage);
+  throw new ApiError(res.status, errorMessage);
 }
 
 function getAccessToken(): string | null {
