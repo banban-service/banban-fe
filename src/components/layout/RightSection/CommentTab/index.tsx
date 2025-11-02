@@ -1,18 +1,23 @@
 import styled from "styled-components";
 import { ChevronLeftIcon } from "@/components/svg/ChevronLeftIcon";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { SectionContext } from "../SectionContext";
 
 const CommentTab = () => {
   const router = useRouter();
+  const { inBottomSheet } = useContext(SectionContext);
 
   return (
     <StyledContainer>
       <StyledCommentsTab>
-        <StyledBackButton onClick={() => {
-          router.push("/");
-        }}>
-          <ChevronLeftIcon size={24} />
-        </StyledBackButton>
+        {!inBottomSheet && (
+          <StyledBackButton onClick={() => {
+            router.push("/");
+          }}>
+            <ChevronLeftIcon size={24} />
+          </StyledBackButton>
+        )}
       </StyledCommentsTab>
     </StyledContainer>
   );

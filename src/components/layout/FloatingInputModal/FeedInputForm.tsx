@@ -1,4 +1,5 @@
 import styled, {keyframes} from "styled-components";
+import { media } from "@/constants/breakpoints";
 import {Avatar} from "../../common/Avatar/Avatar";
 import {CloseIcon} from "../../svg";
 import {DefaultButton} from "@/components/common/Button";
@@ -143,6 +144,17 @@ const modalSlideUp = keyframes`
   }
 `;
 
+const modalSlideUpMobile = keyframes`
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -160,6 +172,12 @@ const ModalOverlay = styled.div`
   & > * {
     pointer-events: auto;
   }
+
+  ${media.mobile} {
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
 `;
 
 const ModalContainer = styled.div`
@@ -176,6 +194,14 @@ const ModalContainer = styled.div`
   flex-direction: column;
   animation: ${modalSlideUp} 0.22s ease;
   will-change: transform, opacity;
+
+  ${media.mobile} {
+    width: 100%;
+    max-width: none;
+    border-radius: 12px 12px 0 0;
+    max-height: 85vh;
+    animation: ${modalSlideUpMobile} 0.28s ease;
+  }
 `;
 
 const Header = styled.div`
@@ -255,6 +281,12 @@ const Description = styled.span`
 const InputSection = styled.div`
   padding: 0 20px;
   flex: 1;
+
+  ${media.mobile} {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const TextInput = styled.textarea`
@@ -278,6 +310,11 @@ const TextInput = styled.textarea`
   &::placeholder {
     color: #9ca3af;
     font-weight: bold;
+  }
+
+  ${media.mobile} {
+    min-height: 200px;
+    font-size: 18px;
   }
 `;
 

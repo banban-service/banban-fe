@@ -8,10 +8,14 @@ export const SectionContext = createContext<{
 
   targetFeed: Feed | null;
   setTargetFeed: Dispatch<SetStateAction<Feed | null>>;
+
+  inBottomSheet?: boolean;
 }>({
   sectionStatus: "feeds",
   setSectionStatus: () => {},
 
   targetFeed: null,
   setTargetFeed: () => {},
+
+  inBottomSheet: false,
 });

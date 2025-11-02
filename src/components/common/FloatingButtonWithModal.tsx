@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import styled from "styled-components";
+import { media } from "@/constants/breakpoints";
 import { FloatingInputModal } from "@/components/layout/FloatingInputModal";
 import { FloatingButton } from "@/components/common/Button/Floating/FloatingButton";
 import type { Feed } from "@/types/feeds";
@@ -66,4 +67,9 @@ const FloatingButtonContainer = styled.div<{ $isHidden?: boolean }>`
   opacity: ${({ $isHidden }) => ($isHidden ? "0" : "1")};
   pointer-events: ${({ $isHidden }) => ($isHidden ? "none" : "auto")};
   transition: opacity 0.2s ease;
+
+  ${media.mobile} {
+    bottom: 32px;
+    right: 16px;
+  }
 `;
