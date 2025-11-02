@@ -12,6 +12,9 @@ export default function LoginPage() {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/${id}`,
+        {
+          credentials: 'include',
+        }
       );
       if (!res.ok) throw new Error("Login API Error");
 

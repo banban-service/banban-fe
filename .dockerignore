@@ -1,0 +1,63 @@
+# git
+.git
+.gitignore
+.gitattributes
+
+# dependencies
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+pnpm-lock.yaml
+yarn.lock
+
+# next.js
+.next
+out
+build
+
+# testing
+.jest
+coverage
+
+# misc
+.DS_Store
+.env*
+!.env.production
+.vercel
+*.pem
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.code-workspace
+
+# storybook
+storybook-static
+.storybook
+
+# documentation
+README.md
+docs
+.github
+
+# ci/cd
+.gitlab-ci.yml
+.travis.yml
+.github/workflows
+
+# nodejs
+.nvmrc
+.nvm
+
+# docker
+Dockerfile
+docker-compose.yml
+nginx/
+
+# markdown
+*.md
