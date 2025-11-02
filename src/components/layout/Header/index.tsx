@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { DefaultButton } from "@/components/common/Button";
 import { BanBanLogo, BellIcon, DotIcon, UserIcon } from "@/components/svg";
 import styled from "styled-components";
+import { media } from "@/constants/breakpoints";
 import useAuth from "@/hooks/useAuth";
 import { usePathname, useRouter } from "next/navigation";
 import { UserMenu } from "@/components/common/UserMenu/UserMenu";
@@ -374,12 +375,22 @@ const Container = styled.header`
   align-items: center;
   padding: 0px 32px;
   z-index: ${Z_INDEX.header};
+
+  ${media.mobile} {
+    padding: 0px 12px;
+  }
 `;
 
 const LogoArea = styled.div`
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+
+  ${media.mobile} {
+    position: static;
+    left: auto;
+    transform: none;
+  }
 `;
 
 const LogoButton = styled.button`
@@ -415,6 +426,12 @@ const IconButton = styled.button<{ $active?: boolean }>`
     outline: 2px solid #3e13ff6c;
     outline-offset: 2px;
   }
+
+  ${media.mobile} {
+    width: 40px;
+    height: 40px;
+    margin-right: 2px;
+  }
 `;
 
 const Actions = styled.div`
@@ -424,6 +441,10 @@ const Actions = styled.div`
   align-items: center;
   width: fit-content;
   gap: 12px;
+
+  ${media.mobile} {
+    gap: 6px;
+  }
 `;
 
 const ButtonBase = styled(DefaultButton)`
@@ -432,6 +453,13 @@ const ButtonBase = styled(DefaultButton)`
   height: 44px;
   padding: 10px 18px;
   font-size: 16px;
+
+  ${media.mobile} {
+    width: 70px;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
 `;
 
 const TransparentButton = styled(ButtonBase)`

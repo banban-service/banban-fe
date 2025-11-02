@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import styled from "styled-components";
+import { useSwipeable } from "react-swipeable";
 import LeftSection from "@/components/layout/LeftSection/LeftSection";
 import RightSection from "@/components/layout/RightSection/RightSection";
-import MobileTabBar from "@/components/layout/MobileTabBar/MobileTabBar";
+import PageIndicator from "@/components/layout/PageIndicator/PageIndicator";
 import { SectionContext } from "@/components/layout/RightSection/SectionContext";
 import { media } from "@/constants/breakpoints";
 import type { Feed } from "@/types/feeds";
@@ -21,8 +22,23 @@ export default function Home() {
   const [mobileActiveTab, setMobileActiveTab] = useState<"poll" | "feeds">(
     "poll",
   );
+  const swipeRef = useRef<HTMLDivElement>(null);
   const { isLoggedIn } = useAuthStore();
   const { data: pollData, isLoading: isPollLoading } = usePoll();
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (mobileActiveTab === "poll") {
+        setMobileActiveTab("feeds");
+      }
+    },
+    onSwipedRight: () => {
+      if (mobileActiveTab === "feeds") {
+        setMobileActiveTab("poll");
+      }
+    },
+    trackMouse: false,
+  });
 
   const sectionContextValue = useMemo(
     () => ({
@@ -48,13 +64,16 @@ export default function Home() {
 
   return (
     <SectionContext.Provider value={sectionContextValue}>
-      <ContentContainer>
+      <PageIndicator currentPage={mobileActiveTab} />
+      <ContentContainer ref={swipeRef} {...swipeHandlers}>
         <MainContentWrapper>
-          {/* 데스크톱: 둘 다 표시, 모바일: 탭 기반으로 표시 */}
-          {mobileActiveTab === "poll" && <LeftSection />}
-          {mobileActiveTab === "feeds" && <RightSection />}
+          {/* 모바일에서만 탭 기반 렌더링 */}
+          <MobileOnly>
+            {mobileActiveTab === "poll" && <LeftSection />}
+            {mobileActiveTab === "feeds" && <RightSection />}
+          </MobileOnly>
 
-          {/* 데스크톱에서는 둘 다 표시 */}
+          {/* 태블릿/데스크톱에서는 둘 다 표시 */}
           <DesktopOnly>
             <LeftSection />
             <RightSection />
@@ -69,10 +88,6 @@ export default function Home() {
           )}
         </MainContentWrapper>
       </ContentContainer>
-      <MobileTabBar
-        activeTab={mobileActiveTab}
-        onTabChange={setMobileActiveTab}
-      />
     </SectionContext.Provider>
   );
 }
@@ -85,7 +100,7 @@ const ContentContainer = styled.div`
   padding-top: 60px;
 
   ${media.mobile} {
-    padding-bottom: 56px;
+    padding-top: 64px;
     height: 100dvh;
     overflow: hidden;
   }
@@ -113,7 +128,7 @@ const MainContentWrapper = styled.div`
     display: block;
     width: 100%;
     max-width: 100%;
-    height: calc(100dvh - 116px);
+    height: 100%;
     overflow-y: auto;
   }
 
@@ -129,6 +144,18 @@ const MainContentWrapper = styled.div`
     gap: 24px;
     width: fit-content;
     height: fit-content;
+  }
+`;
+
+const MobileOnly = styled.div`
+  display: block;
+
+  ${media.tablet} {
+    display: none;
+  }
+
+  ${media.desktop} {
+    display: none;
   }
 `;
 
