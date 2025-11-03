@@ -45,7 +45,7 @@ export const Avatar = ({ src, alt, size, background }: AvatarProps) => {
     }
   }, [src]);
 
-  const isExternal = url && (url.startsWith("http://") || url.startsWith("https://"));
+  const isExternal = !!url && (url.startsWith("http://") || url.startsWith("https://"));
 
   return (
     <GradientBorder $background={background}>
