@@ -13,7 +13,7 @@ export const fetchPoll = async (date?: string): Promise<Poll> => {
 };
 
 export const makeVote = async ({ id }: { id: number }): Promise<BanbanResponse> => {
-  return await apiFetch("/polls/votes/", {
+  return await apiFetch("/polls/votes", {
     method: "POST",
     body: JSON.stringify({ poll_option_id: id }),
   });
