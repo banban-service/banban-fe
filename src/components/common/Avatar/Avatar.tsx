@@ -45,6 +45,8 @@ export const Avatar = ({ src, alt, size, background }: AvatarProps) => {
     }
   }, [src]);
 
+  const isExternal = url && (url.startsWith("http://") || url.startsWith("https://"));
+
   return (
     <GradientBorder $background={background}>
       <StyledImageWrapper size={size}>
@@ -54,6 +56,7 @@ export const Avatar = ({ src, alt, size, background }: AvatarProps) => {
           alt={alt}
           width={url == "/no_img.png" ? 30 : size}
           height={url == "/no_img.png" ? 30 : size}
+          unoptimized={isExternal}
           style={{
             objectFit: "cover",
             objectPosition: "center",

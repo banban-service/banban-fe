@@ -7,6 +7,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://www.banban.today
+        NEXT_PUBLIC_KAKAO_REST_API_KEY: ${NEXT_PUBLIC_KAKAO_REST_API_KEY}
+        NEXT_PUBLIC_KAKAO_REDIRECT_URI: ${NEXT_PUBLIC_KAKAO_REDIRECT_URI}
+        NEXT_PUBLIC_NAVER_REST_API_KEY: ${NEXT_PUBLIC_NAVER_REST_API_KEY}
+        NEXT_PUBLIC_NAVER_REDIRECT_URI: ${NEXT_PUBLIC_NAVER_REDIRECT_URI}
+        NEXT_PUBLIC_NAVER_CLIENT_SECRET: ${NEXT_PUBLIC_NAVER_CLIENT_SECRET}
     container_name: banban-nextjs
     ports:
       - "3000:3000"  # 호스트 Nginx가 localhost:3000으로 접근
