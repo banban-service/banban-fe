@@ -399,6 +399,12 @@ const LogoButton = styled.button`
   cursor: pointer;
   display: flex;
   align-items: center;
+
+  ${media.mobile} {
+    svg {
+      width: 100px;
+    }
+  }
 `;
 
 const IconButton = styled.button<{ $active?: boolean }>`
@@ -442,7 +448,7 @@ const Actions = styled.div`
   gap: 12px;
 
   ${media.mobile} {
-    gap: 6px;
+    gap: 8px;
   }
 `;
 
@@ -456,7 +462,7 @@ const ButtonBase = styled(DefaultButton)`
   ${media.mobile} {
     width: 70px;
     height: 40px;
-    padding: 8px 12px;
+    padding: 6px 10px;
     font-size: 14px;
   }
 `;
