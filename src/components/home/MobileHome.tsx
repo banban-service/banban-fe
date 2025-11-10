@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import LeftSection from "@/components/layout/LeftSection/LeftSection";
-import RightSection from "@/components/layout/RightSection/RightSection";
+import HomeTab from "@/components/mobile/tabs/HomeTab";
+import FeedTab from "@/components/mobile/tabs/FeedTab";
 import BottomTabBar, { type TabType } from "@/components/mobile/BottomTabBar";
 import NotificationsPage from "@/components/mobile/pages/NotificationsPage";
 import ProfilePage from "@/components/mobile/pages/ProfilePage";
@@ -53,8 +53,8 @@ export default function MobileHome() {
     <SectionContext.Provider value={sectionContextValue}>
       <div className="flex justify-center w-full mx-auto pt-16 pb-16 h-dvh overflow-hidden">
         <div className="block w-full max-w-full h-full overflow-y-auto">
-          {mobileActiveTab === "home" && <LeftSection />}
-          {mobileActiveTab === "feeds" && <RightSection />}
+          {mobileActiveTab === "home" && <HomeTab />}
+          {mobileActiveTab === "feeds" && <FeedTab />}
           {mobileActiveTab === "notifications" && <NotificationsPage />}
           {mobileActiveTab === "profile" && <ProfilePage />}
 
