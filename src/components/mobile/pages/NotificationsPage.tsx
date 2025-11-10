@@ -76,16 +76,6 @@ export default function NotificationsPage() {
     },
   });
 
-  // 페이지 진입 시 모든 알림을 읽음 처리
-  useEffect(() => {
-    const unreadIds = allNotifications
-      .filter((notification) => !notification.isRead)
-      .map((notification) => notification.id);
-    if (unreadIds.length > 0) {
-      markAsRead(unreadIds);
-    }
-  }, [allNotifications, markAsRead]);
-
   const handleMarkAllRead = async () => {
     try {
       await markAllNotificationsAsRead();
