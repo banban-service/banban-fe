@@ -1,80 +1,108 @@
-import styled from "styled-components";
-import { PollIcon, FeedIcon } from "@/components/svg";
+import { HomeIcon, FeedIcon, BellIcon, UserIcon } from "@/components/svg";
+
+export type TabType = "home" | "feeds" | "notifications" | "profile";
 
 interface BottomTabBarProps {
-  activeTab: "poll" | "feeds";
-  onTabChange: (tab: "poll" | "feeds") => void;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
+  hasUnreadNotifications?: boolean;
 }
 
-export default function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
+export default function BottomTabBar({
+  activeTab,
+  onTabChange,
+  hasUnreadNotifications = false,
+}: BottomTabBarProps) {
   return (
-    <Container>
-      <TabButton
-        $active={activeTab === "poll"}
-        onClick={() => onTabChange("poll")}
-        aria-label="투표"
+    <nav className="fixed bottom-0 left-0 right-0 flex justify-around items-center bg-white border-t border-[#d5d7da] py-2 pb-[max(8px,env(safe-area-inset-bottom))] z-[100] h-16">
+      <button
+        onClick={() => onTabChange("home")}
+        aria-label="홈"
+        className="flex flex-col items-center justify-center gap-1 flex-1 border-none bg-transparent cursor-pointer p-2 transition-transform active:scale-95"
       >
-        <PollIcon
+        <HomeIcon
           width={24}
           height={24}
-          color={activeTab === "poll" ? "#3f13ff" : "#535862"}
+          color={activeTab === "home" ? "#3f13ff" : "#535862"}
         />
-        <TabLabel $active={activeTab === "poll"}>투표</TabLabel>
-      </TabButton>
+        <span
+          className={`text-xs transition-colors ${
+            activeTab === "home"
+              ? "font-semibold text-[#3f13ff]"
+              : "font-normal text-[#535862]"
+          }`}
+        >
+          홈
+        </span>
+      </button>
 
-      <TabButton
-        $active={activeTab === "feeds"}
+      <button
         onClick={() => onTabChange("feeds")}
         aria-label="피드"
+        className="flex flex-col items-center justify-center gap-1 flex-1 border-none bg-transparent cursor-pointer p-2 transition-transform active:scale-95"
       >
         <FeedIcon
           width={24}
           height={24}
           color={activeTab === "feeds" ? "#3f13ff" : "#535862"}
         />
-        <TabLabel $active={activeTab === "feeds"}>피드</TabLabel>
-      </TabButton>
-    </Container>
+        <span
+          className={`text-xs transition-colors ${
+            activeTab === "feeds"
+              ? "font-semibold text-[#3f13ff]"
+              : "font-normal text-[#535862]"
+          }`}
+        >
+          피드
+        </span>
+      </button>
+
+      <button
+        onClick={() => onTabChange("notifications")}
+        aria-label="알림"
+        className="flex flex-col items-center justify-center gap-1 flex-1 border-none bg-transparent cursor-pointer p-2 transition-transform active:scale-95"
+      >
+        <div className="relative flex items-center justify-center">
+          <BellIcon
+            width={24}
+            height={24}
+            color={activeTab === "notifications" ? "#3f13ff" : "#535862"}
+          />
+          {hasUnreadNotifications && (
+            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#ff474f] border-2 border-white" />
+          )}
+        </div>
+        <span
+          className={`text-xs transition-colors ${
+            activeTab === "notifications"
+              ? "font-semibold text-[#3f13ff]"
+              : "font-normal text-[#535862]"
+          }`}
+        >
+          알림
+        </span>
+      </button>
+
+      <button
+        onClick={() => onTabChange("profile")}
+        aria-label="프로필"
+        className="flex flex-col items-center justify-center gap-1 flex-1 border-none bg-transparent cursor-pointer p-2 transition-transform active:scale-95"
+      >
+        <UserIcon
+          width={24}
+          height={24}
+          color={activeTab === "profile" ? "#3f13ff" : "#535862"}
+        />
+        <span
+          className={`text-xs transition-colors ${
+            activeTab === "profile"
+              ? "font-semibold text-[#3f13ff]"
+              : "font-normal text-[#535862]"
+          }`}
+        >
+          프로필
+        </span>
+      </button>
+    </nav>
   );
 }
-
-const Container = styled.nav`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: #ffffff;
-  border-top: 1px solid #d5d7da;
-  padding: 8px 0;
-  padding-bottom: max(8px, env(safe-area-inset-bottom));
-  z-index: 100;
-  height: 64px;
-`;
-
-const TabButton = styled.button<{ $active: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  flex: 1;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 8px;
-  transition: transform 0.2s ease;
-
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-
-const TabLabel = styled.span<{ $active: boolean }>`
-  font-size: 12px;
-  font-weight: ${({ $active }) => ($active ? "600" : "400")};
-  color: ${({ $active }) => ($active ? "#3f13ff" : "#535862")};
-  transition: color 0.2s ease;
-`;
