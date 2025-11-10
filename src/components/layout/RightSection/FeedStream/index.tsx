@@ -38,16 +38,21 @@ export default function FeedStream() {
 
   const [scrollTrigger, isInView] = useInView({
     threshold: 0,
+    rootMargin: "200px", // 200px 전에 미리 로드 (부드러운 UX)
   });
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const { scrollPosition, setScrollPosition } = useScrollPositionStore();
 
+  // 무한 스크롤 디바운스 (빠른 스크롤 시 불필요한 fetch 방지)
   useEffect(() => {
-    if (!feedsEnabled) return;
-    if (hasNextPage && isInView) {
+    if (!feedsEnabled || !hasNextPage || !isInView) return;
+
+    const timeoutId = setTimeout(() => {
       fetchNextPage();
-    }
+    }, 100); // 100ms 디바운스
+
+    return () => clearTimeout(timeoutId);
   }, [isInView, hasNextPage, feedsEnabled, fetchNextPage]);
 
   useEffect(() => {
@@ -66,7 +71,7 @@ export default function FeedStream() {
       }
       timeoutId = window.setTimeout(() => {
         setScrollPosition(container.scrollTop || 0);
-      }, 200);
+      }, 100); // 100ms 디바운스 (성능 개선)
     };
 
     container.addEventListener("scroll", handleScroll);
