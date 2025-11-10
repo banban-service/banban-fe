@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import styled from "styled-components";
+import { useState, useEffect } from "react";
 import useAuth from "@/hooks/useAuth";
 import { Avatar } from "@/components/common/Avatar";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
@@ -9,7 +8,6 @@ import { CommunityInfoCard } from "@/components/communityInfo/CommunityInfoCard"
 import { LogoutIcon, UserProfileIcon, UsersIcon, SettingsIcon } from "@/components/svg";
 import { isAdmin as checkIsAdmin } from "@/utils/jwt";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import { useEffect } from "react";
 import { logger } from "@/utils/logger";
 import { AdminSettingsModal } from "@/components/admin/AdminSettingsModal";
 
@@ -41,63 +39,87 @@ export default function ProfilePage() {
 
   if (!isLoggedIn || !user) {
     return (
-      <Container>
-        <EmptyState>
-          <EmptyText>로그인이 필요합니다</EmptyText>
-        </EmptyState>
-      </Container>
+      <div className="flex flex-col w-full h-full bg-[#f4f6f8]">
+        <div className="flex flex-col items-center justify-center h-full py-15 px-5">
+          <p className="text-base text-[#858d9d] m-0">로그인이 필요합니다</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>프로필</Title>
-      </Header>
+    <div className="flex flex-col w-full h-full bg-[#f4f6f8]">
+      <div className="flex items-center px-4 py-4 bg-white border-b border-[#e9eaeb]">
+        <h1 className="text-xl font-bold text-[#181d27]">프로필</h1>
+      </div>
 
-      <ProfileSection>
+      <div className="flex items-center gap-4 px-4 py-6 bg-white border-b border-[#e9eaeb]">
         <Avatar
           src={user.profileImageUrl || "/user.png"}
           alt={user.username}
           size={80}
         />
-        <UserInfo>
-          <Nickname>{user.username}</Nickname>
-          <Email>{user.email}</Email>
-        </UserInfo>
-      </ProfileSection>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-lg font-bold text-[#181d27] m-0 mb-1">
+            {user.username}
+          </h2>
+          <p className="text-sm text-[#858d9d] m-0 overflow-hidden overflow-ellipsis whitespace-nowrap">
+            {user.email}
+          </p>
+        </div>
+      </div>
 
-      <MenuSection>
-        <MenuItem onClick={() => setProfileEditOpen(true)}>
-          <MenuIcon>
+      <div className="mt-3 bg-white border-t border-b border-[#e9eaeb]">
+        <button
+          onClick={() => setProfileEditOpen(true)}
+          className="flex items-center gap-3 w-full px-4 py-4 border-none border-b border-[#e9eaeb] bg-white cursor-pointer transition-colors hover:bg-[#f4f6f8] active:bg-[#e9eaeb]"
+        >
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#f4f6f8]">
             <UserProfileIcon width={20} height={20} color="#535862" />
-          </MenuIcon>
-          <MenuText>프로필 편집</MenuText>
-        </MenuItem>
+          </div>
+          <span className="text-base text-[#181d27] font-medium">
+            프로필 편집
+          </span>
+        </button>
 
-        <MenuItem onClick={() => setCommunityInfoOpen(true)}>
-          <MenuIcon>
+        <button
+          onClick={() => setCommunityInfoOpen(true)}
+          className="flex items-center gap-3 w-full px-4 py-4 border-none border-b border-[#e9eaeb] bg-white cursor-pointer transition-colors hover:bg-[#f4f6f8] active:bg-[#e9eaeb]"
+        >
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#f4f6f8]">
             <UsersIcon width={20} height={20} color="#535862" />
-          </MenuIcon>
-          <MenuText>커뮤니티 정보</MenuText>
-        </MenuItem>
+          </div>
+          <span className="text-base text-[#181d27] font-medium">
+            커뮤니티 정보
+          </span>
+        </button>
 
         {isAdmin && (
-          <MenuItem onClick={() => setAdminSettingsOpen(true)}>
-            <MenuIcon>
+          <button
+            onClick={() => setAdminSettingsOpen(true)}
+            className="flex items-center gap-3 w-full px-4 py-4 border-none border-b border-[#e9eaeb] bg-white cursor-pointer transition-colors hover:bg-[#f4f6f8] active:bg-[#e9eaeb]"
+          >
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#f4f6f8]">
               <SettingsIcon width={20} height={20} color="#535862" />
-            </MenuIcon>
-            <MenuText>관리자 설정</MenuText>
-          </MenuItem>
+            </div>
+            <span className="text-base text-[#181d27] font-medium">
+              관리자 설정
+            </span>
+          </button>
         )}
 
-        <MenuItem onClick={logout}>
-          <MenuIcon>
+        <button
+          onClick={logout}
+          className="flex items-center gap-3 w-full px-4 py-4 border-none bg-white cursor-pointer transition-colors hover:bg-[#f4f6f8] active:bg-[#e9eaeb]"
+        >
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#f4f6f8]">
             <LogoutIcon width={20} height={20} color="#535862" />
-          </MenuIcon>
-          <MenuText>로그아웃</MenuText>
-        </MenuItem>
-      </MenuSection>
+          </div>
+          <span className="text-base text-[#181d27] font-medium">
+            로그아웃
+          </span>
+        </button>
+      </div>
 
       <ProfileEditModal
         isOpen={isProfileEditOpen}
@@ -112,121 +134,6 @@ export default function ProfilePage() {
         isOpen={isAdminSettingsOpen}
         onClose={() => setAdminSettingsOpen(false)}
       />
-    </Container>
+    </div>
   );
 }
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  background-color: #f4f6f8;
-`;
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  background-color: #fff;
-  border-bottom: 1px solid #e9eaeb;
-`;
-
-const Title = styled.h1`
-  font-size: 20px;
-  font-weight: 700;
-  color: #181d27;
-`;
-
-const ProfileSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 24px 16px;
-  background-color: #fff;
-  border-bottom: 1px solid #e9eaeb;
-`;
-
-const UserInfo = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const Nickname = styled.h2`
-  font-size: 18px;
-  font-weight: 700;
-  color: #181d27;
-  margin: 0 0 4px 0;
-`;
-
-const Email = styled.p`
-  font-size: 14px;
-  color: #858d9d;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const MenuSection = styled.div`
-  margin-top: 12px;
-  background-color: #fff;
-  border-top: 1px solid #e9eaeb;
-  border-bottom: 1px solid #e9eaeb;
-`;
-
-const MenuItem = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-bottom: 1px solid #e9eaeb;
-  background-color: #fff;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background-color: #f4f6f8;
-  }
-
-  &:active {
-    background-color: #e9eaeb;
-  }
-`;
-
-const MenuIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #f4f6f8;
-`;
-
-const MenuText = styled.span`
-  font-size: 16px;
-  color: #181d27;
-  font-weight: 500;
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 60px 20px;
-`;
-
-const EmptyText = styled.p`
-  font-size: 16px;
-  color: #858d9d;
-  margin: 0;
-`;

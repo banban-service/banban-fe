@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import styled from "styled-components";
 import LeftSection from "@/components/layout/LeftSection/LeftSection";
 import RightSection from "@/components/layout/RightSection/RightSection";
 import BottomTabBar, { type TabType } from "@/components/mobile/BottomTabBar";
@@ -41,19 +40,19 @@ export default function MobileHome() {
   // Poll 데이터가 없을 때 (로딩 완료 후)
   if (!isPollLoading && !pollData) {
     return (
-      <FullScreenContainer>
+      <div className="flex items-center justify-center w-screen h-dvh bg-[#f8fafc]">
         <NoTopicState
           message="오늘의 주제가 없습니다"
           description="잠시 후 다시 시도해주세요"
         />
-      </FullScreenContainer>
+      </div>
     );
   }
 
   return (
     <SectionContext.Provider value={sectionContextValue}>
-      <ContentContainer>
-        <MainContentWrapper>
+      <div className="flex justify-center w-full mx-auto pt-16 pb-16 h-dvh overflow-hidden">
+        <div className="block w-full max-w-full h-full overflow-y-auto">
           {mobileActiveTab === "home" && <LeftSection />}
           {mobileActiveTab === "feeds" && <RightSection />}
           {mobileActiveTab === "notifications" && <NotificationsPage />}
@@ -66,8 +65,8 @@ export default function MobileHome() {
               targetFeed={null}
             />
           )}
-        </MainContentWrapper>
-      </ContentContainer>
+        </div>
+      </div>
       <BottomTabBar
         activeTab={mobileActiveTab}
         onTabChange={setMobileActiveTab}
@@ -76,31 +75,3 @@ export default function MobileHome() {
     </SectionContext.Provider>
   );
 }
-
-const ContentContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 0 auto;
-  padding-top: 64px;
-  padding-bottom: 64px; /* 하단 탭바 공간 확보 */
-  height: 100dvh;
-  overflow: hidden;
-`;
-
-const MainContentWrapper = styled.div`
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  overflow-y: auto;
-`;
-
-const FullScreenContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  height: 100dvh;
-  background-color: #f8fafc;
-`;

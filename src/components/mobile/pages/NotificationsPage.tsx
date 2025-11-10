@@ -1,15 +1,11 @@
 "use client";
 
 import { useMemo, useCallback, useEffect } from "react";
-import styled from "styled-components";
 import type {
   Notification,
   NotificationConnectionStatus,
-  NotificationType,
 } from "@/types/notification";
 import { useInView } from "react-intersection-observer";
-import type { InfiniteData } from "@tanstack/react-query";
-import type { NotificationResponse } from "@/remote/notification";
 import { Avatar } from "@/components/common/Avatar";
 import { useToast } from "@/components/common/Toast/useToast";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -30,6 +26,24 @@ const STATUS_LABELS: Record<NotificationConnectionStatus, string> = {
   reconnecting: "재연결 중",
   disconnected: "연결 끊김",
   error: "오류",
+};
+
+const STATUS_BG_COLORS: Record<NotificationConnectionStatus, string> = {
+  idle: "bg-[#e9eaeb]",
+  connecting: "bg-[#fff3cd]",
+  connected: "bg-[#d4edda]",
+  reconnecting: "bg-[#fff3cd]",
+  disconnected: "bg-[#f8d7da]",
+  error: "bg-[#f8d7da]",
+};
+
+const STATUS_TEXT_COLORS: Record<NotificationConnectionStatus, string> = {
+  idle: "text-[#535862]",
+  connecting: "text-[#856404]",
+  connected: "text-[#155724]",
+  reconnecting: "text-[#856404]",
+  disconnected: "text-[#721c24]",
+  error: "text-[#721c24]",
 };
 
 export default function NotificationsPage() {
@@ -119,7 +133,6 @@ export default function NotificationsPage() {
     }
   };
 
-
   const formatTimeAgo = useCallback((createdAt: string): string => {
     const now = new Date();
     const created = new Date(createdAt);
@@ -136,218 +149,80 @@ export default function NotificationsPage() {
   }, []);
 
   return (
-    <Container>
-      <Header>
-        <Title>알림</Title>
-        <StatusBadge $status={connectionStatus}>
+    <div className="flex flex-col w-full h-full bg-white">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-[#e9eaeb]">
+        <h1 className="text-xl font-bold text-[#181d27]">알림</h1>
+        <span
+          className={`text-xs px-2 py-1 rounded-xl ${STATUS_BG_COLORS[connectionStatus]} ${STATUS_TEXT_COLORS[connectionStatus]}`}
+        >
           {STATUS_LABELS[connectionStatus]}
-        </StatusBadge>
-      </Header>
+        </span>
+      </div>
 
-      <ActionBar>
-        <ActionButton onClick={handleMarkAllRead}>모두 읽음</ActionButton>
-        <ActionButton onClick={handleDeleteRead}>읽은 알림 삭제</ActionButton>
-      </ActionBar>
+      <div className="flex gap-2 px-4 py-3 border-b border-[#e9eaeb]">
+        <button
+          onClick={handleMarkAllRead}
+          className="text-sm px-3 py-1.5 border border-[#d5d7da] rounded-md bg-white text-[#535862] cursor-pointer transition-colors hover:bg-[#f4f6f8] active:bg-[#e9eaeb]"
+        >
+          모두 읽음
+        </button>
+        <button
+          onClick={handleDeleteRead}
+          className="text-sm px-3 py-1.5 border border-[#d5d7da] rounded-md bg-white text-[#535862] cursor-pointer transition-colors hover:bg-[#f4f6f8] active:bg-[#e9eaeb]"
+        >
+          읽은 알림 삭제
+        </button>
+      </div>
 
-      <NotificationList>
+      <div className="flex-1 overflow-y-auto">
         {allNotifications.length === 0 ? (
-          <EmptyState>알림이 없습니다</EmptyState>
+          <div className="flex items-center justify-center py-15 px-5 text-base text-[#858d9d]">
+            알림이 없습니다
+          </div>
         ) : (
           <>
             {allNotifications.map((notification) => (
-              <NotificationItem
+              <div
                 key={notification.id}
-                $isRead={notification.isRead}
                 onClick={() => handleNotificationItemClick(notification)}
+                className={`flex items-center gap-3 px-4 py-3 border-b border-[#e9eaeb] cursor-pointer transition-colors hover:bg-[#f4f6f8] active:bg-[#e9eaeb] ${
+                  notification.isRead ? "bg-white" : "bg-[#f8f9ff]"
+                }`}
               >
-                <AvatarWrapper>
+                <div className="flex-shrink-0">
                   <Avatar
                     src={notification.fromUser?.profileImage || "/user.png"}
                     alt={notification.fromUser?.username || "사용자"}
                     size={40}
                   />
-                </AvatarWrapper>
-                <Content>
-                  <Text>{notification.message}</Text>
-                  <Time>{formatTimeAgo(notification.createdAt)}</Time>
-                </Content>
-                {!notification.isRead && <UnreadDot />}
-              </NotificationItem>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-[#181d27] mb-1 break-words">
+                    {notification.message}
+                  </p>
+                  <span className="text-xs text-[#858d9d]">
+                    {formatTimeAgo(notification.createdAt)}
+                  </span>
+                </div>
+                {!notification.isRead && (
+                  <div className="w-2 h-2 rounded-full bg-[#3f13ff] flex-shrink-0" />
+                )}
+              </div>
             ))}
             {hasNextPage && (
-              <LoadMore ref={loadMoreRef}>
+              <div ref={loadMoreRef} className="p-4 text-center text-sm text-[#858d9d]">
                 {isFetchingNextPage ? "로딩 중..." : ""}
-              </LoadMore>
+              </div>
             )}
           </>
         )}
-      </NotificationList>
+      </div>
 
       {isTimeout && (
-        <TimeoutWarning>
+        <div className="px-4 py-3 bg-[#fff3cd] text-[#856404] text-center text-sm border-t border-[#ffeaa7]">
           알림 연결 시간이 초과되었습니다. 새로고침해주세요.
-        </TimeoutWarning>
+        </div>
       )}
-    </Container>
+    </div>
   );
 }
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-`;
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  border-bottom: 1px solid #e9eaeb;
-`;
-
-const Title = styled.h1`
-  font-size: 20px;
-  font-weight: 700;
-  color: #181d27;
-`;
-
-const StatusBadge = styled.span<{ $status: NotificationConnectionStatus }>`
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  background-color: ${({ $status }) => {
-    switch ($status) {
-      case "connected":
-        return "#d4edda";
-      case "connecting":
-      case "reconnecting":
-        return "#fff3cd";
-      case "disconnected":
-      case "error":
-        return "#f8d7da";
-      default:
-        return "#e9eaeb";
-    }
-  }};
-  color: ${({ $status }) => {
-    switch ($status) {
-      case "connected":
-        return "#155724";
-      case "connecting":
-      case "reconnecting":
-        return "#856404";
-      case "disconnected":
-      case "error":
-        return "#721c24";
-      default:
-        return "#535862";
-    }
-  }};
-`;
-
-const ActionBar = styled.div`
-  display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #e9eaeb;
-`;
-
-const ActionButton = styled.button`
-  font-size: 14px;
-  padding: 6px 12px;
-  border: 1px solid #d5d7da;
-  border-radius: 6px;
-  background-color: #fff;
-  color: #535862;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #f4f6f8;
-  }
-
-  &:active {
-    background-color: #e9eaeb;
-  }
-`;
-
-const NotificationList = styled.div`
-  flex: 1;
-  overflow-y: auto;
-`;
-
-const NotificationItem = styled.div<{ $isRead: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: ${({ $isRead }) => ($isRead ? "#fff" : "#f8f9ff")};
-  border-bottom: 1px solid #e9eaeb;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #f4f6f8;
-  }
-
-  &:active {
-    background-color: #e9eaeb;
-  }
-`;
-
-const AvatarWrapper = styled.div`
-  flex-shrink: 0;
-`;
-
-const Content = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const Text = styled.p`
-  font-size: 14px;
-  color: #181d27;
-  margin: 0 0 4px 0;
-  word-break: break-word;
-`;
-
-const Time = styled.span`
-  font-size: 12px;
-  color: #858d9d;
-`;
-
-const UnreadDot = styled.div`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #3f13ff;
-  flex-shrink: 0;
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  font-size: 16px;
-  color: #858d9d;
-`;
-
-const LoadMore = styled.div`
-  padding: 16px;
-  text-align: center;
-  font-size: 14px;
-  color: #858d9d;
-`;
-
-const TimeoutWarning = styled.div`
-  padding: 12px 16px;
-  background-color: #fff3cd;
-  color: #856404;
-  text-align: center;
-  font-size: 14px;
-  border-top: 1px solid #ffeaa7;
-`;
