@@ -1,25 +1,32 @@
 import styled from "styled-components";
-import { PollIcon, FeedIcon } from "@/components/svg";
+import { HomeIcon, FeedIcon, BellIcon, UserIcon } from "@/components/svg";
+
+export type TabType = "home" | "feeds" | "notifications" | "profile";
 
 interface BottomTabBarProps {
-  activeTab: "poll" | "feeds";
-  onTabChange: (tab: "poll" | "feeds") => void;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
+  hasUnreadNotifications?: boolean;
 }
 
-export default function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
+export default function BottomTabBar({
+  activeTab,
+  onTabChange,
+  hasUnreadNotifications = false,
+}: BottomTabBarProps) {
   return (
     <Container>
       <TabButton
-        $active={activeTab === "poll"}
-        onClick={() => onTabChange("poll")}
-        aria-label="투표"
+        $active={activeTab === "home"}
+        onClick={() => onTabChange("home")}
+        aria-label="홈"
       >
-        <PollIcon
+        <HomeIcon
           width={24}
           height={24}
-          color={activeTab === "poll" ? "#3f13ff" : "#535862"}
+          color={activeTab === "home" ? "#3f13ff" : "#535862"}
         />
-        <TabLabel $active={activeTab === "poll"}>투표</TabLabel>
+        <TabLabel $active={activeTab === "home"}>홈</TabLabel>
       </TabButton>
 
       <TabButton
@@ -33,6 +40,35 @@ export default function BottomTabBar({ activeTab, onTabChange }: BottomTabBarPro
           color={activeTab === "feeds" ? "#3f13ff" : "#535862"}
         />
         <TabLabel $active={activeTab === "feeds"}>피드</TabLabel>
+      </TabButton>
+
+      <TabButton
+        $active={activeTab === "notifications"}
+        onClick={() => onTabChange("notifications")}
+        aria-label="알림"
+      >
+        <IconWrapper>
+          <BellIcon
+            width={24}
+            height={24}
+            color={activeTab === "notifications" ? "#3f13ff" : "#535862"}
+          />
+          {hasUnreadNotifications && <UnreadDot />}
+        </IconWrapper>
+        <TabLabel $active={activeTab === "notifications"}>알림</TabLabel>
+      </TabButton>
+
+      <TabButton
+        $active={activeTab === "profile"}
+        onClick={() => onTabChange("profile")}
+        aria-label="프로필"
+      >
+        <UserIcon
+          width={24}
+          height={24}
+          color={activeTab === "profile" ? "#3f13ff" : "#535862"}
+        />
+        <TabLabel $active={activeTab === "profile"}>프로필</TabLabel>
       </TabButton>
     </Container>
   );
@@ -77,4 +113,22 @@ const TabLabel = styled.span<{ $active: boolean }>`
   font-weight: ${({ $active }) => ($active ? "600" : "400")};
   color: ${({ $active }) => ($active ? "#3f13ff" : "#535862")};
   transition: color 0.2s ease;
+`;
+
+const IconWrapper = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const UnreadDot = styled.div`
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff474f;
+  border: 2px solid #ffffff;
 `;

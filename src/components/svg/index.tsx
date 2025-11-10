@@ -8,6 +8,7 @@ export { CloseIcon } from "./CloseIcon";
 export { CloseThickIcon } from "./CloseIcon";
 export { ErrorIcon } from "./ErrorIcon";
 export { FeedIcon } from "./FeedIcon";
+export { HomeIcon } from "./HomeIcon";
 export { InfoIcon } from "./InfoIcon";
 export { PollIcon } from "./PollIcon";
 export { UserIcon } from "./UserIcon";

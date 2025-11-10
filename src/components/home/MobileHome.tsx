@@ -4,24 +4,29 @@ import { useMemo, useState } from "react";
 import styled from "styled-components";
 import LeftSection from "@/components/layout/LeftSection/LeftSection";
 import RightSection from "@/components/layout/RightSection/RightSection";
-import BottomTabBar from "@/components/mobile/BottomTabBar";
+import BottomTabBar, { type TabType } from "@/components/mobile/BottomTabBar";
+import NotificationsPage from "@/components/mobile/pages/NotificationsPage";
+import ProfilePage from "@/components/mobile/pages/ProfilePage";
 import { SectionContext } from "@/components/layout/RightSection/SectionContext";
 import type { Feed } from "@/types/feeds";
 import FloatingButtonWithModal from "@/components/common/FloatingButtonWithModal";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePoll } from "@/hooks/usePoll";
 import NoTopicState from "@/components/layout/LeftSection/TodayTopicCard/NoTopicState";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export default function MobileHome() {
   const [sectionStatus, setSectionStatus] = useState<"feeds" | "comments">(
     "feeds",
   );
   const [targetFeed, setTargetFeed] = useState<Feed | null>(null);
-  const [mobileActiveTab, setMobileActiveTab] = useState<"poll" | "feeds">(
-    "poll",
-  );
+  const [mobileActiveTab, setMobileActiveTab] = useState<TabType>("home");
   const { isLoggedIn } = useAuthStore();
   const { data: pollData, isLoading: isPollLoading } = usePoll();
+
+  // 알림 데이터 (읽지 않은 알림 개수 확인용)
+  const { data: notificationsData } = useNotifications({ enabled: isLoggedIn });
+  const unreadCount = notificationsData?.pages[0]?.data.unreadCount ?? 0;
 
   const sectionContextValue = useMemo(
     () => ({
@@ -49,11 +54,13 @@ export default function MobileHome() {
     <SectionContext.Provider value={sectionContextValue}>
       <ContentContainer>
         <MainContentWrapper>
-          {mobileActiveTab === "poll" && <LeftSection />}
+          {mobileActiveTab === "home" && <LeftSection />}
           {mobileActiveTab === "feeds" && <RightSection />}
+          {mobileActiveTab === "notifications" && <NotificationsPage />}
+          {mobileActiveTab === "profile" && <ProfilePage />}
 
-          {/* 메인 화면에서만 피드 작성 플러스 버튼 표시 (투표 완료 시에만) */}
-          {isLoggedIn && pollData?.hasVoted && (
+          {/* 피드 탭에서만 피드 작성 플러스 버튼 표시 (투표 완료 시에만) */}
+          {isLoggedIn && pollData?.hasVoted && mobileActiveTab === "feeds" && (
             <FloatingButtonWithModal
               sectionStatus="feeds"
               targetFeed={null}
@@ -64,6 +71,7 @@ export default function MobileHome() {
       <BottomTabBar
         activeTab={mobileActiveTab}
         onTabChange={setMobileActiveTab}
+        hasUnreadNotifications={unreadCount > 0}
       />
     </SectionContext.Provider>
   );
