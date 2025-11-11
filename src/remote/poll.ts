@@ -1,14 +1,23 @@
 import { apiFetch } from "@/lib/apiFetch";
 import { BanbanResponse, PollResponse } from "@/types/api";
 import { Poll } from "@/types/poll";
+import { useAuthStore, waitForAuthReady } from "@/store/useAuthStore";
 
 export const fetchPoll = async (date?: string): Promise<Poll> => {
   const hasDate = typeof date === "string" && date.trim().length > 0;
   const endpoint = hasDate
-    ? `/polls/?poll_date=${encodeURIComponent(date.trim())}`
+    ? `/polls?poll_date=${encodeURIComponent(date.trim())}`
     : "/polls";
 
-  const response: PollResponse = await apiFetch(endpoint);
+  if (typeof window !== "undefined") {
+    await waitForAuthReady();
+  }
+
+  const { isLoggedIn } = useAuthStore.getState();
+
+  const response: PollResponse = await apiFetch(endpoint, {
+    skipAuth: !isLoggedIn,
+  });
   return response.data;
 };
 

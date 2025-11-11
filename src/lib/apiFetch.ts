@@ -7,6 +7,10 @@ import camelcaseKeys from "camelcase-keys";
 
 let refreshPromise: Promise<boolean> | null = null;
 
+type ApiRequestInit = RequestInit & {
+  skipAuth?: boolean;
+};
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -18,7 +22,7 @@ export class ApiError extends Error {
 
 export async function apiFetch<T>(
   url: string,
-  options: RequestInit = {},
+  options: ApiRequestInit = {},
   retry = true,
   context?: ApiContext,
 ): Promise<T> {
@@ -34,24 +38,25 @@ export async function apiFetch<T>(
   }
 
   const token = getAccessToken();
+  const { skipAuth, headers: customHeaders, ...restOptions } = options;
 
   logger.debug("API 요청 시작", {
     url,
-    method: options.method || "GET",
+    method: restOptions.method || "GET",
     hasToken: !!token,
-    headers: options.headers,
+    headers: customHeaders,
     context,
   });
 
   // FormData인 경우 Content-Type을 자동으로 설정하도록 함
-  const isFormData = options.body instanceof FormData;
+  const isFormData = restOptions.body instanceof FormData;
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api${url}`, {
-    ...options,
+    ...restOptions,
     headers: {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
+      ...(!skipAuth && token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(customHeaders || {}),
     },
     credentials: "include",
   });

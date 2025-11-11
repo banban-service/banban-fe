@@ -378,6 +378,7 @@ const Container = styled.header`
   align-items: center;
   padding: 0px 32px;
   z-index: ${Z_INDEX.header};
+  background-color: #f8fafc;
 
   ${media.mobile} {
     padding: 0px 12px;
@@ -437,9 +438,10 @@ const IconButton = styled.button<{ $active?: boolean }>`
   }
 
   ${media.mobile} {
-    width: 40px;
-    height: 40px;
-    margin-right: 2px;
+    /* 최소 터치 영역 44px (Apple HIG 권장) */
+    width: 44px;
+    height: 44px;
+    margin-right: 4px;
   }
 `;
 
@@ -465,8 +467,8 @@ const ButtonBase = styled(DefaultButton)`
 
   ${media.mobile} {
     width: 70px;
-    height: 40px;
-    padding: 6px 10px;
+    height: 44px; /* 터치 영역 유지 (44px) */
+    padding: 8px 10px;
     font-size: 14px;
   }
 `;
@@ -485,6 +487,12 @@ const NotificationDot = styled(DotIcon)`
   position: absolute;
   right: 13px;
   top: 9px;
+
+  ${media.mobile} {
+    /* 버튼 크기 44px에 맞춰 조정 */
+    right: 11px;
+    top: 7px;
+  }
 `;
 
 const ButtonsWrapper = styled.div`

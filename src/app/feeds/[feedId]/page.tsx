@@ -10,6 +10,7 @@ import type { Feed } from "@/types/feeds";
 import { useFeeds } from "@/hooks/useFeeds";
 import { useFeedFilterStore } from "@/store/useFeedFilterStore";
 import { BREAKPOINTS } from "@/constants/breakpoints";
+import { useSafeMediaQuery } from "@/hooks/useMediaQuery";
 import dynamic from "next/dynamic";
 const BottomSheet = dynamic(
   () =>
@@ -27,23 +28,14 @@ export default function FeedPage() {
     "feeds",
   );
   const [targetFeed, setTargetFeed] = useState<Feed | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useSafeMediaQuery(
+    `(max-width: ${BREAKPOINTS.mobile - 1}px)`,
+  );
   const { sortBy, filterType } = useFeedFilterStore();
   const { data } = useFeeds({
     sort_by: sortBy,
     filter_type: filterType,
   });
-
-  // 모바일 감지
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < BREAKPOINTS.mobile);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   // feedId로 해당 피드를 찾아서 댓글 화면 자동 오픈
   useEffect(() => {
@@ -99,6 +91,26 @@ export default function FeedPage() {
         <SectionContext.Provider value={backgroundContextValue}>
           <MobileBackgroundContainer>
             <RightSection />
+            {/* 홈으로 가기 버튼 */}
+            <HomeButton onClick={() => router.push("/")}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <polyline
+                  points="9 22 9 12 15 12 15 22"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>홈으로</span>
+            </HomeButton>
           </MobileBackgroundContainer>
         </SectionContext.Provider>
 
@@ -140,4 +152,38 @@ const MobileBackgroundContainer = styled.div`
   z-index: 1;
   padding-top: 64px;
   overflow: hidden;
+`;
+
+const HomeButton = styled.button`
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #3f13ff;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(63, 19, 255, 0.3);
+  z-index: 10;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #3310dd;
+    box-shadow: 0 6px 16px rgba(63, 19, 255, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 `;
