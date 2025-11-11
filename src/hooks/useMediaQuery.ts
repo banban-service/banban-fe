@@ -2,36 +2,49 @@
 
 import { useEffect, useState } from "react";
 
-/**
- * 미디어 쿼리 매칭 여부를 추적하는 Hook
- * @param query - CSS 미디어 쿼리 문자열 (예: '(max-width: 767px)')
- * @returns 미디어 쿼리 매칭 여부
- */
-export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState<boolean>(false);
+function useHasMounted() {
   const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted;
+}
+
+function useMediaQuery(query: string): boolean {
+  const getMatches = () => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return window.matchMedia(query).matches;
+  };
+
+  const [matches, setMatches] = useState<boolean>(getMatches);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
+    if (typeof window === "undefined") return;
 
     const mediaQuery = window.matchMedia(query);
-    setMatches(mediaQuery.matches);
-
     const handler = (event: MediaQueryListEvent) => {
       setMatches(event.matches);
     };
 
-    // Modern browsers
-    mediaQuery.addEventListener("change", handler);
+    // hydration 직후에도 최신 상태를 반영
+    setMatches(mediaQuery.matches);
 
-    return () => {
-      mediaQuery.removeEventListener("change", handler);
-    };
-  }, [query, mounted]);
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handler);
+      return () => mediaQuery.removeEventListener("change", handler);
+    }
+
+    // Safari < 14 fallback
+    mediaQuery.addListener(handler);
+    return () => mediaQuery.removeListener(handler);
+  }, [query]);
 
   return matches;
+}
+
+export function useSafeMediaQuery(query: string) {
+  const hasMounted = useHasMounted();
+  const matches = useMediaQuery(query);
+  return hasMounted ? matches : false;
 }

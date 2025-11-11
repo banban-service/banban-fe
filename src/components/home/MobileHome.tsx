@@ -30,7 +30,10 @@ export default function MobileHome() {
     if (typeof window === "undefined") return "home";
 
     const savedTab = sessionStorage.getItem("mobileActiveTab");
-    if (savedTab && ["home", "feeds", "notifications", "profile"].includes(savedTab)) {
+    if (
+      savedTab &&
+      ["home", "feeds", "notifications", "profile"].includes(savedTab)
+    ) {
       return savedTab as TabType;
     }
     return "home";
@@ -73,12 +76,11 @@ export default function MobileHome() {
   }, [selectedFeedId, feedsData]);
 
   // 선택된 피드가 변경되면 targetFeed 업데이트
-  useMemo(() => {
-    if (selectedFeed) {
-      setTargetFeed(selectedFeed);
-      setSectionStatus("comments");
-    }
-  }, [selectedFeed]);
+  useEffect(() => {
+    if (!selectedFeed) return;
+    setTargetFeed(selectedFeed);
+    setSectionStatus("comments");
+  }, [selectedFeed, setSectionStatus, setTargetFeed]);
 
   // 모바일 피드 클릭 핸들러 (바텀시트 열기)
   const handleMobileFeedClick = useCallback((feedId: number) => {
@@ -144,7 +146,7 @@ export default function MobileHome() {
   return (
     <SectionContext.Provider value={sectionContextValue}>
       <div className="flex justify-center w-full mx-auto pt-16 pb-16 h-dvh overflow-hidden">
-        <div className="block w-full max-w-full h-full overflow-y-auto">
+        <div className="block w-full max-w-full h-full overflow-y-auto scrollbar-hide">
           {mobileActiveTab === "home" && <HomeTab />}
           {mobileActiveTab === "feeds" && <FeedTab />}
           {mobileActiveTab === "notifications" && <NotificationsPage />}
@@ -152,10 +154,7 @@ export default function MobileHome() {
 
           {/* 피드 탭에서만 피드 작성 플러스 버튼 표시 (투표 완료 시에만) */}
           {isLoggedIn && pollData?.hasVoted && mobileActiveTab === "feeds" && (
-            <FloatingButtonWithModal
-              sectionStatus="feeds"
-              targetFeed={null}
-            />
+            <FloatingButtonWithModal sectionStatus="feeds" targetFeed={null} />
           )}
         </div>
       </div>

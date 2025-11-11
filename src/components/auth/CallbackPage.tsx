@@ -98,7 +98,6 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #100d1f;
   padding: 24px;
 `;
 
@@ -107,7 +106,7 @@ const StatusCard = styled.div`
   width: 100%;
   border-radius: 16px;
   padding: 28px 24px;
-  background: rgba(255, 255, 255, 0.08);
+  background: #270cb0a2;
   backdrop-filter: blur(12px);
   box-shadow: 0 18px 40px rgba(63, 19, 255, 0.25);
   text-align: center;

@@ -53,7 +53,7 @@ const Container = styled.header`
   justify-content: center;
   align-items: center;
   padding: 0 32px;
-  background-color: #f4f6f8;
+  background-color: #f8fafc;
 
   ${media.mobile} {
     padding: 0 12px;

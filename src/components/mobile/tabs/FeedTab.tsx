@@ -9,7 +9,7 @@ export default function FeedTab() {
   const { sectionStatus } = useContext(SectionContext);
 
   return (
-    <div className="flex flex-col w-full h-full bg-white rounded-t-lg mt-3 overflow-y-auto scrollbar-hide">
+    <div className="flex flex-col w-full h-full bg-white rounded-t-lg overflow-y-auto scrollbar-hide">
       {sectionStatus === "feeds" ? <FeedsPanel /> : <CommentsPanel />}
     </div>
   );

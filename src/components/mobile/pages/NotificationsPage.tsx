@@ -104,11 +104,10 @@ export default function NotificationsPage() {
   }, [selectedFeedId, feedsData]);
 
   // 선택된 피드가 변경되면 targetFeed 업데이트
-  useMemo(() => {
-    if (selectedFeed) {
-      setTargetFeed(selectedFeed);
-    }
-  }, [selectedFeed]);
+  useEffect(() => {
+    if (!selectedFeed) return;
+    setTargetFeed(selectedFeed);
+  }, [selectedFeed, setTargetFeed]);
 
   const { ref: loadMoreRef } = useInView({
     onChange: (inView) => {

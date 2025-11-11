@@ -180,9 +180,7 @@ export const ReportsTab = () => {
               placeholder="(opt)"
               onChange={(e) => {
                 setPage(0);
-                setUserId(
-                  e.target.value ? Number(e.target.value) : undefined,
-                );
+                setUserId(e.target.value ? Number(e.target.value) : undefined);
               }}
             />
           </Input>
@@ -201,9 +199,7 @@ export const ReportsTab = () => {
               onChange={(e) => {
                 setPage(0);
                 setTargetType(
-                  (e.target.value || undefined) as
-                    | ReportTargetType
-                    | undefined,
+                  (e.target.value || undefined) as ReportTargetType | undefined,
                 );
               }}
             >
@@ -345,7 +341,7 @@ export const ReportsTab = () => {
                         </span>
                         {r.targetType === "FEED" ? (
                           <Link
-                            href={`/?feedId=${r.targetId}&tab=comments`}
+                            href={`/feedId=${r.targetId}&tab=comments`}
                             className="text-xs font-semibold text-slate-600 underline underline-offset-4"
                             title="피드로 이동"
                           >

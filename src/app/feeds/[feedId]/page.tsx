@@ -10,6 +10,7 @@ import type { Feed } from "@/types/feeds";
 import { useFeeds } from "@/hooks/useFeeds";
 import { useFeedFilterStore } from "@/store/useFeedFilterStore";
 import { BREAKPOINTS } from "@/constants/breakpoints";
+import { useSafeMediaQuery } from "@/hooks/useMediaQuery";
 import dynamic from "next/dynamic";
 const BottomSheet = dynamic(
   () =>
@@ -27,23 +28,14 @@ export default function FeedPage() {
     "feeds",
   );
   const [targetFeed, setTargetFeed] = useState<Feed | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useSafeMediaQuery(
+    `(max-width: ${BREAKPOINTS.mobile - 1}px)`,
+  );
   const { sortBy, filterType } = useFeedFilterStore();
   const { data } = useFeeds({
     sort_by: sortBy,
     filter_type: filterType,
   });
-
-  // 모바일 감지
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < BREAKPOINTS.mobile);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   // feedId로 해당 피드를 찾아서 댓글 화면 자동 오픈
   useEffect(() => {

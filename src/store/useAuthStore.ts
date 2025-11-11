@@ -212,3 +212,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 }));
+
+export const waitForAuthReady = (): Promise<void> => {
+  if (typeof window === "undefined") {
+    return Promise.resolve();
+  }
+
+  const { loading } = useAuthStore.getState();
+  if (!loading) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const unsubscribe = useAuthStore.subscribe((state) => {
+      if (!state.loading) {
+        unsubscribe();
+        resolve();
+      }
+    });
+  });
+};

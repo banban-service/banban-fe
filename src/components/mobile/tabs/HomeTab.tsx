@@ -5,7 +5,7 @@ import RealtimeFeedRanking from "@/components/layout/LeftSection/RealtimeFeedRan
 
 export default function HomeTab() {
   return (
-    <div className="flex flex-col gap-[10px] pt-3 pb-8 w-full">
+    <div className="flex flex-col gap-[10px] pb-8 w-full">
       <TodayTopicCard />
       <RealtimeFeedRanking />
     </div>
