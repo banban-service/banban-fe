@@ -261,7 +261,7 @@ export default function Header({ isNew }: HeaderProps) {
                   onClick={handleNotificationToggle}
                   $active={isNotificationOpen}
                 >
-                  <BellIcon />
+                  <BellIcon color="#3f13ff" />
                   {hasUnreadIndicator && (
                     <NotificationDot data-testid="notification-dot" />
                   )}
@@ -501,6 +501,10 @@ const NotificationWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+
+  ${media.mobile} {
+    display: none;
+  }
 `;
 
 const ProfileWrapper = styled.div`
