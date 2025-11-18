@@ -13,16 +13,9 @@ import NoTopicState from "@/components/layout/LeftSection/TodayTopicCard/NoTopic
 import { useNotifications } from "@/hooks/api/notification/useNotifications";
 import { useFeeds } from "@/hooks/api/feed/useFeeds";
 import { useFeedFilterStore } from "@/store/useFeedFilterStore";
-import NeutralSkeleton from "@/components/common/Skeleton/NeutralSkeleton";
 import CommentThread from "../../feed/detail/CommentThread";
-
-const TabPlaceholder = () => (
-  <div className="flex flex-col gap-3 p-4">
-    <NeutralSkeleton height="16px" />
-    <NeutralSkeleton height="16px" width="80%" />
-    <NeutralSkeleton height="200px" />
-  </div>
-);
+import TabPlaceholder from "@/components/common/Skeleton/TabPlaceholder";
+import FloatingButtonPlaceholder from "@/components/common/Skeleton/FloatingButtonPlaceholder";
 
 const NotificationsPage = dynamic(
   () => import("@/components/mobile/pages/NotificationsPage"),
@@ -55,20 +48,7 @@ const FeedComposerFloatingButton = dynamic(
   () => import("@/components/common/FeedComposerFloatingButton"),
   {
     ssr: false,
-    loading: () => (
-      <div
-        className="
-    fixed
-    bottom-[80px]
-    right-[16px]
-    w-[56px]
-    h-[56px]
-    rounded-full
-    bg-[rgba(63,19,255,0.12)]
-    shadow-[0_2px_8px_rgba(0,0,0,0.1)]
-  "
-      ></div>
-    ),
+    loading: () => <FloatingButtonPlaceholder />,
   },
 );
 

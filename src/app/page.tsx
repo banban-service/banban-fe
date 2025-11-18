@@ -5,14 +5,7 @@ import { useEffect, useState } from "react";
 import { useSafeMediaQuery } from "@/hooks/common/useMediaQuery";
 import MobileHomeSkeleton from "@/components/common/Skeleton/MobileHomeSkeleton";
 import DesktopHomeSkeleton from "@/components/common/Skeleton/DesktopHomeSkeleton";
-
-const MobileHome = dynamic(
-  () => import("@/components/mobile/pages/MobileHome"),
-  {
-    ssr: false,
-    loading: () => <MobileHomeSkeleton />,
-  },
-);
+import MobileHome from "@/components/mobile/pages/MobileHome";
 
 const DesktopHome = dynamic(() => import("@/components/home/DesktopHome"), {
   ssr: false,
