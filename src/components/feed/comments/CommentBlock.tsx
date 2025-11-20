@@ -13,7 +13,6 @@ import dynamic from "next/dynamic";
 import { useCommentLikeOptimisticUpdate } from "@/hooks/api/feed/useLikeOptimisticUpdate";
 import { useVoteOptionColor } from "@/hooks/ui/poll/useVoteOptionColor";
 import { Poll } from "@/types/poll";
-import useReportMutation from "@/hooks/api/report/useReportMutation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { ConfirmModal } from "@/components/common/ConfirmModal/ConfirmModal";
 import { useToast } from "@/components/common/Toast/useToast";
@@ -21,6 +20,7 @@ import { deleteComment, updateComment } from "@/remote/comment";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CommentComposer } from "@/components/feed/comments/CommentComposer";
 import type { CommentUser } from "@/types/comments";
+import useReportMutation from "@/hooks/api/report/useReportMutation";
 
 const ReportModal = dynamic(
   () => import("@/components/common/Report").then((mod) => mod.ReportModal),
