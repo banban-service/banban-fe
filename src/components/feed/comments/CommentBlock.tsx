@@ -89,7 +89,7 @@ const CommentBlock = ({
   const reportMutation = useReportMutation();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const { isLoggedIn } = useAuthStore();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);

@@ -15,8 +15,8 @@ interface UserVoteInfo {
 const fetchPollData = (date?: string) => fetchPoll(date);
 
 export const useUserVoteInfo = (date?: string) => {
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const authLoading = useAuthStore((state) => state.loading);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const authLoading = useAuthStore((s) => s.loading);
 
   const normalized = date?.trim();
   const effectiveDate =

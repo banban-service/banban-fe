@@ -46,7 +46,7 @@ export default function DesktopHome() {
     "feeds",
   );
   const [targetFeed, setTargetFeed] = useState<Feed | null>(null);
-  const { isLoggedIn } = useAuthStore();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const { data: pollData, isLoading: isPollLoading } = usePoll();
 
   const sectionContextValue = useMemo(

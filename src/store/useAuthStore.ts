@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import STORAGE_KEYS from "@/constants/storageKeys";
 import { logger } from "@/utils/logger";
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   isLoggedIn: boolean;
   loading: boolean;

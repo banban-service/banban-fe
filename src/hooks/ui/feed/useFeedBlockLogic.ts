@@ -13,10 +13,12 @@ import {
 import { useClickOutside } from "../../common/useClickOutside";
 import { useFeedLikeOptimisticUpdate } from "../../api/feed/useLikeOptimisticUpdate";
 import { useVoteOptionColor } from "../poll/useVoteOptionColor";
-import useReportMutation from "../../api/report/useReportMutation";
+import useReportMutation from "@/hooks/api/report/useReportMutation";
 
 export function useFeedBlockLogic(feed: Feed, pollData: Poll) {
-  const { isLoggedIn, user: me } = useAuthStore();
+  const me = useAuthStore((s) => s.user);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+
   const { setSectionStatus, setTargetFeed } = useContext(SectionContext);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);

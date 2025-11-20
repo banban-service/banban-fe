@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function AuthManager() {
-  const { checkAuth } = useAuthStore();
+  const checkAuth = useAuthStore((s) => s.checkAuth);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
