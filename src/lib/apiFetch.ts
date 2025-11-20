@@ -119,6 +119,7 @@ export async function apiFetch<T>(
 
     if (!success) {
       logger.error("토큰 갱신 실패, 로그아웃 처리", { url });
+      useAuthStore.getState().logout();
       throw new ApiError(401, "인증이 만료되었습니다. 다시 로그인해주세요.");
     }
 

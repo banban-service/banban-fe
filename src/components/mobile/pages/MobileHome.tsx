@@ -74,7 +74,7 @@ export default function MobileHome() {
   // 바텀시트 상태 (피드 클릭용)
   const [selectedFeedId, setSelectedFeedId] = useState<number | null>(null);
 
-  const { isLoggedIn } = useAuthStore();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const { data: pollData, isLoading: isPollLoading } = usePoll();
 
   // 알림 데이터 (읽지 않은 알림 개수 확인용)

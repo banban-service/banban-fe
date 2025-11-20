@@ -11,7 +11,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 const CommentThread = () => {
   const { targetFeed, inBottomSheet } = useContext(SectionContext);
   const { data: pollData } = usePoll();
-  const { isLoggedIn } = useAuthStore();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
 
   if (targetFeed === null) {
     return (

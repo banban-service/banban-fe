@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import STORAGE_KEYS from "@/constants/storageKeys";
 import { logger } from "@/utils/logger";
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   isLoggedIn: boolean;
   loading: boolean;
@@ -62,39 +62,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       logger.warn("인증 체크 실패", error);
 
       const status = error instanceof ApiError ? error.status : undefined;
-      const message =
-        error instanceof Error
-          ? error.message
-          : "알 수 없는 오류가 발생했습니다.";
-
-      if (silent) {
-        throw error instanceof Error ? error : new Error(message);
-      }
-
-      const tokenExists =
-        typeof window !== "undefined" &&
-        !!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-
-      if (tokenExists && status && [401, 403].includes(status)) {
-        const refreshed = await get().refreshToken();
-        if (refreshed) {
-          set({ loading: false, error: null });
-          return;
-        }
-      }
 
       if (status && [401, 403].includes(status)) {
         if (typeof window !== "undefined") {
           clearTokens();
         }
+
         set({
           user: null,
           isLoggedIn: false,
           loading: false,
           error: null,
         });
+
         return;
       }
+
+      // silent 모드의 일반 오류: 조용히 무시
+      if (silent) {
+        return;
+      }
+
+      // visible 모드의 일반 오류
+      const message =
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다.";
 
       set({
         loading: false,
@@ -121,6 +114,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           status: res.status,
           statusText: res.statusText,
         });
+        clearTokens();
+        set({ user: null, isLoggedIn: false, loading: false });
         return false;
       }
 
@@ -149,6 +144,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return true;
     } catch (error) {
       logger.error("토큰 갱신 중 예외 발생", error);
+      clearTokens();
+      set({ user: null, isLoggedIn: false, loading: false });
       return false;
     }
   },
