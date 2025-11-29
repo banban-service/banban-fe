@@ -21,7 +21,10 @@ interface AdminSettingsModalProps {
   onClose: () => void;
 }
 
-export const AdminSettingsModal = ({ isOpen, onClose }: AdminSettingsModalProps) => {
+export const AdminSettingsModal = ({
+  isOpen,
+  onClose,
+}: AdminSettingsModalProps) => {
   const [activeTabId, setActiveTabId] = useState("system");
 
   const tabs: AdminTab[] = [
@@ -60,7 +63,12 @@ export const AdminSettingsModal = ({ isOpen, onClose }: AdminSettingsModalProps)
   const activeTab = tabs.find((tab) => tab.id === activeTabId) || tabs[0];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCloseButton={true} width="1000px">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      isCloseButton={true}
+      width="1000px"
+    >
       <Modal.Layout>
         <ModalHeader>
           <ModalTitle>관리자 설정</ModalTitle>
@@ -86,9 +94,12 @@ export const AdminSettingsModal = ({ isOpen, onClose }: AdminSettingsModalProps)
   );
 };
 
-
 const ModalHeader = styled.div`
   margin-bottom: 16px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 8px;
+  }
 `;
 
 const ModalTitle = styled.h1`
@@ -103,6 +114,15 @@ const ModalContainer = styled.div`
   gap: 16px;
   height: 60vh;
   min-height: 400px;
+  max-height: 70vh;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+  }
 `;
 
 const TabNavigation = styled.div`
@@ -113,13 +133,22 @@ const TabNavigation = styled.div`
   padding: 8px;
   background-color: #f9fafb;
   border-radius: 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: initial;
+  }
 `;
 
 const TabButton = styled.button<{ $isActive: boolean }>`
   padding: 10px 12px;
-  border: 1px solid ${({ $isActive }) => ($isActive ? "#e5e7eb" : "transparent")};
+  border: 1px solid
+    ${({ $isActive }) => ($isActive ? "#e5e7eb" : "transparent")};
   border-radius: 6px;
-  background-color: ${({ $isActive }) => ($isActive ? "#ffffff" : "transparent")};
+  background-color: ${({ $isActive }) =>
+    $isActive ? "#ffffff" : "transparent"};
   color: ${({ $isActive }) => ($isActive ? "#181d27" : "#6b7280")};
   font-size: 14px;
   font-weight: ${({ $isActive }) => ($isActive ? "500" : "400")};
@@ -132,6 +161,11 @@ const TabButton = styled.button<{ $isActive: boolean }>`
     background-color: ${({ $isActive }) => ($isActive ? "#ffffff" : "#f3f4f6")};
     color: #181d27;
   }
+
+  @media (max-width: 768px) {
+    flex: 1 1 calc(50% - 8px);
+    text-align: center;
+  }
 `;
 
 const TabContent = styled.div`
@@ -141,4 +175,9 @@ const TabContent = styled.div`
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   overflow-y: auto;
+
+  @media (max-width: 768px) {
+    flex: none;
+    max-height: 60vh;
+  }
 `;

@@ -1,10 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
-import type {
-  ComponentPropsWithoutRef,
-  HTMLAttributes,
-} from "react";
+import type { ComponentPropsWithoutRef, HTMLAttributes } from "react";
 
 const merge = (base: string, extra?: string) =>
   extra ? `${base} ${extra}` : base;
@@ -46,7 +43,7 @@ export function AdminCard({
   return (
     <section
       className={merge(
-        "rounded-2xl border border-slate-200 bg-white/95 p-6 shadow-sm transition hover:shadow-md lg:p-7",
+        "rounded-2xl border border-slate-200 bg-white/95 p-3 md:p-6 shadow-sm transition hover:shadow-md lg:p-7",
         className,
       )}
       {...props}
@@ -61,7 +58,7 @@ export function AdminCardTitle({
   return (
     <h2
       className={merge(
-        "mb-4 text-lg font-semibold leading-6 text-slate-900 lg:text-xl",
+        "mb-2 md:mb-4 text-md md:text-lg font-semibold leading-6 text-slate-900 lg:text-xl",
         className,
       )}
       {...props}
@@ -75,10 +72,7 @@ export function SectionLabel({
 }: ComponentPropsWithoutRef<"div">) {
   return (
     <div
-      className={merge(
-        "text-sm font-semibold text-slate-600",
-        className,
-      )}
+      className={merge("text-sm font-semibold text-slate-600", className)}
       {...props}
     />
   );
@@ -101,7 +95,10 @@ export const SmallButton = forwardRef<
 
 SmallButton.displayName = "SmallButton";
 
-export function Actions({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function Actions({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={merge("flex flex-wrap items-center gap-2", className)}
@@ -110,7 +107,10 @@ export function Actions({ className, ...props }: HTMLAttributes<HTMLDivElement>)
   );
 }
 
-export function MetaRow({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function MetaRow({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={merge(
@@ -128,10 +128,7 @@ export function MetaItem({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={merge(
-        "flex min-w-[200px] flex-col gap-1",
-        className,
-      )}
+      className={merge("flex min-w-[200px] flex-col gap-1", className)}
       {...props}
     />
   );
