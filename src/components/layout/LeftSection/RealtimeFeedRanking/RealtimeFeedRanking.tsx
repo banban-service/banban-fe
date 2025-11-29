@@ -151,8 +151,8 @@ const Title = styled.header`
   display: flex;
   align-items: center;
   color: #ff474f;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 24px;
 `;
 

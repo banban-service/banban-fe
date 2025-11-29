@@ -164,7 +164,7 @@ const ComposerBody = styled.div<{ $variant: ComposerVariant }>`
   display: flex;
   flex-direction: ${({ $variant }) => ($variant === "edit" ? "column" : "row")};
   align-items: ${({ $variant }) =>
-    $variant === "edit" ? "stretch" : "flex-end"};
+    $variant === "edit" ? "stretch" : "center"};
   gap: ${({ $variant }) => ($variant === "edit" ? "12px" : "8px")};
 `;
 
@@ -180,6 +180,7 @@ const StyledTextarea = styled.textarea<{ $variant: ComposerVariant }>`
   font-family: inherit;
   outline: none;
   max-height: 120px;
+  overflow-x: hidden;
   overflow-y: auto;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: ${({ $variant }) =>
@@ -210,7 +211,8 @@ const StyledTextarea = styled.textarea<{ $variant: ComposerVariant }>`
     padding: 12px 18px;
     transform: scale(0.875);
     transform-origin: left top;
-    width: calc(100% / 0.875);
+    width: 135%;
+    flex: 1;
   }
 
   &:disabled {

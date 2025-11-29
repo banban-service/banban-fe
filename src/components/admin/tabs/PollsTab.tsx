@@ -15,8 +15,7 @@ import { getAdminPolls, type AdminPollListParams } from "@/remote/admin";
 import type { Poll } from "@/types/poll";
 
 const PollCreateModal = dynamic(
-  () =>
-    import("../modals/PollCreateModal").then((mod) => mod.PollCreateModal),
+  () => import("../modals/PollCreateModal").then((mod) => mod.PollCreateModal),
   { ssr: false, loading: () => null },
 );
 
@@ -29,7 +28,7 @@ const selectClass =
   "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200";
 const tableHeaderClass =
   "px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500";
-const tableCellClass = "px-4 py-2 text-sm text-slate-700";
+const tableCellClass = "px-4 py-2 text-sm text-slate-700 whitespace-nowrap";
 
 export const PollsTab = () => {
   const qc = useQueryClient();
@@ -101,13 +100,11 @@ export const PollsTab = () => {
         <AdminCardTitle>투표 목록</AdminCardTitle>
         {isLoading && <p className="text-sm text-slate-500">로딩 중...</p>}
         {error && (
-          <p className="text-sm text-red-600">
-            {(error as Error).message}
-          </p>
+          <p className="text-sm text-red-600">{(error as Error).message}</p>
         )}
         {!isLoading && !error && (
-          <div className="overflow-hidden rounded-xl border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200 text-sm">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50">
                 <tr>
                   <th className={tableHeaderClass}>ID</th>
@@ -132,7 +129,9 @@ export const PollsTab = () => {
                   polls.map((p: Poll) => (
                     <tr key={p.id} className="hover:bg-slate-50/70">
                       <td className={tableCellClass}>{p.id}</td>
-                      <td className={`${tableCellClass} font-semibold text-slate-900`}>
+                      <td
+                        className={`${tableCellClass} font-semibold text-slate-900`}
+                      >
                         {p.title}
                       </td>
                       <td className={tableCellClass}>{p.pollDate}</td>
@@ -174,12 +173,11 @@ export const PollsTab = () => {
           >
             이전
           </SmallButton>
-          <span className="text-sm text-slate-600">
-            페이지 {params.page}
-          </span>
+          <span className="text-sm text-slate-600">페이지 {params.page}</span>
           <SmallButton
             onClick={() =>
-              setParams((p) => ({ ...p, page: (p.page || 1) + 1 }))}
+              setParams((p) => ({ ...p, page: (p.page || 1) + 1 }))
+            }
             disabled={!hasNext}
           >
             다음
