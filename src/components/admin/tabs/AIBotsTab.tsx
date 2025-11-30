@@ -44,10 +44,7 @@ export const AIBotsTab = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingBot, setEditingBot] = useState<AdminAIBot | null>(null);
   const [activityLogBot, setActivityLogBot] = useState<AdminAIBot | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
+  const [selectedBots, setSelectedBots] = useState<Set<number>>(new Set());
 
   const { data, isLoading, error } = useQuery<AdminAIBotsData>({
     queryKey: ["admin", "ai-bots", { page, limit }],
@@ -58,31 +55,32 @@ export const AIBotsTab = () => {
       }),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (botId: number) => deleteAdminAIBot(botId),
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (botIds: number[]) => {
+      await Promise.all(botIds.map((id) => deleteAdminAIBot(id)));
+    },
     onSuccess: () => {
-      showToast({ type: "success", message: "AI 봇이 삭제되었습니다." });
+      showToast({ type: "success", message: "선택한 봇이 삭제되었습니다." });
       qc.invalidateQueries({ queryKey: ["admin", "ai-bots"] });
-      setConfirmDelete(null);
+      setSelectedBots(new Set());
     },
     onError: (err: unknown) => {
-      const message = err instanceof Error ? err.message : "삭제 실패";
+      const message = err instanceof Error ? err.message : "일괄 삭제 실패";
       showToast({ type: "error", message });
     },
   });
 
-  const toggleMutation = useMutation({
-    mutationFn: ({ botId, isActive }: { botId: number; isActive: boolean }) =>
-      toggleAdminAIBotActivation(botId, isActive),
+  const bulkToggleMutation = useMutation({
+    mutationFn: async ({ botIds, isActive }: { botIds: number[]; isActive: boolean }) => {
+      await Promise.all(botIds.map((id) => toggleAdminAIBotActivation(id, isActive)));
+    },
     onSuccess: () => {
-      showToast({
-        type: "success",
-        message: "AI 봇 상태가 변경되었습니다.",
-      });
+      showToast({ type: "success", message: "선택한 봇의 상태가 변경되었습니다." });
       qc.invalidateQueries({ queryKey: ["admin", "ai-bots"] });
+      setSelectedBots(new Set());
     },
     onError: (err: unknown) => {
-      const message = err instanceof Error ? err.message : "상태 변경 실패";
+      const message = err instanceof Error ? err.message : "일괄 상태 변경 실패";
       showToast({ type: "error", message });
     },
   });
@@ -125,6 +123,36 @@ export const AIBotsTab = () => {
 
   const bots = data?.bots ?? [];
 
+  const toggleSelectAll = () => {
+    if (selectedBots.size === bots.length) {
+      setSelectedBots(new Set());
+    } else {
+      setSelectedBots(new Set(bots.map((bot) => bot.id)));
+    }
+  };
+
+  const toggleSelectBot = (botId: number) => {
+    const newSelected = new Set(selectedBots);
+    if (newSelected.has(botId)) {
+      newSelected.delete(botId);
+    } else {
+      newSelected.add(botId);
+    }
+    setSelectedBots(newSelected);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedBots.size === 0) return;
+    bulkDeleteMutation.mutate(Array.from(selectedBots));
+  };
+
+  const handleBulkToggle = () => {
+    if (selectedBots.size === 0) return;
+    const selectedBotsList = bots.filter(b => selectedBots.has(b.id));
+    const allActive = selectedBotsList.every(b => b.isActive);
+    bulkToggleMutation.mutate({ botIds: Array.from(selectedBots), isActive: !allActive });
+  };
+
   return (
     <Container>
       <AdminCard>
@@ -132,10 +160,59 @@ export const AIBotsTab = () => {
         <div className="mb-4 flex items-center justify-between">
           <div className="text-sm text-slate-600">
             총 {total}개 (페이지 {page + 1})
+            {selectedBots.size > 0 && ` · ${selectedBots.size}개 선택됨`}
           </div>
-          <SmallButton onClick={() => setCreateModalOpen(true)}>
-            새 봇 생성
-          </SmallButton>
+          <div className="flex items-center gap-2">
+            {selectedBots.size === 1 && (() => {
+              const selectedId = Array.from(selectedBots)[0];
+              const selectedBot = bots.find(b => b.id === selectedId);
+              return selectedBot ? (
+                <>
+                  <SmallButton onClick={() => setEditingBot(selectedBot)}>
+                    수정
+                  </SmallButton>
+                  <SmallButton onClick={() => setActivityLogBot(selectedBot)}>
+                    로그
+                  </SmallButton>
+                  <SmallButton
+                    onClick={() => testFeedMutation.mutate(selectedBot.id)}
+                    disabled={testFeedMutation.isPending}
+                  >
+                    피드 테스트
+                  </SmallButton>
+                  <SmallButton
+                    onClick={() => testCommentMutation.mutate(selectedBot.id)}
+                    disabled={testCommentMutation.isPending}
+                  >
+                    댓글 테스트
+                  </SmallButton>
+                </>
+              ) : null;
+            })()}
+            {selectedBots.size > 0 && (
+              <>
+                <SmallButton
+                  onClick={handleBulkToggle}
+                  disabled={bulkToggleMutation.isPending}
+                  style={{ color: "#0ea5e9" }}
+                >
+                  활성 상태 변경
+                </SmallButton>
+                <SmallButton
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleteMutation.isPending}
+                  style={{ color: "#dc2626" }}
+                >
+                  선택 삭제
+                </SmallButton>
+              </>
+            )}
+            {selectedBots.size === 0 && (
+              <SmallButton onClick={() => setCreateModalOpen(true)}>
+                새 봇 생성
+              </SmallButton>
+            )}
+          </div>
         </div>
 
         {isLoading && <p className="text-sm text-slate-500">로딩 중...</p>}
@@ -150,94 +227,48 @@ export const AIBotsTab = () => {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50">
                 <tr>
+                  <th className={`${tableHeaderClass} w-12`}>
+                    <input
+                      type="checkbox"
+                      checked={bots.length > 0 && selectedBots.size === bots.length}
+                      onChange={toggleSelectAll}
+                      className="h-4 w-4 rounded border-slate-300"
+                    />
+                  </th>
                   <th className={`${tableHeaderClass} w-20`}>ID</th>
                   <th className={tableHeaderClass}>이름</th>
                   <th className={tableHeaderClass}>Username</th>
                   <th className={tableHeaderClass}>상태</th>
                   <th className={`${tableHeaderClass} w-48`}>생성일</th>
-                  <th className={`${tableHeaderClass} w-80`}>작업</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white/95">
                 {bots.map((bot) => (
                   <tr key={bot.id} className="hover:bg-slate-50/70">
+                    <td className={tableCellClass}>
+                      <input
+                        type="checkbox"
+                        checked={selectedBots.has(bot.id)}
+                        onChange={() => toggleSelectBot(bot.id)}
+                        className="h-4 w-4 rounded border-slate-300"
+                      />
+                    </td>
                     <td className={tableCellClass}>{bot.id}</td>
                     <td className={tableCellClass} title={bot.name}>
                       <div className="max-w-xs truncate">{bot.name}</div>
                     </td>
                     <td className={tableCellClass}>{bot.username}</td>
                     <td className={tableCellClass}>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() =>
-                            toggleMutation.mutate({
-                              botId: bot.id,
-                              isActive: !bot.isActive,
-                            })
-                          }
-                          disabled={toggleMutation.isPending}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            bot.isActive
-                              ? "bg-green-500"
-                              : "bg-slate-300"
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              bot.isActive ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                        <span className="text-xs">
-                          {bot.isActive ? "활성" : "비활성"}
-                        </span>
-                      </div>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        bot.isActive 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-slate-100 text-slate-800"
+                      }`}>
+                        {bot.isActive ? "활성" : "비활성"}
+                      </span>
                     </td>
                     <td className={tableCellClass}>
                       {formatDate(bot.createdAt)}
-                    </td>
-                    <td className={tableCellClass}>
-                      <Actions>
-                        <SmallButton
-                          onClick={() => setEditingBot(bot)}
-                          disabled={editingBot !== null}
-                        >
-                          수정
-                        </SmallButton>
-                        <SmallButton
-                          onClick={() => setActivityLogBot(bot)}
-                          disabled={activityLogBot !== null}
-                        >
-                          로그
-                        </SmallButton>
-                        <SmallButton
-                          onClick={() =>
-                            testFeedMutation.mutate(bot.id)
-                          }
-                          disabled={testFeedMutation.isPending}
-                        >
-                          피드 테스트
-                        </SmallButton>
-                        <SmallButton
-                          onClick={() =>
-                            testCommentMutation.mutate(bot.id)
-                          }
-                          disabled={testCommentMutation.isPending}
-                        >
-                          댓글 테스트
-                        </SmallButton>
-                        <SmallButton
-                          onClick={() =>
-                            setConfirmDelete({ id: bot.id, name: bot.name })
-                          }
-                          style={{
-                            color: "#dc2626",
-                          }}
-                          disabled={deleteMutation.isPending}
-                        >
-                          삭제
-                        </SmallButton>
-                      </Actions>
                     </td>
                   </tr>
                 ))}
@@ -317,39 +348,6 @@ export const AIBotsTab = () => {
           bot={activityLogBot}
           onClose={() => setActivityLogBot(null)}
         />
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {confirmDelete && (
-        <Modal
-          isOpen={!!confirmDelete}
-          onClose={() => setConfirmDelete(null)}
-          width="400px"
-        >
-          <Modal.Header>
-            <Modal.Title>AI 봇 삭제</Modal.Title>
-            <Modal.Description>
-              "{confirmDelete.name}" 봇을 삭제하시겠습니까? 이 작업은 되돌릴
-              수 없습니다.
-            </Modal.Description>
-          </Modal.Header>
-          <Modal.Actions direction="row" align="end">
-            <Modal.Button
-              $variant="secondary"
-              onClick={() => setConfirmDelete(null)}
-              disabled={deleteMutation.isPending}
-            >
-              취소
-            </Modal.Button>
-            <Modal.Button
-              $variant="danger"
-              onClick={() => deleteMutation.mutate(confirmDelete.id)}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "삭제 중..." : "삭제"}
-            </Modal.Button>
-          </Modal.Actions>
-        </Modal>
       )}
     </Container>
   );
