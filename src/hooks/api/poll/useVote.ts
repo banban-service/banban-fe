@@ -41,13 +41,13 @@ export const useVote = <TData = any>(
         );
       }
       if (options?.onError) {
-        options.onError(error, variables, context);
+        (options.onError as any)(error, variables, context);
       }
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ["polls"] });
       if (options?.onSuccess) {
-        options.onSuccess(data, variables, context);
+        (options.onSuccess as any)(data, variables, context);
       }
     },
     ...options,

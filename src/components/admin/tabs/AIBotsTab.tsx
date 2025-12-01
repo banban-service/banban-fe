@@ -223,7 +223,7 @@ export const AIBotsTab = () => {
           <p className="text-sm text-slate-500">AI 봇이 없습니다.</p>
         )}
         {!isLoading && !error && bots.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-slate-200">
+          <div className="rounded-xl border border-slate-200">
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50">
                 <tr>
@@ -302,7 +302,7 @@ export const AIBotsTab = () => {
                               )}
                             </span>
                             {/* Simple Tooltip on Hover */}
-                            <div className="absolute left-0 bottom-full mb-2 hidden w-48 rounded-lg bg-slate-800 p-2 text-xs text-white shadow-lg group-hover/schedule:block z-10">
+                            <div className="absolute left-0 bottom-full mb-2 hidden w-48 rounded-lg bg-slate-800 p-2 text-xs text-white shadow-lg group-hover/schedule:block z-50">
                               <div className="font-semibold mb-1 border-b border-slate-700 pb-1">오늘의 피드 스케줄</div>
                               <div className="flex flex-wrap gap-1">
                                 {bot.todayFeedSchedule.map((t, i) => (
@@ -328,7 +328,7 @@ export const AIBotsTab = () => {
                               )}
                             </span>
                             {/* Simple Tooltip on Hover */}
-                            <div className="absolute left-0 bottom-full mb-2 hidden w-48 rounded-lg bg-slate-800 p-2 text-xs text-white shadow-lg group-hover/schedule:block z-10">
+                            <div className="absolute left-0 bottom-full mb-2 hidden w-48 rounded-lg bg-slate-800 p-2 text-xs text-white shadow-lg group-hover/schedule:block z-50">
                               <div className="font-semibold mb-1 border-b border-slate-700 pb-1">오늘의 댓글 스케줄</div>
                               <div className="flex flex-wrap gap-1">
                                 {bot.todayCommentSchedule.map((t, i) => (

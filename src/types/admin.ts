@@ -200,9 +200,12 @@ export interface UpdateAIBotPayload {
 export interface AIBotActivityLogItem {
   id: number;
   botId: number;
-  activityType: string; // e.g., "FEED_CREATED", "COMMENT_CREATED"
-  description: string;
-  metadata?: Record<string, unknown>;
+  agentName: string;
+  activityType: string; // "feed" | "comment"
+  targetId: number;
+  promptUsed: string;
+  responseReceived: string;
+  errorMessage?: string | null;
   createdAt: string;
 }
 

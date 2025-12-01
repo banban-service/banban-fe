@@ -4,6 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import { Modal } from "@/components/common/Modal";
+import Link from "next/link";
 import { getAdminAIBotActivityLog } from "@/remote/admin";
 import type { AdminAIBot, AIBotActivityLogsData } from "@/types/admin";
 
@@ -115,7 +116,15 @@ export const AIBotActivityLogModal = ({
               <LogItem key={log.id}>
                 <LogType>{log.activityType}</LogType>
                 <LogContent>
-                  <LogDescription>{log.description}</LogDescription>
+                  <LogDescription>
+                    <Link
+                      href={`/feeds/${log.targetId}`}
+                      target="_blank"
+                      className="hover:text-blue-600 hover:underline"
+                    >
+                      {log.responseReceived}
+                    </Link>
+                  </LogDescription>
                   <LogTime>{formatDate(log.createdAt)}</LogTime>
                 </LogContent>
               </LogItem>
