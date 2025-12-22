@@ -16,8 +16,8 @@ import { AdminSettingsModal } from "@/components/admin/AdminSettingsModal";
 import { CommunityInfoCard } from "@/components/communityInfo/CommunityInfoCard";
 import { logger } from "@/utils/logger";
 import { isAdmin as checkIsAdmin } from "@/utils/jwt";
-import STORAGE_KEYS from "@/constants/storageKeys";
 import dynamic from "next/dynamic";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const ConfirmModal = dynamic(
   () =>
@@ -47,6 +47,7 @@ export default function Header({ isNew }: HeaderProps) {
   const [isLogoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const { isLoggedIn, user, logout, loading } = useAuth();
+  const accessToken = useAuthStore((s) => s.accessToken);
   const pathname = usePathname();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -75,17 +76,12 @@ export default function Header({ isNew }: HeaderProps) {
     }
 
     try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
-          : null;
-
-      setIsAdmin(checkIsAdmin(token));
+      setIsAdmin(checkIsAdmin(accessToken));
     } catch (error) {
       logger.warn("Failed to check admin status:", error);
       setIsAdmin(false);
     }
-  }, [isLoggedIn]);
+  }, [accessToken, isLoggedIn]);
 
   const handleToggleMenu = () => {
     setProfileCardOpen(false);

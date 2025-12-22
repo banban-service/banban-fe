@@ -1,0 +1,1 @@
+export const AUTH_SILENT_CHECK_INTERVAL_MS = 60 * 1000;

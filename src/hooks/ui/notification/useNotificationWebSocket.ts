@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import STORAGE_KEYS from "@/constants/storageKeys";
 import { logger } from "@/utils/logger";
 import type {
   NotificationConnectionStatus,
@@ -13,6 +12,7 @@ import type {
   WSPongMessage,
   WSSystemMessage,
 } from "@/types/notification";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface UseNotificationWebSocketOptions {
   enabled: boolean;
@@ -107,6 +107,7 @@ export function useNotificationWebSocket(
   const [isConnected, setIsConnected] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const [lastActivity, setLastActivity] = useState<number | null>(null);
+  const accessToken = useAuthStore((s) => s.accessToken);
 
   const wsRef = useRef<WebSocket | null>(null);
   const connectRef = useRef<() => void>(() => {});
@@ -280,18 +281,13 @@ export function useNotificationWebSocket(
       return;
     }
 
-    const token =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
-        : null;
-
-    if (!token) {
+    if (!accessToken) {
       logger.warn("WebSocket: 액세스 토큰이 없어 연결을 중단합니다.");
       setStatus("error");
       return;
     }
 
-    const urlWithToken = appendToken(baseUrl, token);
+    const urlWithToken = appendToken(baseUrl, accessToken);
 
     cleanupSocket();
 
@@ -355,6 +351,7 @@ export function useNotificationWebSocket(
     cleanupSocket,
     clearPingTimer,
     handleMessage,
+    accessToken,
     pingIntervalMs,
     scheduleReconnect,
   ]);

@@ -1,7 +1,7 @@
 "use client";
 import clsx from "clsx";
 
-export default function HeaderSkeleton() {
+const HeaderSkeleton = () => {
   return (
     <header
       data-testid="header-skeleton"
@@ -24,20 +24,18 @@ export default function HeaderSkeleton() {
       </div>
     </header>
   );
-}
+};
 
 function SkeletonRect({ className }: { className?: string }) {
   return (
     <div
-      className={clsx(
-        "animate-shimmer rounded-[4px]",
-        "bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200",
-        className,
-      )}
+      className={clsx("animate-shimmer rounded-sm bg-slate-200", className)}
     />
   );
 }
 
 function SkeletonRoundedRect({ className }: { className?: string }) {
-  return <SkeletonRect className={clsx("rounded-xl", className)} />;
+  return <SkeletonRect className={clsx("rounded-md", className)} />;
 }
+
+export default HeaderSkeleton;

@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/store/useAuthStore";
-import STORAGE_KEYS from "@/constants/storageKeys";
 import { extractErrorMessage } from "@/utils/errorMessages";
 import { logger } from "@/utils/logger";
 import { ApiContext } from "@/types/api";
@@ -95,12 +94,8 @@ export async function apiFetch<T>(
   if (res.status === 401 && retry) {
     logger.warn("액세스 토큰 만료 감지", { url, duration: `${duration}ms` });
 
-    // 토큰이 없으면 리프레시 시도하지 않음
-    if (!token) {
-      logger.warn("비로그인 상태 - 리프레시 불필요", {
-        url,
-        hasToken: !!token,
-      });
+    if (skipAuth) {
+      logger.warn("skipAuth 요청에서 401 발생 - 리프레시 생략", { url });
       throw new ApiError(401, "로그인이 필요합니다.");
     }
 
@@ -119,7 +114,7 @@ export async function apiFetch<T>(
 
     if (!success) {
       logger.error("토큰 갱신 실패, 로그아웃 처리", { url });
-      useAuthStore.getState().logout();
+      useAuthStore.getState().expireSession();
       throw new ApiError(401, "인증이 만료되었습니다. 다시 로그인해주세요.");
     }
 
@@ -157,8 +152,7 @@ export async function apiFetch<T>(
 }
 
 function getAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
-  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  const token = useAuthStore.getState().accessToken;
   logger.debug("액세스 토큰 조회", { hasToken: !!token });
   return token;
 }

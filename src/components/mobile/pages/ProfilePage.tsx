@@ -12,10 +12,10 @@ import {
   SettingsIcon,
 } from "@/components/svg";
 import { isAdmin as checkIsAdmin } from "@/utils/jwt";
-import STORAGE_KEYS from "@/constants/storageKeys";
 import { logger } from "@/utils/logger";
 import { AdminSettingsModal } from "@/components/admin/AdminSettingsModal";
 import dynamic from "next/dynamic";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const ConfirmModal = dynamic(
   () =>
@@ -27,6 +27,7 @@ const ConfirmModal = dynamic(
 
 export default function ProfilePage() {
   const { user, logout, isLoggedIn } = useAuth();
+  const accessToken = useAuthStore((s) => s.accessToken);
   const [isProfileEditOpen, setProfileEditOpen] = useState(false);
   const [isCommunityInfoOpen, setCommunityInfoOpen] = useState(false);
   const [isAdminSettingsOpen, setAdminSettingsOpen] = useState(false);
@@ -40,17 +41,12 @@ export default function ProfilePage() {
     }
 
     try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
-          : null;
-
-      setIsAdmin(checkIsAdmin(token));
+      setIsAdmin(checkIsAdmin(accessToken));
     } catch (error) {
       logger.warn("Failed to check admin status:", error);
       setIsAdmin(false);
     }
-  }, [isLoggedIn]);
+  }, [accessToken, isLoggedIn]);
 
   const handleOpenLogoutConfirm = () => {
     setLogoutConfirmOpen(true);

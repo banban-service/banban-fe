@@ -2,34 +2,30 @@
 
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-import STORAGE_KEYS from "@/constants/storageKeys";
+import { AUTH_SILENT_CHECK_INTERVAL_MS } from "@/constants/auth";
 
 export default function AuthManager() {
   const checkAuth = useAuthStore((s) => s.checkAuth);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const accessToken = useAuthStore((s) => s.accessToken);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      checkAuth();
-    }
+    checkAuth();
   }, [checkAuth]);
 
   const lastCheckRef = useRef(0);
   const checkingRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const shouldSkip = () => {
       if (!isLoggedIn) return true;
       if (checkingRef.current) return true;
 
-      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-      if (!token) return true;
+      if (!accessToken) return true;
 
       const now = Date.now();
       const elapsed = now - lastCheckRef.current;
-      const MIN_INTERVAL = 1000 * 60; // 최소 1분 간격
+      const MIN_INTERVAL = AUTH_SILENT_CHECK_INTERVAL_MS; // 최소 1분 간격
 
       if (elapsed < MIN_INTERVAL) {
         return true;
@@ -69,7 +65,7 @@ export default function AuthManager() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("focus", handleFocus);
     };
-  }, [checkAuth, isLoggedIn]);
+  }, [accessToken, checkAuth, isLoggedIn]);
 
   return null;
 }

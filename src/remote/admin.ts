@@ -21,7 +21,7 @@ import type {
   NotificationTargetType,
   ActivityStats,
 } from "@/types/admin";
-import STORAGE_KEYS from "@/constants/storageKeys";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export async function getAdminSystem(): Promise<AdminSystemData> {
   const res = await apiFetch<AdminApiResponse<AdminSystemData>>(
@@ -363,10 +363,7 @@ export async function getAdminHealthDetailed(): Promise<AdminHealthDetailed> {
 
 // System - metrics (text/plain)
 export async function getAdminMetrics(): Promise<string> {
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
-      : null;
+  const token = useAuthStore.getState().accessToken;
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/admin/metrics`,
