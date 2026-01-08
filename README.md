@@ -28,17 +28,6 @@
 - Recharts (Data Visualization)
 
 
-## 🧱 Architecture
-
-Frontend
-├── Next.js (App Router)
-├── React Query ---- server state (피드, 댓글, 투표, 핫 피드, 알림 목록)
-├── Zustand -------- client state (세션, 토큰, UI 상태)
-├── apiFetch ------- 토큰/401 핸들링 + 에러 규격 일원화
-├── WebSocket ------ 알림 실시간 수신 + 캐시 무효화
-└── Recharts ------- 투표 결과 PieChart 시각화
-
-
 ## Auth & API Strategy
 
 - 모든 API 요청은 `apiFetch` 래퍼로 통일
